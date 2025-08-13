@@ -27,6 +27,7 @@ async def add_user(userbase, session):
     try:
         user_data = userbase.model_dump()
         user_data['hashed_password'] = hash_password(user_data.pop('password'))
+        user_data.pop('password_confirmation')
         session.add(UserModel(**user_data))
         await session.commit()
         return True
