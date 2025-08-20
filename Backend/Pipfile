@@ -11,6 +11,8 @@ sqlalchemy = "*"
 pydantic = {extras = ["email"], version = "*"}
 passlib = "*"
 bcrypt = "*"
+pyjwt = "*"
+dotenv = "*"
 
 [dev-packages]
 
