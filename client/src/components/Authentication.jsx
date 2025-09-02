@@ -2,9 +2,8 @@ import {Mail, Key, X, ShieldUser} from "lucide-react";
 import {Button} from "./ui/Button.jsx";
 import {useEffect, useRef, useState} from "react";
 
-function Authentication() {
+function Authentication({isOpen, onClose}) {
     const [authVariant, setAuthVariant] = useState('register');
-    const [open, setOpen] = useState(true);
     const AuthenticationSectionRef = useRef(null)
 
     const emailRef = useRef(null)
@@ -13,11 +12,9 @@ function Authentication() {
     const nicknameRef = useRef(null)
 
     useEffect(() => {
-        if (!open) return;
-
         function handleClickOutside(event) {
             if (AuthenticationSectionRef.current && !AuthenticationSectionRef.current.contains(event.target)) {
-                setOpen(false)
+                onClose()
             }
         }
 
@@ -28,11 +25,9 @@ function Authentication() {
         }
 
 
-    }, [open])
+    }, [isOpen, onClose])
 
-    if (!open) {
-        return;
-    }
+    if (!isOpen) return null;
 
     async function fetchUserCreate(){
         const data = {
@@ -68,7 +63,7 @@ function Authentication() {
                                 Register
                             </h1>
 
-                            <Button className="group" variant='ghost' size='icon' onClick={() => setOpen(false)}>
+                            <Button className="group" variant='ghost' size='icon' onClick={onClose}>
                                 <X className="group-hover:rotate-255 transition-normal"/>
                             </Button>
                         </div>
@@ -173,7 +168,7 @@ function Authentication() {
                                 Sign in
                             </h1>
 
-                            <Button className="group" variant='ghost' size='icon' onClick={() => setOpen(false)}>
+                            <Button className="group" variant='ghost' size='icon' onClick={onClose}>
                                 <X className="group-hover:rotate-255 transition-normal"/>
                             </Button>
                         </div>

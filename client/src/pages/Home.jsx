@@ -8,7 +8,6 @@ import Authentication from "../components/Authentication.jsx"
 function Home() {
     return (
         <>
-            <Authentication/>
             <section className="relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"/>
                 <div className="container mx-auto px-4 py-24 md:py-32 relative">
