@@ -1,15 +1,15 @@
-import {Mail, Key, X, ShieldUser} from "lucide-react";
-import {Button} from "./ui/Button.jsx";
-import {useEffect, useRef, useState} from "react";
+import { Mail, Key, X, ShieldUser } from "lucide-react";
+import { Button } from "./ui/Button.jsx";
+import { useEffect, useRef, useState } from "react";
 
-function Authentication({isOpen, onClose}) {
+function Authentication({ isOpen, onClose }) {
     const [authVariant, setAuthVariant] = useState('register');
     const AuthenticationSectionRef = useRef(null)
 
-    const emailRef = useRef(null)
-    const passwordRef = useRef(null)
-    const password2Ref = useRef(null)
-    const nicknameRef = useRef(null)
+    const [emailInput, setEmailInput] = useState(null)
+    const [passwordInput, setPasswordInput] = useState(null)
+    const [password2Input, setPassword2Input] = useState(null)
+    const [nicknameInput, setNicknameInput] = useState(null)
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -29,18 +29,19 @@ function Authentication({isOpen, onClose}) {
 
     if (!isOpen) return null;
 
-    async function fetchUserCreate(){
+    async function fetchUserCreate() {
         const data = {
-            email: emailRef.current.value,
-            password: passwordRef.current.value,
-            nickname: nicknameRef.current.value,
+            email: emailInput,
+            password: passwordInput,
+            password_confirmation: password2Input,
+            nickname: nicknameInput
         };
 
         try {
             const response = await fetch("http://127.0.0.1:8000/auth/create", {
                 method: "POST",
                 body: JSON.stringify(data),
-                headers: {'Content-Type': 'application/json'}
+                headers: { 'Content-Type': 'application/json' }
             })
 
             let dataIn = await response.json();
@@ -50,9 +51,16 @@ function Authentication({isOpen, onClose}) {
         }
     }
 
+    const isRegisterDisabled =
+        !emailInput ||
+        !passwordInput ||
+        !password2Input ||
+        !nicknameInput ||
+        passwordInput !== password2Input;
+
     return (
         <section ref={AuthenticationSectionRef}
-                 className="fixed top-0 left-0 md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-50">
+            className="fixed top-0 left-0 md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-50">
             <div
                 className="bg-primary text-primary-foreground w-screen h-screen md:max-w-[500px] md:max-h-[550px] p-5 md:p-10 md:rounded-2xl">
 
@@ -64,7 +72,7 @@ function Authentication({isOpen, onClose}) {
                             </h1>
 
                             <Button className="group" variant='ghost' size='icon' onClick={onClose}>
-                                <X className="group-hover:rotate-255 transition-normal"/>
+                                <X className="group-hover:rotate-255 transition-normal" />
                             </Button>
                         </div>
 
@@ -72,12 +80,12 @@ function Authentication({isOpen, onClose}) {
 
                             <div className="relative">
                                 <div className="absolute left-3 top-1/2 p-transform -translate-y-1/2 flex items-center gap-2">
-                                    <Mail className="h-4 w-4 text-black/55"/>
+                                    <Mail className="h-4 w-4 text-black/55" />
                                 </div>
                                 <input
-                                    ref={emailRef}
                                     type="email"
                                     placeholder="Email"
+                                    onChange={() => setEmailInput(event.target.value)}
                                     className="
                                   w-full h-12 flex min-w-0 items-center rounded-md border border-input
                                   bg-input-background dark:bg-input/30 px-3 py-1 pl-10
@@ -90,12 +98,12 @@ function Authentication({isOpen, onClose}) {
                             </div>
                             <div className="relative">
                                 <div className="absolute left-3 top-1/2 p-transform -translate-y-1/2 flex items-center gap-2">
-                                    <Key className="h-4 w-4 text-black/55"/>
+                                    <Key className="h-4 w-4 text-black/55" />
                                 </div>
                                 <input
-                                    ref={passwordRef}
                                     type="password"
                                     placeholder="Password"
+                                    onChange={() => setPasswordInput(event.target.value)}
                                     className="
                                   w-full h-12 flex min-w-0 items-center rounded-md border border-input
                                   bg-input-background dark:bg-input/30 px-3 py-1 pl-10
@@ -109,12 +117,13 @@ function Authentication({isOpen, onClose}) {
 
                             <div className="relative">
                                 <div className="absolute left-3 top-1/2 p-transform -translate-y-1/2 flex items-center gap-2">
-                                    <Key className="h-4 w-4 text-black/55"/>
+                                    <Key className="h-4 w-4 text-black/55" />
                                 </div>
                                 <input
-                                    ref={password2Ref}
+
                                     type="password"
                                     placeholder="Password"
+                                    onChange={() => setPassword2Input(event.target.value)}
                                     className="
                                   w-full h-12 flex min-w-0 items-center rounded-md border border-input
                                   bg-input-background dark:bg-input/30 px-3 py-1 pl-10
@@ -127,12 +136,12 @@ function Authentication({isOpen, onClose}) {
                             </div>
                             <div className="relative">
                                 <div className="absolute left-3 top-1/2 p-transform -translate-y-1/2 flex items-center gap-2">
-                                    <ShieldUser className="h-4 w-4 text-black/55"/>
+                                    <ShieldUser className="h-4 w-4 text-black/55" />
                                 </div>
                                 <input
-                                    ref={nicknameRef}
                                     type="text"
                                     placeholder="Nickname"
+                                    onChange={() => setNicknameInput(event.target.value)}
                                     className="
                                   w-full h-12 flex min-w-0 items-center rounded-md border border-input
                                   bg-input-background dark:bg-input/30 px-3 py-1 pl-10
@@ -146,7 +155,8 @@ function Authentication({isOpen, onClose}) {
                         </div>
 
                         <div className="flex items-center justify-center">
-                            <Button onClick={() => fetchUserCreate()} variant="secondary" size="sm" className="flex w-full mt-5">
+                            <Button onClick={() => fetchUserCreate()} variant="secondary" size="sm" className="flex w-full mt-5"
+                                disabled={isRegisterDisabled}>
                                 Register
                             </Button>
                         </div>
@@ -154,7 +164,7 @@ function Authentication({isOpen, onClose}) {
                         <div className="flex justify-center mt-5 items-center">
                             <p className='tracking-wide'>Already registred?</p>
                             <Button className="text-forgot-password font-medium"
-                                    variant='link' onClick={() => setAuthVariant('login')}>Sign in</Button>
+                                variant='link' onClick={() => setAuthVariant('login')}>Sign in</Button>
                         </div>
 
 
@@ -169,14 +179,14 @@ function Authentication({isOpen, onClose}) {
                             </h1>
 
                             <Button className="group" variant='ghost' size='icon' onClick={onClose}>
-                                <X className="group-hover:rotate-255 transition-normal"/>
+                                <X className="group-hover:rotate-255 transition-normal" />
                             </Button>
                         </div>
 
                         <div className="relative mb-5">
                             <div
                                 className="absolute left-3 top-1/2 p-transform -translate-y-1/2 flex items-center gap-2">
-                                <Mail className="h-4 w-4 text-black/55"/>
+                                <Mail className="h-4 w-4 text-black/55" />
                             </div>
                             <input
                                 type="email"
@@ -196,7 +206,7 @@ function Authentication({isOpen, onClose}) {
                         <div className="relative">
                             <div
                                 className="absolute left-3 top-1/2 p-transform -translate-y-1/2 flex items-center gap-2">
-                                <Key className="h-4 w-4 text-black/55"/>
+                                <Key className="h-4 w-4 text-black/55" />
                             </div>
 
                             <input
@@ -237,7 +247,7 @@ function Authentication({isOpen, onClose}) {
                         <div className="flex justify-center mt-5 items-center">
                             <p className=' tracking-wide'>Don't have an account yet?</p>
                             <Button className="text-forgot-password font-medium"
-                                    variant='link' onClick={() => setAuthVariant('register')}>Register</Button>
+                                variant='link' onClick={() => setAuthVariant('register')}>Register</Button>
                         </div>
                     </>
                 )}
