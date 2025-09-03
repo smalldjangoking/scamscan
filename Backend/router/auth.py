@@ -2,7 +2,7 @@ import logging
 import os
 import jwt
 
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status, HTTPException, Response
 from database_settings import SessionDep
 from schemas import UserRegistrationSchema, UserLoginSchema, RefreshTokenSchema
 from services import add_user, nickname_check, get_user_by_email, verify_password, create_refresh_token, \
@@ -33,7 +33,7 @@ async def user_create(userbase: UserRegistrationSchema, session: SessionDep):
 
 
 @router.post('/login')
-async def user_login(userbase: UserLoginSchema, session: SessionDep):
+async def user_login(userbase: UserLoginSchema, session: SessionDep, response: Response):
     """Login endpoint.
     format: email, password
     """
@@ -49,9 +49,10 @@ async def user_login(userbase: UserLoginSchema, session: SessionDep):
     refresh_token = create_refresh_token({"sub": str(user.id)})
     access_token = create_access_token({"sub": str(user.id)})
 
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True)
+
     return {
         "access_token": access_token,
-        "refresh_token": refresh_token,
         "token_type": "bearer"
     }
 
