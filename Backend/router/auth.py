@@ -40,11 +40,12 @@ async def user_login(userbase: UserLoginSchema, session: SessionDep, response: R
 
     user = await get_user_by_email(userbase.email, session)
 
+
     if user is None:
-        raise HTTPException(status_code=400, detail="Incorrect credentials.")
+        raise HTTPException(status_code=400, detail="Incorrect credentials. User doesnt exist")
 
     if not verify_password(userbase.password, user.hashed_password):
-        raise HTTPException(status_code=400, detail="Incorrect credentials.")
+        raise HTTPException(status_code=400, detail="Incorrect credentials. Wrong password")
 
     refresh_token = create_refresh_token({"sub": str(user.id)})
     access_token = create_access_token({"sub": str(user.id)})

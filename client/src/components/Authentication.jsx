@@ -1,4 +1,4 @@
-import { Mail, Key, X, ShieldUser } from "lucide-react";
+import { Mail, Key, X, ShieldUser, MessageCircleWarning } from "lucide-react";
 import { Button } from "./ui/Button.jsx";
 import { useEffect, useRef, useState } from "react";
 
@@ -10,6 +10,8 @@ function Authentication({ isOpen, onClose, authVar }) {
     const [passwordInput, setPasswordInput] = useState(null)
     const [password2Input, setPassword2Input] = useState(null)
     const [nicknameInput, setNicknameInput] = useState(null)
+
+    const [wrongCredentials, setWrongCredentials] = useState(false)
 
    
     useEffect(() => {
@@ -57,12 +59,41 @@ function Authentication({ isOpen, onClose, authVar }) {
         }
     }
 
+
+    async function fetchLogin() {
+        const data = {
+            email: emailInput,
+            password: passwordInput,
+        };
+
+
+        try {
+            const response = await fetch("http://127.0.0.1:8000/auth/login", {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: { 'Content-Type': 'application/json' }
+            })
+
+            let awaited_response = await response.json();
+
+            if (awaited_response.detail) {
+                setWrongCredentials(true);
+            } else {
+                localStorage.setItem("access_token", awaited_response.access_token) }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     const isRegisterDisabled =
         !emailInput ||
         !passwordInput ||
         !password2Input ||
         !nicknameInput ||
         passwordInput !== password2Input;
+
+
+    const isLoginDisabled = !emailInput || !passwordInput;
 
     return (
         <section ref={AuthenticationSectionRef}
@@ -189,6 +220,13 @@ function Authentication({ isOpen, onClose, authVar }) {
                             </Button>
                         </div>
 
+                        {wrongCredentials && (
+                            <div className="flex items-center gap-2 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow mb-4 animate-fade-in">
+                                <MessageCircleWarning className="w-5 h-5 text-white/80 font-medium tracking-wide" />
+                                <span className="font-medium tracking-wide">Wrong Email or Password.</span>
+                            </div>
+                        )}
+
                         <div className="relative mb-5">
                             <div
                                 className="absolute left-3 top-1/2 p-transform -translate-y-1/2 flex items-center gap-2">
@@ -197,6 +235,7 @@ function Authentication({ isOpen, onClose, authVar }) {
                             <input
                                 type="email"
                                 placeholder="Email"
+                                onChange={() => setEmailInput(event.target.value)}
                                 className="
                                    w-full h-12 flex min-w-0 items-center rounded-md border border-input
                                    bg-input-background dark:bg-input/30 px-3 py-1 pl-10
@@ -218,6 +257,7 @@ function Authentication({ isOpen, onClose, authVar }) {
                             <input
                                 type="password"
                                 placeholder="Password"
+                                onChange={() => setPasswordInput(event.target.value)}
                                 className="
                                  w-full h-12 flex min-w-0 items-center rounded-md border border-input
                                  bg-input-background dark:bg-input/30 px-3 py-1 pl-10
@@ -245,7 +285,7 @@ function Authentication({ isOpen, onClose, authVar }) {
 
 
                         <div className="flex items-center justify-center">
-                            <Button variant="secondary" size="sm" className="flex w-full mt-5">
+                            <Button onClick={() => fetchLogin()} disabled={isLoginDisabled} variant="secondary" size="sm" className="flex w-full mt-5">
                                 Login
                             </Button>
                         </div>
