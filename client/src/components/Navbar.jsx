@@ -1,17 +1,25 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Shield, ArrowRight } from "lucide-react"
 import { ThemeToggle } from "./ui/ThemeToggle.jsx";
 import { Button } from "./ui/Button.jsx";
 import Authentication from "./Authentication.jsx";
 
 function Navbar() {
-    const [isAuthOpen, setIsAuthOpen] = React.useState(false);
+    const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const [authVariant, setAuthVariant] = useState('register');
     const toggleAuth = () => setIsAuthOpen(prev => !prev);
-    console.log(isAuthOpen);
+
+
+    
+    const openAuth = (variant) => {
+        setAuthVariant(variant);
+        toggleAuth();
+    };
+
 
     return (
         <>
-            <Authentication isOpen={isAuthOpen} onClose={toggleAuth} />
+            <Authentication isOpen={isAuthOpen} onClose={toggleAuth} authVar={authVariant} />
 
             <header
                 className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -37,8 +45,8 @@ function Navbar() {
                     </nav>
                     <div className="flex items-center gap-3">
                         <ThemeToggle />
-                        <Button onClick={toggleAuth} variant="ghost" size="sm">Sign In</Button>
-                        <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                        <Button onClick={() => openAuth('login')} variant="ghost" size="sm">Sign In</Button>
+                        <Button onClick={() => openAuth('register')}  size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
                             Get Started
                             <ArrowRight className="ml-1 h-3 w-3" />
                         </Button>

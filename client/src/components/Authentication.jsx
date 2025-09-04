@@ -2,7 +2,7 @@ import { Mail, Key, X, ShieldUser } from "lucide-react";
 import { Button } from "./ui/Button.jsx";
 import { useEffect, useRef, useState } from "react";
 
-function Authentication({ isOpen, onClose }) {
+function Authentication({ isOpen, onClose, authVar }) {
     const [authVariant, setAuthVariant] = useState('register');
     const AuthenticationSectionRef = useRef(null)
 
@@ -11,7 +11,12 @@ function Authentication({ isOpen, onClose }) {
     const [password2Input, setPassword2Input] = useState(null)
     const [nicknameInput, setNicknameInput] = useState(null)
 
+   
     useEffect(() => {
+        if (authVar) {
+            setAuthVariant(authVar)
+        }
+
         function handleClickOutside(event) {
             if (AuthenticationSectionRef.current && !AuthenticationSectionRef.current.contains(event.target)) {
                 onClose()
@@ -25,7 +30,7 @@ function Authentication({ isOpen, onClose }) {
         }
 
 
-    }, [isOpen, onClose])
+    }, [isOpen, onClose, authVar])
 
     if (!isOpen) return null;
 
@@ -37,6 +42,7 @@ function Authentication({ isOpen, onClose }) {
             nickname: nicknameInput
         };
 
+
         try {
             const response = await fetch("http://127.0.0.1:8000/auth/create", {
                 method: "POST",
@@ -45,7 +51,7 @@ function Authentication({ isOpen, onClose }) {
             })
 
             let dataIn = await response.json();
-            console.log(dataIn)
+            setAuthVariant('login')
         } catch (error) {
             console.log(error)
         }
