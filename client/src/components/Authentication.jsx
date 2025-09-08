@@ -1,4 +1,4 @@
-import { Mail, Key, X, ShieldUser, MessageCircleWarning } from "lucide-react";
+import { Mail, Key, X, ShieldUser, MessageCircleWarning, UserRoundCheck } from "lucide-react";
 import { Button } from "./ui/Button.jsx";
 import { useEffect, useRef, useState } from "react";
 
@@ -12,6 +12,7 @@ function Authentication({ isOpen, onClose, authVar }) {
     const [nicknameInput, setNicknameInput] = useState(null)
 
     const [wrongCredentials, setWrongCredentials] = useState(false)
+    const [accountCreated, setAccountCreated] = useState(false)
 
    
     useEffect(() => {
@@ -53,6 +54,7 @@ function Authentication({ isOpen, onClose, authVar }) {
             })
 
             let dataIn = await response.json();
+            setAccountCreated(true)
             setAuthVariant('login')
         } catch (error) {
             console.log(error)
@@ -79,7 +81,9 @@ function Authentication({ isOpen, onClose, authVar }) {
             if (awaited_response.detail) {
                 setWrongCredentials(true);
             } else {
-                localStorage.setItem("access_token", awaited_response.access_token) }
+                localStorage.setItem("access_token", awaited_response.access_token)
+                window.location.reload();
+            }
         } catch (error) {
             console.log(error)
         }
@@ -221,9 +225,26 @@ function Authentication({ isOpen, onClose, authVar }) {
                         </div>
 
                         {wrongCredentials && (
-                            <div className="flex items-center gap-2 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow mb-4 animate-fade-in">
-                                <MessageCircleWarning className="w-5 h-5 text-white/80 font-medium tracking-wide" />
-                                <span className="font-medium tracking-wide">Wrong Email or Password.</span>
+                            <div className="flex items-center gap-3 bg-red-600/90 text-white px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all">
+                                <span>
+                                    <MessageCircleWarning className="w-6 h-6 text-white" />
+                                </span>
+                                <div>
+                                    <div className="font-bold text-lg">Wrong credentials!</div>
+                                    <div className="text-sm font-medium opacity-90">Try again or reset your password</div>
+                                </div>
+                            </div>
+                        )}
+                            
+                        {accountCreated && (
+                            <div className="flex items-center gap-3 bg-green-600/90 text-white px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all">
+                                <span>
+                                    <UserRoundCheck className="w-6 h-6 text-white" />
+                                </span>
+                                <div>
+                                    <div className="font-bold text-lg">Account created!</div>
+                                    <div className="text-sm font-medium opacity-90">You can now sign in to your profile.</div>
+                                </div>
                             </div>
                         )}
 

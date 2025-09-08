@@ -51,7 +51,7 @@ async def user_login(userbase: UserLoginSchema, session: SessionDep, response: R
     access_token = create_access_token({"sub": str(user.id)})
 
     response.set_cookie(key="refresh_token", value=refresh_token, httponly=True)
-
+    
     return {
         "access_token": access_token,
         "token_type": "bearer"

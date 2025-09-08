@@ -8,6 +8,7 @@ function Navbar() {
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const [authVariant, setAuthVariant] = useState('register');
     const toggleAuth = () => setIsAuthOpen(prev => !prev);
+    const accessToken = localStorage.getItem('access_token');
 
 
     
@@ -45,11 +46,20 @@ function Navbar() {
                     </nav>
                     <div className="flex items-center gap-3">
                         <ThemeToggle />
-                        <Button onClick={() => openAuth('login')} variant="ghost" size="sm">Sign In</Button>
-                        <Button onClick={() => openAuth('register')}  size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                            Get Started
-                            <ArrowRight className="ml-1 h-3 w-3" />
-                        </Button>
+                        {!accessToken ? (
+                            <>
+                                <Button onClick={() => openAuth('login')} variant="ghost" size="sm">Sign In</Button>
+                                <Button onClick={() => openAuth('register')} size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                                    Get Started
+                                    <ArrowRight className="ml-1 h-3 w-3" />
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <p>Profile</p>
+                            </>
+                        )}
+
                     </div>
                 </div>
             </header>
