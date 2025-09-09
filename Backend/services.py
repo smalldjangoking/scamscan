@@ -13,8 +13,8 @@ load_dotenv()
 
 JWT_SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 2
-REFRESH_TOKEN_EXPIRE_DAYS = 5
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+REFRESH_TOKEN_EXPIRE_DAYS = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -63,7 +63,7 @@ async def add_user(userbase: dict, session: dict):
 def create_refresh_token(data: dict, expires_in: int = REFRESH_TOKEN_EXPIRE_DAYS):
     """Creates a new refresh token"""
     payload = data.copy()
-    exp = datetime.utcnow() + timedelta(minutes=expires_in)
+    exp = datetime.utcnow() + timedelta(days=expires_in)
     payload.update({'exp': exp})
     token = jwt.encode(payload, os.getenv('SECRET_KEY'), algorithm=ALGORITHM)
     return token

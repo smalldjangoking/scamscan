@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { User, Phone, AtSign, Calendar, Pencil, Check, X, KeyRound, ShieldAlert, FileWarning } from "lucide-react";
 import { Button } from "../components/ui/Button.jsx";
 import { ThemeToggle } from "../components/ui/ThemeToggle.jsx"; // if you want theme toggle here too
@@ -9,6 +9,7 @@ function Profile() {
     const [fieldDraft, setFieldDraft] = useState("");
     const [passwordOpen, setPasswordOpen] = useState(false);
     const [pwdDraft, setPwdDraft] = useState({ old_password: "", new_password: "", confirm_password: "" });
+    const refactorRef = useRef(null);
     const accessToken = localStorage.getItem('access_token');
     const mockReports = []; // Replace with real data fetching
 
@@ -32,8 +33,6 @@ function Profile() {
             if (newAccessToken) {
                 localStorage.setItem('access_token', newAccessToken);
             }
-
-            console.log(userData)
 
             setUser(userData);
         } catch (error) {
@@ -74,11 +73,26 @@ function Profile() {
         cancelEdit();
     }
 
-    function submitPasswordChange() {
+    async function submitPasswordChange() {
         if (pwdDraft.new_password !== pwdDraft.confirm_password) return;
-        // TODO: POST /user/change-password
-        setPwdDraft({ old_password: "", new_password: "", confirm_password: "" });
-        setPasswordOpen(false);
+
+        const response = await fetch("/user/change-password", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': accessToken ? `Bearer ${accessToken}` : ""
+            },
+            body: JSON.stringify(pwdDraft),
+            credentials: 'include',
+        })
+
+        const data = await response.json()
+        const textChange = refactorRef.current.textContent = data.message
+        
+
+
+        setPwdDraft({ old_password: "", new_password: "", confirm_password: "" })
+        setPasswordOpen(false)
     }
 
     return (
@@ -89,7 +103,7 @@ function Profile() {
                 <div className="max-w-6xl mx-auto mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
                     <div>
                         <h1 className="text-4xl md:text-6xl tracking-tight mb-4">
-                            Hey, <span className="text-primary"></span>
+                            Hey, <span className="text-primary">{user.nickname.charAt(0).toUpperCase() + user.nickname.slice(1) }</span>
                         </h1>
                         <p className="text-muted-foreground max-w-xl">
                             Manage personal information, security and activity.
@@ -259,7 +273,7 @@ function Profile() {
                             ) : (
                                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                     <KeyRound className="h-4 w-4" />
-                                    <span>Keep your account secure. Use a strong password.</span>
+                                        <span ref={refactorRef}>Keep your account secure. Use a strong password.</span>
                                 </div>
                             )}
                         </div>

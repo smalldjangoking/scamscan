@@ -15,3 +15,8 @@ class UserLoginSchema(BaseModel):
 
 class RefreshTokenSchema(BaseModel):
     refresh_token: str
+
+
+class ChagnePasswordSchema(BaseModel):
+    old_password: str
+    new_password: str
