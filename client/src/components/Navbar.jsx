@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Shield, ArrowRight } from "lucide-react"
+import { Shield, ArrowRight, User } from "lucide-react"
 import { ThemeToggle } from "./ui/ThemeToggle.jsx";
 import { Button } from "./ui/Button.jsx";
 import Authentication from "./Authentication.jsx";
@@ -56,7 +56,10 @@ function Navbar() {
                             </>
                         ) : (
                             <>
-                                <p>Profile</p>
+                                    <Button onClick={() => window.location.href = '/profile' } size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                                        <span className="font-medium tracking-wide">Profile</span>
+                                        <User className="ml-1 h-6 w-6" />
+                                    </Button>
                             </>
                         )}
 

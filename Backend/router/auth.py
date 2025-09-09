@@ -42,15 +42,22 @@ async def user_login(userbase: UserLoginSchema, session: SessionDep, response: R
 
 
     if user is None:
-        raise HTTPException(status_code=400, detail="Incorrect credentials. User doesnt exist")
+        raise HTTPException(status_code=400, detail="Incorrect credentials")
 
     if not verify_password(userbase.password, user.hashed_password):
-        raise HTTPException(status_code=400, detail="Incorrect credentials. Wrong password")
+        raise HTTPException(status_code=400, detail="Incorrect credentials")
 
     refresh_token = create_refresh_token({"sub": str(user.id)})
     access_token = create_access_token({"sub": str(user.id)})
 
-    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True)
+    response.set_cookie(
+        key="refresh_token", 
+        value=refresh_token, 
+        httponly=True,
+        secure=False,
+        samesite="lax" 
+    )
+    
     
     return {
         "access_token": access_token,
@@ -60,6 +67,9 @@ async def user_login(userbase: UserLoginSchema, session: SessionDep, response: R
 
 @router.post("/refresh")
 async def refresh_token_endpoint(refresh_token: RefreshTokenSchema):
+    """
+        refresh token endpoint, requires refresh token in cookie
+    """
     try:
         payload = jwt.decode(refresh_token.refresh_token, os.getenv('SECRET_KEY'), algorithms=[ALGORITHM])
         user_id = payload.get("sub")
@@ -77,3 +87,4 @@ async def refresh_token_endpoint(refresh_token: RefreshTokenSchema):
     new_access_token = create_access_token({"sub": user_id})
 
     return {"access_token": new_access_token, "token_type": "bearer"}
+

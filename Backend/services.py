@@ -1,18 +1,25 @@
 import os
+from urllib import response
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import jwt
 from sqlalchemy import select, exists
 from models import UserModel
 from passlib.context import CryptContext
+from fastapi import Depends, HTTPException, Request, Response
+from fastapi.security import OAuth2PasswordBearer
 
 load_dotenv()
 
 JWT_SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
-REFRESH_TOKEN_EXPIRE_DAYS = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 2
+REFRESH_TOKEN_EXPIRE_DAYS = 5
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
+
 
 
 def hash_password(password: str) -> str:
@@ -28,7 +35,7 @@ async def get_user_by_email(email: str, session: dict):
     """check if user with given email exists, gives none if not"""
     stmt = select(UserModel).where(UserModel.email == email)
     result = await session.execute(stmt)
-    user = result.scalar_one_or_none()  # вернёт объект UserModel или None
+    user = result.scalar_one_or_none()
     return user
 
 async def nickname_check(nickname: str , session: dict):
@@ -56,7 +63,7 @@ async def add_user(userbase: dict, session: dict):
 def create_refresh_token(data: dict, expires_in: int = REFRESH_TOKEN_EXPIRE_DAYS):
     """Creates a new refresh token"""
     payload = data.copy()
-    exp = datetime.utcnow() + timedelta(days=expires_in)
+    exp = datetime.utcnow() + timedelta(minutes=expires_in)
     payload.update({'exp': exp})
     token = jwt.encode(payload, os.getenv('SECRET_KEY'), algorithm=ALGORITHM)
     return token
@@ -69,3 +76,60 @@ def create_access_token(data: dict, expires_in: int = ACCESS_TOKEN_EXPIRE_MINUTE
     payload.update({'exp': exp})
     token = jwt.encode(payload, os.getenv('SECRET_KEY'), algorithm=ALGORITHM)
     return token
+
+
+
+async def validationJWT_or_401(
+    request: Request,
+    response: Response,
+    token: str = Depends(oauth2_scheme)
+):
+    """
+    Accepts access_token -> gives user_id if token is valid
+    _____________________________________________________________
+    Validates the JWT token, checks access_token or creates new access_token using refresh_token
+       or raises 401 error if both tokens are invalid
+    ______________________________________________________________
+    """
+
+    try:
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("sub")
+        return user_id
+
+    except Exception as e:
+        if isinstance(e, jwt.ExpiredSignatureError):
+            refresh_token = request.cookies.get("refresh_token", None)
+
+            if not refresh_token:
+                raise HTTPException(status_code=401, detail="Could not validate credentials")
+
+            try:
+                user_id = jwt.decode(refresh_token, JWT_SECRET_KEY, algorithms=[ALGORITHM]).get("sub")
+                new_accessJWT = create_access_token({"sub": user_id})
+                response.headers["X-New-Access-Token"] = new_accessJWT
+                return user_id
+
+            except jwt.ExpiredSignatureError:
+                response.headers["X-New-Access-Token"] = ""
+                response.delete_cookie("refresh_token")
+                raise HTTPException(status_code=401, detail="Could not validate credentials")
+            except jwt.DecodeError:
+                raise HTTPException(status_code=401, detail="Could not validate credentials")
+            except Exception:
+                raise HTTPException(status_code=401, detail="Could not validate credentials")
+
+
+        if isinstance(e, jwt.InvalidTokenError):
+            raise HTTPException(status_code=401, detail="Could not validate credentials")
+
+        if isinstance(e, jwt.DecodeError):
+            raise HTTPException(status_code=401, detail="Could not validate credentials")
+
+        raise HTTPException(status_code=401, detail="Could not validate credentials")
+
+
+        
+        
+       
+

@@ -3,7 +3,6 @@ import {Button} from "../components/ui/Button.jsx"
 import {AlertTriangle, Badge, MessageCircle, Star} from "lucide-react"
 import {SearchField} from "../components/ui/SearchField.jsx";
 import {ArrowRight} from "lucide-react"
-import Authentication from "../components/Authentication.jsx"
 
 function Home() {
     return (
