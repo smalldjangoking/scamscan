@@ -65,6 +65,16 @@ async def user_login(userbase: UserLoginSchema, session: SessionDep, response: R
     }
 
 
+@router.post('/logout')
+async def logout(response: Response):
+    """
+        logout endpoint, clears the refresh token cookie
+    """
+    response.delete_cookie(key="refresh_token")
+
+    return {'status': 'ok'}
+
+
 @router.post("/refresh")
 async def refresh_token_endpoint(refresh_token: RefreshTokenSchema):
     """

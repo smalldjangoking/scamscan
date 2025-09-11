@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { User, Phone, AtSign, Calendar, Pencil, Check, X, KeyRound, ShieldAlert, FileWarning } from "lucide-react";
 import { Button } from "../components/ui/Button.jsx";
 import { ThemeToggle } from "../components/ui/ThemeToggle.jsx"; // if you want theme toggle here too
@@ -9,7 +9,6 @@ function Profile() {
     const [fieldDraft, setFieldDraft] = useState("");
     const [passwordOpen, setPasswordOpen] = useState(false);
     const [pwdDraft, setPwdDraft] = useState({ old_password: "", new_password: "", confirm_password: "" });
-    const refactorRef = useRef(null);
     const accessToken = localStorage.getItem('access_token');
     const mockReports = []; // Replace with real data fetching
 
@@ -35,6 +34,29 @@ function Profile() {
             }
 
             setUser(userData);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+
+    const handleLogout = async () => {
+        try {
+            const response = await fetch("/auth/logout", {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": accessToken ? `Bearer ${accessToken}` : ""
+                }
+            });
+
+            const response_status = await response.json();
+
+            if (response_status.status === "ok") {
+                window.location.href = "/";
+            }
+
         } catch (error) {
             console.log(error);
         }
@@ -87,8 +109,6 @@ function Profile() {
         })
 
         const data = await response.json()
-        const textChange = refactorRef.current.textContent = data.message
-        
 
 
         setPwdDraft({ old_password: "", new_password: "", confirm_password: "" })
@@ -110,10 +130,8 @@ function Profile() {
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <ThemeToggle />
-                        <Button variant="outline" size="sm">
-                            <ShieldAlert className="h-4 w-4 mr-2" />
-                            Security
+                        <Button onClick={handleLogout} size="sm" className="w-[70px]" variant="destructive">
+                        Quit
                         </Button>
                     </div>
                 </div>
@@ -273,7 +291,7 @@ function Profile() {
                             ) : (
                                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                     <KeyRound className="h-4 w-4" />
-                                        <span ref={refactorRef}>Keep your account secure. Use a strong password.</span>
+                                        <span>Keep your account secure. Use a strong password.</span>
                                 </div>
                             )}
                         </div>

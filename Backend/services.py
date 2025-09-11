@@ -6,7 +6,7 @@ import jwt
 from sqlalchemy import select, exists
 from models import UserModel
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, Request, Response
+from fastapi import Depends, HTTPException, Request, Response, status
 from fastapi.security import OAuth2PasswordBearer
 
 load_dotenv()
@@ -126,7 +126,10 @@ async def validationJWT_or_401(
         if isinstance(e, jwt.DecodeError):
             raise HTTPException(status_code=401, detail="Could not validate credentials")
 
-        raise HTTPException(status_code=401, detail="Could not validate credentials")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials"
+        )
 
 
         

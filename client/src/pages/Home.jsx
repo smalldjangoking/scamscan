@@ -27,7 +27,7 @@ function Home() {
                                 <div className="relative group">
                                     <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full blur-lg opacity-30 group-hover:opacity-50 transition-opacity"></div>
                                     <div className="relative bg-gradient-to-r from-blue-500 to-blue-600 text-white px-2 py-2 rounded-full shadow-lg border border-blue-400/30">
-                                        <span className="text-sm md:text-1xl font-semibold">#SCAN</span>
+                                        <span className="text-xl md:text-1xl font-semibold">#SCAN</span>
                                     </div>
                                 </div>
 
