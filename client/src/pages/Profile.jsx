@@ -54,6 +54,7 @@ function Profile() {
             const response_status = await response.json();
 
             if (response_status.status === "ok") {
+                localStorage.removeItem('access_token');
                 window.location.href = "/";
             }
 
