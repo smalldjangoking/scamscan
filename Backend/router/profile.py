@@ -14,14 +14,18 @@ router = APIRouter(prefix="/user", tags=["user"])
 @router.post("/me")
 async def read_user_me(session: SessionDep, user_id: str = Depends(validationJWT_or_401)):
     data = await session.get(UserModel, user_id)
-    return {
+
+    if data:
+        return {
         'email': data.email,
         'name': data.name,
         'surname': data.surname,
         'nickname': data.nickname,
         'phone': data.phone,
         'created_at': data.created_at
-        }     
+        }
+    
+    raise HTTPException(status_code=401, detail="Bad credentials")
 
 
 @router.post('/change-password')
@@ -39,3 +43,7 @@ async def change_password(passwordSchema: ChagnePasswordSchema, session: Session
     raise HTTPException(status_code=400, detail="Bad request")
 
     
+
+@router.post('update-user-info')
+async def update_user_info(passwordSchema: ChagnePasswordSchema, session: SessionDep, user_id: str = Depends(validationJWT_or_401)):
+    pass

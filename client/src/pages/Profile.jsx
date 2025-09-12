@@ -12,33 +12,6 @@ function Profile() {
     const accessToken = localStorage.getItem('access_token');
     const mockReports = []; // Replace with real data fetching
 
-    const fetchUser = async () => {
-        try {
-            const response = await fetch("/user/me", {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": accessToken ? `Bearer ${accessToken}` : ""
-                }
-            });
-            if (response.detail) {
-                console.log("Failed to load user", response.detail);
-                return;
-            }
-            const userData = await response.json();
-
-            const newAccessToken = response.headers.get("X-New-Access-Token");
-            if (newAccessToken) {
-                localStorage.setItem('access_token', newAccessToken);
-            }
-
-            setUser(userData);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
 
     const handleLogout = async () => {
         try {
@@ -63,19 +36,51 @@ function Profile() {
         }
     };
 
+    const fetchUser = async () => {
+        try {
+            const response = await fetch("/user/me", {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": accessToken ? `Bearer ${accessToken}` : ""
+                }
+            });
+            if (response.status == 401) {
+                localStorage.removeItem('access_token');
+                handleLogout()
+                return;
+            }
+
+
+            const userData = await response.json();
+
+            const newAccessToken = response.headers.get("X-New-Access-Token");
+            if (newAccessToken) {
+                localStorage.setItem('access_token', newAccessToken);
+            }
+
+            setUser(userData);
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     useEffect(() => {
         fetchUser();
+
+
+
     }, []);
 
     if (!user) return null;
 
     const fields = [
-        { key: "email", label: "Email", icon: <AtSign className="h-4 w-4" /> },
+        { key: "email", label: "Email", icon: <AtSign className="h-4 w-4" />, readonly: true },
         { key: "name", label: "Name", icon: <User className="h-4 w-4" /> },
         { key: "surname", label: "Surname", icon: <User className="h-4 w-4" /> },
         { key: "phone", label: "Phone", icon: <Phone className="h-4 w-4" /> },
-        { key: "nickname", label: "Nickname", icon: <User className="h-4 w-4" /> },
+        { key: "nickname", label: "Nickname", icon: <User className="h-4 w-4" />},
         { key: "created_at", label: "Created At", icon: <Calendar className="h-4 w-4" />, readonly: true }
     ];
 
@@ -93,6 +98,7 @@ function Profile() {
     function saveField() {
         // TODO: PATCH to backend
         setUser(prev => ({ ...prev, [editField]: fieldDraft }));
+
         cancelEdit();
     }
 
@@ -178,6 +184,7 @@ function Profile() {
                                         <div className="flex items-center gap-2 justify-end">
                                             {editField === f.key ? (
                                                 <>
+                                                
                                                     <Button
                                                         size="icon"
                                                         variant="secondary"

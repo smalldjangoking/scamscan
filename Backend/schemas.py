@@ -20,3 +20,10 @@ class RefreshTokenSchema(BaseModel):
 class ChagnePasswordSchema(BaseModel):
     old_password: str
     new_password: str
+
+
+class UpdateUserInfoSchema(BaseModel):
+    name: str | None = None
+    surname: str | None = None
+    nickname: str | None = None
+    phone: str | None = None
