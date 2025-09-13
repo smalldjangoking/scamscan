@@ -5,6 +5,7 @@ import { ThemeToggle } from "../components/ui/ThemeToggle.jsx"; // if you want t
 
 function Profile() {
     const [user, setUser] = useState(null);
+    const [userUpdate, setUserDataUpdate] = useState(null);
     const [editField, setEditField] = useState(null);
     const [fieldDraft, setFieldDraft] = useState("");
     const [passwordOpen, setPasswordOpen] = useState(false);
@@ -67,11 +68,16 @@ function Profile() {
     };
 
     useEffect(() => {
+        if (userUpdate) {
+            patchUserData();
+        }
+
+
         fetchUser();
 
 
 
-    }, []);
+    }, [userUpdate]);
 
     if (!user) return null;
 
@@ -96,13 +102,43 @@ function Profile() {
     }
 
     function saveField() {
-        // TODO: PATCH to backend
-        setUser(prev => ({ ...prev, [editField]: fieldDraft }));
+        if (fieldDraft === user[editField]) return;
 
+        setUserDataUpdate(prev => ({ ...prev, [editField]: fieldDraft }));
         cancelEdit();
     }
 
-    async function submitPasswordChange() {
+    const patchUserData = async() => {
+        if (!userUpdate) return;
+
+        try {
+            const response = await fetch("/user/update-user-info", {
+                method: "PATCH",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": accessToken ? `Bearer ${accessToken}` : ""
+                },
+                body: JSON.stringify(userUpdate)
+            });
+
+            const data = await response.json();
+
+            if (data.status === "ok") {
+                setUserDataUpdate(null);
+            }
+
+            if (data.status === 400 || data.status === 401) {
+                console.error("Error updating user data:", data.message);
+            }
+
+        } catch (error) {
+            console.error("Error updating user data:", error);
+        }
+    }
+
+
+    const submitPasswordChange = async() => {
         if (pwdDraft.new_password !== pwdDraft.confirm_password) return;
 
         const response = await fetch("/user/change-password", {
@@ -120,6 +156,7 @@ function Profile() {
 
         setPwdDraft({ old_password: "", new_password: "", confirm_password: "" })
         setPasswordOpen(false)
+
     }
 
     return (
@@ -192,7 +229,7 @@ function Profile() {
                                                         onClick={saveField}
                                                         disabled={f.readonly || (fieldDraft === user[f.key])}
                                                     >
-                                                        <Check className="h-4 w-4" />
+                                                         <Check className="h-4 w-4" />
                                                     </Button>
                                                     <Button size="icon" variant="ghost" className="h-8 w-8" onClick={cancelEdit}>
                                                         <X className="h-4 w-4" />

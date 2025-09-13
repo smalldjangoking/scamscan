@@ -7,6 +7,7 @@ from services import validationJWT_or_401
 from models import UserModel
 from services import verify_password, hash_password
 from schemas import ChagnePasswordSchema
+from schemas import UpdateUserInfoSchema
 
 
 router = APIRouter(prefix="/user", tags=["user"])
@@ -44,6 +45,15 @@ async def change_password(passwordSchema: ChagnePasswordSchema, session: Session
 
     
 
-@router.post('update-user-info')
-async def update_user_info(passwordSchema: ChagnePasswordSchema, session: SessionDep, user_id: str = Depends(validationJWT_or_401)):
-    pass
+@router.patch('/update-user-info')
+async def update_user_info(userInfoSchema: UpdateUserInfoSchema, session: SessionDep, user_id: str = Depends(validationJWT_or_401)):
+    data = await session.get(UserModel, user_id)
+
+    if data:
+        for key, value in userInfoSchema.model_dump(exclude_unset=True).items():
+            setattr(data, key, value)
+
+        await session.commit()
+        return {'status': 'ok'}
+
+    raise HTTPException(status_code=400, detail="Bad request")
