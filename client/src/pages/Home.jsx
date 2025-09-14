@@ -60,7 +60,7 @@ function Home() {
 
                         {/* Action Buttons */}
                         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-                            <Button size="lg"
+                            <Button onClick={() => window.location.href = '/report'} size="lg"
                                     className="px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90">
                                 <AlertTriangle className="mr-2 h-5 w-5"/>
                                 Report a Scammer

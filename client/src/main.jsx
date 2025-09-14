@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import './main.css'
 import AuthRequired from './pages/AuthRequired';
+import Report from './pages/Report';
 
 const router = createBrowserRouter([
     {
@@ -14,7 +15,7 @@ const router = createBrowserRouter([
         children: [
             { index: true, element: <Home /> },
             { path: 'profile', index: false, element: <AuthRequired><Profile /></AuthRequired> },
-        ],
+            { path: 'report', index: false, element: <Report /> },        ],
     },
 ]);
 createRoot(document.getElementById('root')).render(
