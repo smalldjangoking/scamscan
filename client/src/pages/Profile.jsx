@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { User, Phone, AtSign, Calendar, Pencil, Check, X, KeyRound, ShieldAlert, FileWarning } from "lucide-react";
 import { Button } from "../components/ui/Button.jsx";
-import { ThemeToggle } from "../components/ui/ThemeToggle.jsx"; // if you want theme toggle here too
+import toast, { Toaster } from 'react-hot-toast';
 
 function Profile() {
     const [user, setUser] = useState(null);
@@ -12,6 +12,8 @@ function Profile() {
     const [pwdDraft, setPwdDraft] = useState({ old_password: "", new_password: "", confirm_password: "" });
     const accessToken = localStorage.getItem('access_token');
     const mockReports = []; // Replace with real data fetching
+    const seccessToast = (data) => toast.success(`Your ${data.charAt(0).toUpperCase()}${data.slice(1)} updated successfully`);
+    const failedToast = (errorReason) => toast.error(`${errorReason}`);
 
 
     const handleLogout = async () => {
@@ -124,12 +126,14 @@ function Profile() {
 
             const data = await response.json();
 
-            if (data.status === "ok") {
+            if (response.status === 200 && data.status === "ok") {
+                seccessToast(data.field);
                 setUserDataUpdate(null);
+
             }
 
-            if (data.status === 400 || data.status === 401) {
-                console.error("Error updating user data:", data.message);
+            if (response.status === 400) {
+                failedToast(data.detail)
             }
 
         } catch (error) {
@@ -161,11 +165,13 @@ function Profile() {
 
     return (
         <section className="relative">
+            <Toaster />
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
             <div className="container mx-auto px-4 py-20 md:py-28 relative">
                 {/* Header */}
                 <div className="max-w-6xl mx-auto mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
                     <div>
+                        
                         <h1 className="text-4xl md:text-6xl tracking-tight mb-4">
                             Hey, <span className="text-primary">{user.nickname.charAt(0).toUpperCase() + user.nickname.slice(1) }</span>
                         </h1>

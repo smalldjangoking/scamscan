@@ -1,3 +1,4 @@
+from ast import Try
 from hmac import new
 from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordBearer
@@ -8,6 +9,7 @@ from models import UserModel
 from services import verify_password, hash_password
 from schemas import ChagnePasswordSchema
 from schemas import UpdateUserInfoSchema
+from sqlalchemy import select
 
 
 router = APIRouter(prefix="/user", tags=["user"])
@@ -49,11 +51,28 @@ async def change_password(passwordSchema: ChagnePasswordSchema, session: Session
 async def update_user_info(userInfoSchema: UpdateUserInfoSchema, session: SessionDep, user_id: str = Depends(validationJWT_or_401)):
     data = await session.get(UserModel, user_id)
 
-    if data:
+    if userInfoSchema.phone:
+        result = await session.execute(select(UserModel).where(UserModel.phone == userInfoSchema.phone))
+        phone_user = result.scalar_one_or_none()
+
+        if phone_user:
+            raise HTTPException(status_code=400, detail="Phone is already in use")
+
+    if userInfoSchema.nickname:
+        result = await session.execute(select(UserModel).where(UserModel.nickname == userInfoSchema.nickname))
+        nickname_user = result.scalar_one_or_none()
+
+        if nickname_user:
+            raise HTTPException(status_code=400, detail="Nickname is already in use")
+
+    try:
         for key, value in userInfoSchema.model_dump(exclude_unset=True).items():
             setattr(data, key, value)
+            
+            await session.commit()
+            return {'status': 'ok', 'field': key}
 
-        await session.commit()
-        return {'status': 'ok'}
+    except Exception as e:
+        return {'status': 'error'}
 
     raise HTTPException(status_code=400, detail="Bad request")
