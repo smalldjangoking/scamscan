@@ -12,7 +12,7 @@ function Profile() {
     const [pwdDraft, setPwdDraft] = useState({ old_password: "", new_password: "", confirm_password: "" });
     const accessToken = localStorage.getItem('access_token');
     const mockReports = []; // Replace with real data fetching
-    const seccessToast = (data) => toast.success(`Your ${data.charAt(0).toUpperCase()}${data.slice(1)} updated successfully`);
+    const successToast = (data) => toast.success(data);
     const failedToast = (errorReason) => toast.error(`${errorReason}`);
 
 
@@ -127,7 +127,7 @@ function Profile() {
             const data = await response.json();
 
             if (response.status === 200 && data.status === "ok") {
-                seccessToast(data.field);
+                successToast(data.message);
                 setUserDataUpdate(null);
 
             }
@@ -156,6 +156,14 @@ function Profile() {
         })
 
         const data = await response.json()
+
+        if (response.status === 200) {
+            successToast(data.message);
+        }
+
+        if (response.status === 400) {
+            failedToast(data.detail)
+        }
 
 
         setPwdDraft({ old_password: "", new_password: "", confirm_password: "" })

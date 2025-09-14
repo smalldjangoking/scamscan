@@ -41,7 +41,7 @@ async def change_password(passwordSchema: ChagnePasswordSchema, session: Session
         return {'message': 'Password changed successfully'}
 
     else:
-        return {'message': 'Old password is incorrect'}
+        raise HTTPException(status_code=400, detail="Old password is incorrect")
 
     raise HTTPException(status_code=400, detail="Bad request")
 
@@ -70,7 +70,7 @@ async def update_user_info(userInfoSchema: UpdateUserInfoSchema, session: Sessio
             setattr(data, key, value)
             
             await session.commit()
-            return {'status': 'ok', 'field': key}
+            return {'status': 'ok', 'message': f'Your {key.title()} updated successfully'}
 
     except Exception as e:
         return {'status': 'error'}
