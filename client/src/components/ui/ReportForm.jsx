@@ -49,7 +49,9 @@ function ReportForm() {
                 <TriangleAlert />
                 Scam Report Form
                 </h2>
-                { if (stepForm) }
+                {stepForm === 2 && (
+                    <Button className="flex items-center justify-center" onClick={() => { setStepForm(1) }} size="sm" variant="ghost"><ChevronLeft /> Back to Subject</Button>
+                ) }
             </div>
             
 
