@@ -125,6 +125,50 @@
     --color-forgot-password: var(--forgot-password);
 }
 
+@layer components {
+    .radio-custom {
+        appearance: none;
+        width: 1.25rem;
+        height: 1.25rem;
+        border: 2px solid #000000;
+        border-radius: 50%;
+        background-color: transparent;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .radio-custom:checked {
+        background-color: #000000;
+
+    }
+    .radio-custom:checked::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background-color: #ffffff;
+            }
+
+    .dark .radio-custom {
+        border-color: #fff;
+    }
+    
+    .dark .radio-custom:checked {
+        background-color: #fff;
+
+    }
+    
+    .dark .radio-custom:checked::after {
+        background-color: #000000;
+
+    }
+}
+
+
 @layer base {
     * {
         @apply border-border outline-ring/50;
