@@ -1,10 +1,10 @@
 ﻿import { useState, useEffect } from "react";
 import { Button } from "../components/ui/Button";
-import ReportForm from "../components/ui/ReportForm";
+import ReportForm from "../components/ReportForm"
 import {Coins, Globe, Plus, HelpCircle, SquareDashedTopSolid, MoveLeft, Cog, BadgeCheck, ShieldUser, UserX, Shield, MessageCircle, CheckCircle, TrendingUp, History, AlertTriangle, Users, Eye } from 'lucide-react';
 
 function Report() {
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(2);
     const accessToken = localStorage.getItem("access_token"); // Исправлено название ключа
 
     useEffect(() => {
@@ -160,8 +160,6 @@ function Report() {
 
                             {/* Content */}
                             <ReportForm />
-
-                        
                         </>
                     )}
 

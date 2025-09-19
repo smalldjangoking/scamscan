@@ -135,23 +135,64 @@
         background-color: transparent;
         position: relative;
         cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        flex-shrink: 0;
+    }
+
+    @media (max-width: 640px) {
+        .radio-custom {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-width: 3px;
+        }
+        
+        .radio-custom:checked::after {
+            width: 8px;
+            height: 8px;
+        }
+    }
+
+    /* Touch target improvements for mobile */
+    @media (hover: none) and (pointer: coarse) {
+        .radio-custom { 
+            width: 1.2rem;
+            height: 1.2rem;
+            border-width: 1px;
+        }
+        
+        .radio-custom:checked::after {
+            width: 10px;
+            height: 10px;
+        }
     }
 
     .radio-custom:checked {
         background-color: #000000;
-
+        transform: scale(1.05);
     }
+    
     .radio-custom:checked::after {
-                content: '';
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 6px;
-                height: 6px;
-                border-radius: 50%;
-                background-color: #ffffff;
-            }
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: #ffffff;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .radio-custom:focus-visible {
+        outline: 2px solid #000000;
+        outline-offset: 2px;
+    }
+
+    .radio-custom:hover:not(:checked) {
+        border-width: 3px;
+        transform: scale(1.02);
+    }
 
     .dark .radio-custom {
         border-color: #fff;
@@ -159,12 +200,14 @@
     
     .dark .radio-custom:checked {
         background-color: #fff;
-
     }
     
     .dark .radio-custom:checked::after {
         background-color: #000000;
-
+    }
+    
+    .dark .radio-custom:focus-visible {
+        outline-color: #fff;
     }
 }
 
@@ -230,6 +273,15 @@
             line-height: 1.5;
         }
     }
+}
+
+
+.tiptap p.is-editor-empty:first-child::before {
+    color: #adb5bd;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
 }
 
 html {
