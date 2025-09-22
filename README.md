@@ -31,7 +31,18 @@ Ultimately, the project aims to build a safer environment for everyone by empowe
 ### Key Features of Functionality
 
 - **Account**  
-  - Create account to save your search history and manage reports.
-  - Confirm account through email to get verified badge.
+  - Save your search history and manage reports.
+  - Verified users gain the ability to leave comments
+  - Verified accounts have their credibility highlighted in ready reports.
+ 
+- **Profile**
+  - Change Password
+  - Update Information
+  - Сheck Нistory
+  - Check your reports
+  - Delete an Account
+
+ - **Report Form**
+  ...
  
 **................ in a progress**  
