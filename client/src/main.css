@@ -125,92 +125,184 @@
     --color-forgot-password: var(--forgot-password);
 }
 
-@layer components {
-    .radio-custom {
-        appearance: none;
-        width: 1.25rem;
-        height: 1.25rem;
-        border: 2px solid #000000;
-        border-radius: 50%;
-        background-color: transparent;
-        position: relative;
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-        flex-shrink: 0;
-    }
 
-    @media (max-width: 640px) {
-        .radio-custom {
-            width: 1.5rem;
-            height: 1.5rem;
-            border-width: 3px;
-        }
-        
-        .radio-custom:checked::after {
-            width: 8px;
-            height: 8px;
-        }
-    }
 
-    /* Touch target improvements for mobile */
-    @media (hover: none) and (pointer: coarse) {
-        .radio-custom { 
-            width: 1.2rem;
-            height: 1.2rem;
-            border-width: 1px;
-        }
-        
-        .radio-custom:checked::after {
-            width: 10px;
-            height: 10px;
-        }
-    }
 
-    .radio-custom:checked {
-        background-color: #000000;
-        transform: scale(1.05);
-    }
-    
-    .radio-custom:checked::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background-color: #ffffff;
-        transition: all 0.2s ease-in-out;
-    }
+.checkbox-custom {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 
-    .radio-custom:focus-visible {
-        outline: 2px solid #000000;
-        outline-offset: 2px;
-    }
-
-    .radio-custom:hover:not(:checked) {
-        border-width: 3px;
-        transform: scale(1.02);
-    }
-
-    .dark .radio-custom {
-        border-color: #fff;
-    }
-    
-    .dark .radio-custom:checked {
-        background-color: #fff;
-    }
-    
-    .dark .radio-custom:checked::after {
-        background-color: #000000;
-    }
-    
-    .dark .radio-custom:focus-visible {
-        outline-color: #fff;
-    }
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--border);
+    background-color: var(--input, var(--background));
+    position: relative;
+    display: inline-grid;
+    place-content: center;
+    cursor: pointer;
+    transition: background-color .2s ease, border-color .2s ease, transform .15s ease;
+    flex-shrink: 0;
 }
 
+
+.checkbox-custom:hover:not(:disabled):not(:checked) {
+    background-color: var(--accent);
+    border-color: var(--accent-foreground);
+}
+.checkbox-custom:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+
+.checkbox-custom:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+}
+
+
+.checkbox-custom:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    transform: scale(1.03);
+}
+
+
+.checkbox-custom::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 10px;
+    border: 2px solid var(--primary-foreground);
+    border-top: 0;
+    border-left: 0;
+    transform: translate(-50%, -55%) rotate(45deg) scale(0.9);
+    top: 50%;
+    left: 50%;
+    opacity: 0;
+    transition: opacity .15s ease, transform .15s ease;
+    pointer-events: none;
+}
+.checkbox-custom:checked::after {
+    opacity: 1;
+    transform: translate(-50%, -55%) rotate(45deg) scale(1);
+}
+
+
+.checkbox-custom:indeterminate {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+.checkbox-custom:indeterminate::after {
+    content: '';
+    width: 60%;
+    height: 2px;
+    border: 0;
+    background-color: var(--primary-foreground);
+    border-radius: 1px;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    opacity: 1;
+}
+
+
+.checkbox-custom:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+
+.checkbox-sm { width: 1rem; height: 1rem; }
+.checkbox-lg { width: 1.5rem; height: 1.5rem; }
+
+
+@media (max-width: 640px) {
+    .checkbox-custom { width: 1.5rem; height: 1.5rem; }
+    .checkbox-custom::after { width: 7px; height: 12px; }
+}
+@media (hover: none) and (pointer: coarse) {
+    .checkbox-custom { width: 1.35rem; height: 1.35rem; }
+    .checkbox-custom::after { width: 6px; height: 10px; }
+}
+
+/* Radio in the same B/W style as checkbox-custom (append) */
+.radio-custom {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 9999px; /* circle */
+    border: 2px solid var(--border);
+    background-color: var(--input, var(--background));
+    position: relative;
+    display: inline-grid;
+    place-content: center;
+    cursor: pointer;
+    transition: background-color .2s ease, border-color .2s ease, transform .15s ease;
+    flex-shrink: 0;
+}
+
+/* Hover/active (unchecked) */
+.radio-custom:hover:not(:disabled):not(:checked) {
+    background-color: var(--accent);
+    border-color: var(--accent-foreground);
+}
+.radio-custom:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+/* Focus ring */
+.radio-custom:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+}
+
+/* Checked: fill with primary; inner dot uses primary-foreground */
+.radio-custom:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    transform: scale(1.03);
+}
+
+/* Inner dot */
+.radio-custom::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 9999px;
+    background-color: var(--primary-foreground);
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity .15s ease, transform .15s ease;
+}
+.radio-custom:checked::after {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Disabled */
+.radio-custom:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+/* Size variants (optional) */
+.radio-sm { width: 1rem; height: 1rem; }
+.radio-lg { width: 1.5rem; height: 1.5rem; }
+
+/* Mobile/touch tweaks */
+@media (max-width: 640px) {
+    .radio-custom { width: 1.5rem; height: 1.5rem; }
+    .radio-custom::after { width: 10px; height: 10px; }
+}
+@media (hover: none) and (pointer: coarse) {
+    .radio-custom { width: 1.35rem; height: 1.35rem; }
+    .radio-custom::after { width: 9px; height: 9px; }
+}
 
 @layer base {
     * {
