@@ -44,7 +44,7 @@ function ReportForm() {
 
         websiteUrl: Yup.string().when("reportSubject", {
             is: "website",
-            then: (s) => s.required("Website URL is required").url("Invalid URL"),
+            then: (s) => s.required("Website URL is required").test("is-valid-url", "Invalid URL", (value) => validUrl.isUri(value)),
             otherwise: (s) => s.notRequired()
         }),
 
@@ -154,6 +154,7 @@ function ReportForm() {
                     {selectedReportSubject === "website" && (
                         <div className="mt-5">
                             <Input {...register("websiteUrl")} label="Website URL" placeholder='Enter the URL of the website you want to report' />
+                            {errors.websiteUrl && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.websiteUrl.message}</p>}
                         </div>
                     )}
 
