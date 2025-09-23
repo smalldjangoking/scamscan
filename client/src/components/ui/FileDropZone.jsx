@@ -11,7 +11,7 @@ export default function Dropzone({ onFilesSelected }) {
         onDrop,
         accept: { "image/*": [] },
         maxSize: 5 * 1024 * 1024,
-        multiple: true
+        multiple: false
     });
 
     return (

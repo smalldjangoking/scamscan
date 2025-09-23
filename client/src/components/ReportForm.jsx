@@ -1,4 +1,4 @@
-﻿import { TriangleAlert, ChevronLeft, Camera, CircleQuestionMark, WalletMinimal, Globe, Plus, HelpCircle, Search } from "lucide-react";
+﻿import { TriangleAlert, ChevronLeft, MessageSquareWarning, Camera, CircleQuestionMark, WalletMinimal, Globe, Plus, HelpCircle, Search } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "./ui/Button";
 import { SearchField } from "./ui/SearchField";
@@ -9,21 +9,77 @@ import validUrl from "valid-url";
 import { Input } from "./ui/Input";
 import Tiptap from './TipTapEditor';
 import Dropzone from "./ui/FileDropZone";
+import * as Yup from "yup";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 
 function ReportForm() {
+    const schema = Yup.object().shape({
+
+        reportSubject: Yup.string()
+            .oneOf(["crypto", "website"], "Select a valid subject")
+            .required("Please select a subject"),
+
+        reportTitle: Yup.string()
+            .min(10, "At least 10 chars")
+            .max(35, "Max 35 chars")
+            .required("Title is required"),
+
+        description: Yup.string()
+            .min(500, "At least 500 chars")
+            .max(2000, "Max 2000 chars")
+            .required("Description is required"),
+
+        screenshots: Yup.array()
+            .min(0)
+            .max(8, "You can upload up to 8 screenshots")
+            .of(
+                Yup.mixed()
+                    .test("fileSize", "File is too large", (file) => !file || file.size <= 5 * 1024 * 1024)
+                    .test("fileType", "Unsupported file format", (file) =>
+                        !file || ["image/jpeg", "image/png", "image/heic"].includes(file.type)
+                )
+            ),
+
+        websiteUrl: Yup.string().when("reportSubject", {
+            is: "website",
+            then: (s) => s.required("Website URL is required").url("Invalid URL"),
+            otherwise: (s) => s.notRequired()
+        }),
+
+
+        cryptoAddress: Yup.string().when("reportSubject", {
+            is: "crypto",
+            then: (s) =>
+                s.required("Crypto address is required"),
+            otherwise: (s) => s.notRequired()
+        })
+
+    });
+
+
+    const { register, watch, setValue, control, formState: { errors, isValid } } = useForm({
+        resolver: yupResolver(schema),
+        mode: "onBlur",
+        defaultValues: {
+            reportSubject: "",
+            reportTitle: "",
+            description: "",
+            websiteUrl: "",
+            cryptoAddress: "",
+            screenshots: []
+        }
+    });
+
+
+    const selectedReportSubject = watch("reportSubject");
+    const screenshots = watch("screenshots");
+
     const [tooltipContent, setTooltipContent] = useState("ToolTip");
-    const [reportData, setReportData] = useState({});
-    const [selectedReportSubject, setSelectedReportSubject] = useState("");
-    const [reportTitle, setReportTitle] = useState("");
-    const [content, setContent] = useState("");
-    const [evidence, setEvidence] = useState([]);
-    const [websiteUrl, setWebsiteUrl] = useState("");
-    const [cryptoAddress, setCryptoAddress] = useState("");
 
-    const [verifyFields, SetVerifyFields] = useState([]);
-
-    const fileInputRef = useRef(null);
+    const values = watch();
+    console.log(values);
 
     const reportOptions = [
         {
@@ -39,25 +95,6 @@ function ReportForm() {
             icon: <Globe className="h-5 w-5" />,
         }
     ];
-
-    useEffect(() => {
-
-        setReportData({
-            ...reportData,
-            reportSubject: selectedReportSubject,
-            reportTitle: reportTitle,
-            description: content,
-            screenshots: evidence,
-            websiteUrl: websiteUrl ? websiteUrl : null,
-            cryptoAddress: cryptoAddress ? cryptoAddress : null
-        });
-
-    }, [selectedReportSubject, content, reportTitle, evidence, websiteUrl, cryptoAddress]);
-
-
-    useEffect(() => {
-        console.log("reportData обновилось:", reportData);
-    }, [reportData]);
 
     return (
         <form className="relative rounded-2xl border border-border bg-card/80 p-6 shadow-sm backdrop-blur-sm">
@@ -75,7 +112,7 @@ function ReportForm() {
                                 name="reportSubject"
                                 value={option.id}
                                 className="radio-custom"
-                                onChange={(e) => { setSelectedReportSubject(e.target.value) }}
+                                {...register("reportSubject")}
                             />
                             <div className={`p-2 rounded-full bg-accent/50 hidden md:flex`}>
                                 {option.icon}
@@ -86,33 +123,44 @@ function ReportForm() {
                             </div>
                         </label>
                     ))}
-            </div>
+                </div>
 
             
             {selectedReportSubject && (
                 <>
-                    <div className="mt-5 space-y-6">
-                        <Input value={reportTitle} onChange={(e) => setReportTitle(e.target.value)} label="Title" maxLength="45" placeholder='Enter a clear and descriptive title for your scam report' />
-
-                        <div>
+                    <div className="mt-5">
+                        <Input aria-invalid={!!errors.reportTitle} {...register("reportTitle")} label="Title"  placeholder='Enter a clear and descriptive title for your scam report' />
+                        {errors.reportTitle && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.reportTitle.message}</p>}
+                        <div className="mt-5">
                             <label className="mb-2 block text-lg font-medium tracking-wider text-foreground">
                                 What happened
                             </label>
-                            <Tiptap content={content} onChange={setContent} />
+                            <Controller
+                                name="description"
+                                control={control}
+                                render={({ field }) => (
+                                    <Tiptap
+                                        content={field.value}
+                                        onChange={field.onChange}
+                                        onBlur={field.onBlur}
+                                        error={!!errors.description}
+                                    />
+                                )}
+                            />
+                            {errors.description && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.description.message}</p>}
                         </div>
                     </div>
 
                     {selectedReportSubject === "website" && (
                         <div className="mt-5">
-                            <Input value={websiteUrl} onChange={(e) => setWebsiteUrl(e.target.value)} label="Website URL" placeholder='Enter the URL of the website you want to report' />
+                            <Input {...register("websiteUrl")} label="Website URL" placeholder='Enter the URL of the website you want to report' />
                         </div>
                     )}
 
                     {selectedReportSubject === "crypto" && (
                         <div className="mt-5">
                             <Input
-                                value={cryptoAddress}
-                                onChange={(e) => setCryptoAddress(e.target.value)}
+                                {...register("cryptoAddress")}
                                 label="Crypto Address"
                                 placeholder="Enter the cryptocurrency address you want to report"
                             />
@@ -126,7 +174,7 @@ function ReportForm() {
                     </div>
 
                     <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-                        {evidence.map((file, index) => (
+                        {screenshots.map((file, index) => (
                             <div key={index} className="group relative">
                                 <div className="relative h-32 w-full overflow-hidden rounded-lg border border-border bg-gray-100">
                                     <img
@@ -137,7 +185,7 @@ function ReportForm() {
                                     <Button
                                         variant="link"
                                         size="icon"
-                                        onClick={() => setEvidence(evidence.filter((_, i) => i !== index))}
+                                        onClick={() => setValue('screenshots', screenshots.filter((_, i) => i !== index))}
                                         className="absolute top-1 right-1 opacity-0 transition-opacity group-hover:opacity-100 bg-destructive"
                                     >
                                         <Plus className="h-3 w-3 rotate-45 text-[#fff]" />
@@ -146,17 +194,16 @@ function ReportForm() {
                                 <p className="text-muted-foreground mt-1 truncate text-xs">{file.name}</p>
                             </div>
                         ))}
-                        {evidence.length < 8 && <Dropzone onFilesSelected={(newFiles) => setEvidence((prev) => [...prev, ...newFiles])} />}
+                        {screenshots.length < 8 && <Dropzone onFilesSelected={(newFiles) => setValue('screenshots', [...screenshots, ...newFiles], { shouldValidate: true })} />}
                     </div>
 
                     <div className="mt-5 flex items-center gap-3">
-                        <Button className="ml-1">
+                        <Button disabled={!isValid} className="ml-1">
                             Submit Report
                         </Button>
                         <input
                             type="checkbox"
                             className="checkbox-custom"
-
                         />
                         <p>I agree with all rules and things</p>
                     </div>

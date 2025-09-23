@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "@tiptap/extension-placeholder": "^3.4.4",
     "@tiptap/pm": "^3.4.4",
     "@tiptap/react": "^3.4.4",
@@ -17,10 +18,12 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-dropzone": "^14.3.8",
+    "react-hook-form": "^7.63.0",
     "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.7.1",
     "react-tooltip": "^5.29.1",
-    "valid-url": "^1.0.9"
+    "valid-url": "^1.0.9",
+    "yup": "^1.7.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",

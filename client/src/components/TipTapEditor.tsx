@@ -4,15 +4,18 @@ import Placeholder from '@tiptap/extension-placeholder'
 import { 
     Bold, 
     Italic, 
-    Strikethrough, 
-    List,
-    ListOrdered,
-    Quote,
+    Strikethrough,
     Undo,
     Redo
 } from 'lucide-react'
+import { cn } from './ui/utils'
 
-const Tiptap = ({ content, onChange }: { content?: string; onChange?: (content: string) => void }) => {
+const Tiptap = ({ content, onChange, onBlur, error }: { 
+    content?: string; 
+    onChange?: (content: string) => void; 
+    onBlur?: () => void;
+    error?: boolean 
+}) => {
     const editor = useEditor({
         extensions: [
             StarterKit,
@@ -26,6 +29,11 @@ const Tiptap = ({ content, onChange }: { content?: string; onChange?: (content: 
                 onChange(editor.getHTML())
             }
         },
+        onBlur: () => {
+            if (onBlur) {
+                onBlur()
+            }
+        },
         editorProps: {
             attributes: {
                 class: 'prose prose-sm focus:outline-none min-h-[150px] p-4 text-foreground',
@@ -36,7 +44,10 @@ const Tiptap = ({ content, onChange }: { content?: string; onChange?: (content: 
     if (!editor) return null
 
     return (
-        <div className="rounded-lg border border-border bg-card">
+        <div className={cn(
+            "rounded-lg border border-border bg-card",
+            error && "border-destructive ring-destructive/20 ring-[3px]"
+        )}>
             <div className="flex flex-wrap gap-1 border-b border-border p-2">
                 <button
                     type="button"

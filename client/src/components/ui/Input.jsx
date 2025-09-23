@@ -10,7 +10,7 @@ function Input({ className, type, label, placeholder, ...props }) {
                 </label>
             )}
             <input
-                for={label}
+                id={label}
                 type={type}
                 data-slot="input"
                 placeholder={placeholder}
