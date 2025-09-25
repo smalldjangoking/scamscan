@@ -1,7 +1,6 @@
 ﻿import { TriangleAlert, ChevronLeft, MessageSquareWarning, Camera, CircleQuestionMark, WalletMinimal, Globe, Plus, HelpCircle, Search } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "./ui/Button";
-import { SearchField } from "./ui/SearchField";
 
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
@@ -12,6 +11,8 @@ import Dropzone from "./ui/FileDropZone";
 import * as Yup from "yup";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import validator from 'crypto-address-validator';
+import CryptoDropDownMenu from "./ui/CryptoDropDownMenu";
 
 
 function ReportForm() {
@@ -51,8 +52,7 @@ function ReportForm() {
 
         cryptoAddress: Yup.string().when("reportSubject", {
             is: "crypto",
-            then: (s) =>
-                s.required("Crypto address is required"),
+            then: (s) => s.required("Crypto address is required"),
             otherwise: (s) => s.notRequired()
         })
 
@@ -99,37 +99,37 @@ function ReportForm() {
     return (
         <form className="relative rounded-2xl border border-border bg-card/80 p-6 shadow-sm backdrop-blur-sm">
 
-                <h3 className="flex items-center gap-3 text-lg tracking-wider">
-                    Report Subject
-                    <CircleQuestionMark size={16} onMouseEnter={() => setTooltipContent("Select what you want to report")} className="my-anchor-element text-muted-foreground hover:text-foreground transition-colors cursor-help" />
-                </h3>
+            <h3 className="flex items-center gap-3 text-lg tracking-wider">
+                Report Subject
+                <CircleQuestionMark size={16} onMouseEnter={() => setTooltipContent("Select what you want to report")} className="my-anchor-element text-muted-foreground hover:text-foreground transition-colors cursor-help" />
+            </h3>
 
-                <div className="flex gap-3">
-                    {reportOptions.map((option) => (
-                        <label key={option.id} className="mt-4 flex cursor-pointer items-center gap-3 rounded-lg border border-border p-4 backdrop-blur-sm transition-colors hover:bg-accent/50">
-                            <input
-                                type="radio"
-                                name="reportSubject"
-                                value={option.id}
-                                className="radio-custom"
-                                {...register("reportSubject")}
-                            />
-                            <div className={`p-2 rounded-full bg-accent/50 hidden md:flex`}>
-                                {option.icon}
-                            </div>
-                            <div>
-                                <p className="font-medium">{option.label}</p>
-                                <p className="text-muted-foreground text-sm">{option.description}</p>
-                            </div>
-                        </label>
-                    ))}
-                </div>
+            <div className="flex gap-3">
+                {reportOptions.map((option) => (
+                    <label key={option.id} className="mt-4 flex cursor-pointer items-center gap-3 rounded-lg border border-border p-4 backdrop-blur-sm transition-colors hover:bg-accent/50">
+                        <input
+                            type="radio"
+                            name="reportSubject"
+                            value={option.id}
+                            className="radio-custom"
+                            {...register("reportSubject")}
+                        />
+                        <div className={`p-2 rounded-full bg-accent/50 hidden md:flex`}>
+                            {option.icon}
+                        </div>
+                        <div>
+                            <p className="font-medium">{option.label}</p>
+                            <p className="text-muted-foreground text-sm">{option.description}</p>
+                        </div>
+                    </label>
+                ))}
+            </div>
 
-            
+
             {selectedReportSubject && (
                 <>
                     <div className="mt-5">
-                        <Input aria-invalid={!!errors.reportTitle} {...register("reportTitle")} label="Title"  placeholder='Enter a clear and descriptive title for your scam report' />
+                        <Input aria-invalid={!!errors.reportTitle} {...register("reportTitle")} label="Title" placeholder='Enter a clear and descriptive title for your scam report' />
                         {errors.reportTitle && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.reportTitle.message}</p>}
                         <div className="mt-5">
                             <label className="mb-2 block text-lg font-medium tracking-wider text-foreground">
@@ -151,7 +151,14 @@ function ReportForm() {
                         </div>
                     </div>
 
+
+
+
+                    <CryptoDropDownMenu/>
+
                     {selectedReportSubject === "website" && (
+                        
+
                         <div className="mt-5">
                             <Input {...register("websiteUrl")} label="Website URL" placeholder='Enter the URL of the website you want to report' />
                             {errors.websiteUrl && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.websiteUrl.message}</p>}
