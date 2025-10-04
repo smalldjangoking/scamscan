@@ -1,6 +1,6 @@
 import React from 'react'
 import {Button} from "../components/ui/Button.jsx"
-import {AlertTriangle, Badge, MessageCircle, Star} from "lucide-react"
+import {AlertTriangle, Badge, BookText, Star} from "lucide-react"
 import {SearchField} from "../components/ui/SearchField.jsx";
 import {ArrowRight} from "lucide-react"
 
@@ -67,8 +67,8 @@ function Home() {
                                 <ArrowRight className="ml-2 h-5 w-5"/>
                             </Button>
                             <Button size="lg" variant="outline" className="px-8 py-4">
-                                <MessageCircle className="mr-2 h-5 w-5"/>
-                                Join Community
+                                <BookText className="mr-2 h-5 w-5"/>
+                                Observe Scams
                             </Button>
                         </div>
                     </div>
