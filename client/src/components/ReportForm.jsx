@@ -15,18 +15,20 @@ import CryptoDropDownMenu from "./ui/CryptoDropDownMenu";
 
 
 function ReportForm() {
+    const access_token = localStorage.getItem("access_token") || "";
+
     const schema = Yup.object().shape({
 
-        reportSubject: Yup.string()
+        report_subject: Yup.string()
             .oneOf(["crypto", "website"], "Select a valid subject")
             .required("Please select a subject"),
 
-        reportTitle: Yup.string()
+        report_title: Yup.string()
             .min(10, "At least 10 chars")
             .max(35, "Max 35 chars")
             .required("Title is required"),
 
-        description: Yup.string()
+        report_description: Yup.string()
             .min(500, "At least 500 chars")
             .max(2000, "Max 2000 chars")
             .required("Description is required"),
@@ -42,13 +44,13 @@ function ReportForm() {
                 )
             ),
 
-        websiteUrl: Yup.string().when("reportSubject", {
+        website_url: Yup.string().when("report_subject", {
             is: "website",
             then: (s) => s.required("Website URL is required").test("is-valid-url", "Invalid URL", (value) => validUrl.isUri(value)),
             otherwise: (s) => s.notRequired()
         }),
 
-        cryptoChosen: Yup.object().when("reportSubject", {
+        crypto_name: Yup.object().when("report_subject", {
             is: "crypto",
             then: (s) => s.shape({
                 name: Yup.string().required("Cryptocurrency name is required"),
@@ -58,40 +60,70 @@ function ReportForm() {
         }),
 
 
-        cryptoAddress: Yup.string().when(["reportSubject"], {
-            is: (reportSubject) => reportSubject === "crypto",
+        crypto_address: Yup.string().when(["report_subject"], {
+            is: (report_subject) => report_subject === "crypto",
             then: (s) => s.min(15, "Crypto address must be at least 15 characters").required("Crypto address is required"),
             otherwise: (s) => s.notRequired()
         }),
 
-        checkBox: Yup.object().shape({
+        check_box: Yup.object().shape({
             accepted: Yup.boolean().oneOf([true], "You must accept the terms")
         })
         .required("You must agree to the terms"),
     });
 
 
-    const { register, watch, setValue, control, formState: { errors, isValid } } = useForm({
+    const { register, watch, handleSubmit, setValue, control, formState: { errors, isValid } } = useForm({
         resolver: yupResolver(schema),
         mode: "onChange",
         defaultValues: {
-            reportSubject: "",
-            reportTitle: "",
-            description: "",
-            websiteUrl: "",
-            cryptoAddress: "",
+            report_subject: "",
+            report_title: "",
+            report_description: "",
+            website_url: "",
+            crypto_address: "",
+            crypto_name: "",
             screenshots: [],
-            cryptoChosen: null,
-            checkBox: {accepted: false}
+            check_box: {accepted: false}
         }
     });
 
 
-    const selectedReportSubject = watch("reportSubject");
+    const selectedReportSubject = watch("report_subject");
     const screenshots = watch("screenshots");
 
     const [tooltipContent, setTooltipContent] = useState("ToolTip");
 
+    const values = watch();
+    console.log('ошибки', errors)
+    console.log(values);
+
+
+    const onSubmit = (data) => {
+        const {check_box, ...rest} = data;
+        const payload = JSON.stringify(rest);
+
+
+
+        fetch("/reports/create", {
+            method: "post",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                ...(access_token ? { Authorization: `Bearer ${access_token}` } : {})
+            },
+            body: payload
+        })
+        .then((response) => {
+            if (response.ok) {
+                console.log('yes!')
+            }
+            else {
+                console.log('no!', response.status, response.statusText)
+            }
+        })
+
+    }
 
     const reportOptions = [
         {
@@ -115,16 +147,16 @@ function ReportForm() {
                 Report Subject
                 <CircleQuestionMark size={16} onMouseEnter={() => setTooltipContent("Select what you want to report")} className="my-anchor-element text-muted-foreground hover:text-foreground transition-colors cursor-help" />
             </h3>
-
+            {/* Choose the subject of the report */}
             <div className="flex gap-3">
                 {reportOptions.map((option) => (
                     <label key={option.id} className="mt-4 flex cursor-pointer items-center gap-3 rounded-lg border border-border p-4 backdrop-blur-sm transition-colors hover:bg-accent/50">
                         <input
                             type="radio"
-                            name="reportSubject"
+                            name="report_subject"
                             value={option.id}
                             className="radio-custom"
-                            {...register("reportSubject")}
+                            {...register("report_subject")}
                         />
                         <div className={`p-2 rounded-full bg-accent/50 hidden md:flex`}>
                             {option.icon}
@@ -143,34 +175,34 @@ function ReportForm() {
                     : 'max-h-0 opacity-0 transform -translate-y-2'
             }`}>
                     <div className="mt-5">
-                        <Input aria-invalid={!!errors.reportTitle} {...register("reportTitle")} label="Title" placeholder='Enter a clear and descriptive title for your scam report' />
-                        {errors.reportTitle && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.reportTitle.message}</p>}
+                        <Input aria-invalid={!!errors.report_title} {...register("report_title")} label="Title" placeholder='Enter a clear and descriptive title for your scam report' />
+                        {errors.report_title && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.report_title.message}</p>}
                         <div className="mt-5">
                             <label className="mb-2 block text-lg font-medium tracking-wider text-foreground">
                                 What happened
                             </label>
                             <Controller
-                                name="description"
+                                name="report_description"
                                 control={control}
                                 render={({ field }) => (
                                     <Tiptap
                                         content={field.value}
                                         onChange={field.onChange}
                                         onBlur={field.onBlur}
-                                        error={!!errors.description}
+                                        error={!!errors.report_description}
                                     />
                                 )}
                             />
-                            {errors.description && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.description.message}</p>}
+                            {errors.report_description && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.report_description.message}</p>}
                         </div>
                     </div>
 
-                    {errors.cryptoChosen && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.cryptoChosen.message}</p>}
+                    {errors.crypto_name && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.crypto_name.message}</p>}
 
                     {selectedReportSubject === "website" && (
                         <div className="mt-5">
-                            <Input {...register("websiteUrl")} label="Website URL" placeholder='Enter the URL of the website you want to report' />
-                            {errors.websiteUrl && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.websiteUrl.message}</p>}
+                            <Input {...register("website_url")} label="Website URL" placeholder='Enter the URL of the website you want to report' />
+                            {errors.website_url && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.website_url.message}</p>}
                         </div>
                     )}
 
@@ -182,22 +214,22 @@ function ReportForm() {
                             <CircleQuestionMark size={16} onMouseEnter={() => setTooltipContent("Select a blockchain network and write an address")} className="my-anchor-element text-muted-foreground hover:text-foreground transition-colors cursor-help" /> 
                             </div>
                             <Controller
-                                name="cryptoChosen"
+                                name="crypto_name"
                                 control={control}
                                 render={({ field }) => (
                                     <CryptoDropDownMenu
                                         value={field.value}
                                         onChange={field.onChange}
-                                        error={!!errors.cryptoChosen}
+                                        error={!!errors.crypto_name}
                                     />
                                 )}
                             />
-                            {errors.cryptoChosen && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.cryptoChosen.message}</p>}
+                            {errors.crypto_name && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.crypto_name.message}</p>}
                             <Input
-                                {...register("cryptoAddress")}
+                                {...register("crypto_address")}
                                 placeholder="Enter the cryptocurrency address you want to report"
                             />
-                            {errors.cryptoAddress && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.cryptoAddress.message}</p>}
+                            {errors.crypto_address && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.crypto_address.message}</p>}
                         </div>
                     )}
 
@@ -235,13 +267,13 @@ function ReportForm() {
 
                     {/* Submit button */}
                     <div className="mt-5 flex items-center gap-3">
-                        <Button disabled={!isValid} className="ml-1">
+                        <Button disabled={!isValid} onClick={handleSubmit(onSubmit)} className="ml-1">
                             Submit Report
                         </Button>
                         <input
                             type="checkbox"
                             className="checkbox-custom"
-                            {...register("checkBox.accepted")}
+                            {...register("check_box.accepted")}
                         />
                         <p>I agree with all rules and things</p>
                     </div>

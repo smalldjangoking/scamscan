@@ -16,6 +16,10 @@ function Authentication({ isOpen, onClose, authVar }) {
 
    
     useEffect(() => {
+        if (wrongCredentials && accountCreated) {
+            setWrongCredentials(false)
+        }
+
         if (authVar) {
             setAuthVariant(authVar)
         }
@@ -52,7 +56,6 @@ function Authentication({ isOpen, onClose, authVar }) {
                 body: JSON.stringify(data),
                 headers: { 'Content-Type': 'application/json' }
             })
-
             let dataIn = await response.json();
             setAccountCreated(true)
             setAuthVariant('login')

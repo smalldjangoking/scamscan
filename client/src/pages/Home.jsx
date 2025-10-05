@@ -66,7 +66,7 @@ function Home() {
                                 Report a Scammer
                                 <ArrowRight className="ml-2 h-5 w-5"/>
                             </Button>
-                            <Button size="lg" variant="outline" className="px-8 py-4">
+                            <Button onClick={() => window.location.href = '/reports'} size="lg" variant="outline" className="px-8 py-4">
                                 <BookText className="mr-2 h-5 w-5"/>
                                 Observe Scams
                             </Button>

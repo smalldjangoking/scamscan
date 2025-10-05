@@ -4,6 +4,7 @@ import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import Layout from "./Layout";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
+import Reports from "./pages/Reports";
 import './main.css'
 import AuthRequired from './pages/AuthRequired';
 import Report from './pages/Report';
@@ -15,7 +16,9 @@ const router = createBrowserRouter([
         children: [
             { index: true, element: <Home /> },
             { path: 'profile', index: false, element: <AuthRequired><Profile /></AuthRequired> },
-            { path: 'report', index: false, element: <Report /> },        ],
+            { path: 'report', index: false, element: <Report /> },
+            { path: 'reports', index: false, element: <Reports /> },
+        ],
     },
 ]);
 createRoot(document.getElementById('root')).render(
