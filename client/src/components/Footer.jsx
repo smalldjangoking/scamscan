@@ -84,11 +84,7 @@ function Footer() {
                             © 2025 scamscan.io. All rights reserved.
                         </p>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span>123</span>
-                            <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                <span>Online</span>
-                            </div>
+                            <p>version: <span className="font-bold text-sm">1.0.0</span></p>
                         </div>
                     </div>
                 </div>

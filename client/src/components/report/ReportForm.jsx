@@ -1,17 +1,17 @@
 ﻿import { MessageSquareWarning, Camera, CircleQuestionMark, WalletMinimal, Globe, Plus} from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { Button } from "./ui/Button";
+import { useState} from "react";
+import { Button } from "../ui/Button";
 
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 import validUrl from "valid-url";
-import { Input } from "./ui/Input";
+import { Input } from "../ui/Input";
 import Tiptap from './TipTapEditor';
-import Dropzone from "./ui/FileDropZone";
+import Dropzone from "./FileDropZone";
 import * as Yup from "yup";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import CryptoDropDownMenu from "./ui/CryptoDropDownMenu";
+import CryptoDropDownMenu from "../ui/CryptoDropDownMenu";
 
 
 function ReportForm() {

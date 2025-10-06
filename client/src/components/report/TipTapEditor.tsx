@@ -8,7 +8,7 @@ import {
     Undo,
     Redo
 } from 'lucide-react'
-import { cn } from './ui/utils'
+import { cn } from '../ui/utils'
 
 const Tiptap = ({ content, onChange, onBlur, error }: { 
     content?: string; 

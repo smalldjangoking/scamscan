@@ -1,5 +1,5 @@
 import { Button } from "../components/ui/Button"
-import BurgerFilterMenu from "../components/reports/BurgerFilterMenu"
+import BurgerFilterMenu from "../components/reports/burgerFilterMenu"
 
 
 

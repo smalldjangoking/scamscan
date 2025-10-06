@@ -5,7 +5,7 @@ import { useState } from "react"
 export default function BurgerFilterMenu() {
     const [filterMenu, setFilterMenu] = useState(false);
 
-    
+
 
     return (
     <>
@@ -14,13 +14,13 @@ export default function BurgerFilterMenu() {
         </Button>
 
         <div className={`${filterMenu ? 'block' : 'hidden'} absolute`}>
-            <ul>
-                <li>
-                    <ul>
-                        <li></li>
-                    </ul>
+            <ul className="bg-primary-foreground/95 p-3 rounded shadow-lg w-48">
+                <li className="p-2 border-b">
+                    Cryptocurrencies
                 </li>
-
+                <li className="p-2 border-b">
+                    Websites
+                </li>
             </ul>
         </div>
     </> 
