@@ -1,16 +1,17 @@
-﻿import { useEffect, useState, useRef, useCallback } from "react";
-import { Button } from "./Button";
-import { Input } from "./Input";
-import { createPortal } from "react-dom";
-import { ArrowLeft } from 'lucide-react';
+﻿    import { useEffect, useState, useRef, useCallback } from "react";
+    import { Button } from "./Button";
+    import { Input } from "./Input";
+    import { createPortal } from "react-dom";
+    import { ArrowLeft, ArrowDown } from 'lucide-react';
 
 
-export default function CryptoDropDownMenu({value, onChange, error }) {
+    export default function CryptoDropDownMenu({value, onChange, error }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [coins, setCoins] = useState([]);
     const [page, setPage] = useState(1);
     const [fetching, setFetching] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const dropdownRef = useRef(null);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -31,16 +32,12 @@ export default function CryptoDropDownMenu({value, onChange, error }) {
         )
         : coins;
 
-
-    { /* Fetch to Coingecko API. Filters, Pagination. */ }
     const fetchCoinGecko = async ({ filtering = false, search_word = '' } = {}) => {
         const per_page = 100
-
 
         if (fetching) return;
 
         setFetching(true);
-
 
         try {
             let res;
@@ -55,7 +52,6 @@ export default function CryptoDropDownMenu({value, onChange, error }) {
                     return { image: large, ...rest };
                 })
             }
-
             else {
                 res = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${per_page}&page=${page}`, {
                     method: 'GET',
@@ -64,7 +60,6 @@ export default function CryptoDropDownMenu({value, onChange, error }) {
             }
             
             console.log(data)
-
 
             setCoins(prevCoins => {
                 const existingNames = new Set(prevCoins.map(c => c.name.toLowerCase()));
@@ -77,15 +72,12 @@ export default function CryptoDropDownMenu({value, onChange, error }) {
             }
             return;
         }
-
         catch (error) {
             console.error('Error fetching data:', error);
         }
-
         finally {
             setFetching(false);
         }
-        
     };
 
     const observer = useRef(null);
@@ -93,7 +85,6 @@ export default function CryptoDropDownMenu({value, onChange, error }) {
         if (observer.current) observer.current.disconnect();
 
         observer.current = new IntersectionObserver((entries) => {
-
             if (entries[0].isIntersecting) {
                 fetchCoinGecko();
             }
@@ -102,9 +93,12 @@ export default function CryptoDropDownMenu({value, onChange, error }) {
         if (node) observer.current.observe(node);
     }, [coins]);
 
+    // Определяем целевой контейнер
+    const isMobile = window.innerWidth <= 768;
+    const targetContainer = isMobile ? document.body : dropdownRef.current;
 
     return (
-        <div className="relative mt-5 inline-block w-64">
+        <div className="mt-5 inline-block w-64">
             <Button
                 onClick={
                     () => {
@@ -118,53 +112,41 @@ export default function CryptoDropDownMenu({value, onChange, error }) {
                 type="button"
                 variant="outline"
                 aria-invalid={error ? "true" : "false"}
-                className="crypto-dropdown-button flex w-full items-center justify-between h-9 aria-invalid:border-destructive aria-invalid:text-destructive aria-invalid:focus:ring-destructive"
+                className="relative crypto-dropdown-button flex w-full md:w-md items-center justify-between h-9 aria-invalid:border-destructive aria-invalid:text-destructive aria-invalid:focus:ring-destructive"
                 value={value}
+                ref={dropdownRef}
             >
                 {!value || !value.name ? (
                     <>
                         <span className="truncate text-gray-500">Choose...</span>
-                        <svg
-                            className="h-4 w-4 text-gray-500"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M19 9l-7 7-7-7"
-                            />
-                        </svg>
+                        <ArrowDown className={`transition-transform duration-300 ease-in-out ${menuOpen ? 'rotate-180' : 'rotate-0'}`}
+/>
                     </>
                 ) : (
                     <>
                         <div className="flex items-center gap-3">
                             <img src={value.image} className="mr-2 h-6 w-6" alt={value.name} />
-                                <span className="truncate text-gray-500">{value.name}</span>
+                            <span className="truncate text-gray-500">{value.name}</span>
                         </div>
                     </>
                 )}
             </Button>
                
-
-            {menuOpen && createPortal(
-                <div className={`crypto-dropdown fixed inset-0 z-[50] bg-primary-foreground border focus-visible:border-ring dark:border-input`}>
-
-                    {/* Поле поиска */}
-                    <div className="flex justify-between p-3">
-                        <div className="full mr-10 flex w-full">
+            {menuOpen && targetContainer && createPortal(
+                <div className={`crypto-dropdown md:mt-2 fixed md:absolute inset-0 md:inset-auto md:top-full md:left-0 z-[50] max-h-screen md:max-h-96 md:w-md bg-primary-foreground border focus-visible:border-ring dark:border-input`}>
+                    {/* Search Field && Back button */}
+                    <div className="flex md:justify-initial justify-between p-3">
+                        <div className="full flex w-full">
                             <Input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search..." className="mt-0" />
                         </div>
 
                         <Button
-                            className="flex items-center" onClick={() => setMenuOpen(false)} variant="outline" size="lg"><ArrowLeft />back
+                            className="flex md:hidden items-center ml-10" onClick={() => setMenuOpen(false)} variant="outline" size="lg"><ArrowLeft />back
                         </Button>
                     </div>
 
-                    {/* Список */}
-                    <ul className="mt-1 h-full divide-y overflow-auto text-sm">
+                    {/* Crypto List */}
+                    <ul className="divide-y overflow-auto max-h-screen md:max-h-96 text-sm">
                         {coinsFiltered.map((coin, index) => (
                             <li ref={index === coins.length - 2 ? setRef : null} key={coin.id || index} onClick={() => {
                                 onChange(coin)
@@ -184,8 +166,9 @@ export default function CryptoDropDownMenu({value, onChange, error }) {
                             </li>
                         )}
                     </ul>
-                </div>,
-                document.body)}
+                </div>, 
+                targetContainer
+            )}
         </div>
     )
 }

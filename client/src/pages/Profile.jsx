@@ -18,7 +18,7 @@ function Profile() {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch("/auth/logout", {
+            const response = await fetch("api/auth/logout", {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -41,7 +41,7 @@ function Profile() {
 
     const fetchUser = async () => {
         try {
-            const response = await fetch("/user/me", {
+            const response = await fetch("api/user/me", {
                 method: "POST",
                 credentials: "include",
                 headers: {

@@ -4,7 +4,7 @@ import { useState, useEffect} from "react";
 
 
 
-export function SearchField({ inputType, outputData }) {
+export function SearchField({ inputType }) {
     const [searchInput, setSearchInput] = useState("");
 
     let inputLabel = '';

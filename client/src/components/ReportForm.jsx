@@ -100,9 +100,8 @@ function ReportForm() {
 
 
     const onSubmit = (data) => {
-        const {check_box, ...rest} = data;
-        const payload = JSON.stringify(rest);
-
+        const {check_box, crypto_name, ...rest} = data;
+        const payload = { ...rest, crypto_name: crypto_name?.name };
 
 
         fetch("/reports/create", {
@@ -112,11 +111,11 @@ function ReportForm() {
                 "Content-Type": "application/json",
                 ...(access_token ? { Authorization: `Bearer ${access_token}` } : {})
             },
-            body: payload
+            body: JSON.stringify(payload)
         })
         .then((response) => {
             if (response.ok) {
-                console.log('yes!')
+                console.log('yes!', response.json())
             }
             else {
                 console.log('no!', response.status, response.statusText)

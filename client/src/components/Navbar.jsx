@@ -37,10 +37,10 @@ function Navbar() {
                     <nav className="hidden md:flex items-center gap-8">
                         <a href="/"
                             className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Explore</a>
-                        <a href="#how-it-works"
+                        <a href="/report"
                             className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Report</a>
-                        <a href="#community"
-                            className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Articles</a>
+                        <a href="/reports"
+                            className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">All Reports</a>
                         <a href="#community"
                             className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Community</a>
                     </nav>
