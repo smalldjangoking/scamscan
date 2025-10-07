@@ -1,5 +1,6 @@
 import { Button } from "../components/ui/Button"
 import BurgerFilterMenu from "../components/reports/burgerFilterMenu"
+import ReportCard from '../components/reports/ReportCard'
 
 
 
@@ -21,10 +22,12 @@ export default function Reports() {
                         </div>
 
                         <hr className="my-2" />
-                        <div>
+                        <div className="mb-5">
                             <BurgerFilterMenu />
 
                         </div>
+
+                        <ReportCard/>
 
                     </div>
 
