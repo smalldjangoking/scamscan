@@ -101,10 +101,10 @@ function ReportForm() {
 
     const onSubmit = (data) => {
         const {check_box, crypto_name, ...rest} = data;
-        const payload = { ...rest, crypto_name: crypto_name?.name };
+        const payload = { ...rest, crypto_name: crypto_name?.id, crypto_logo_url: crypto_name?.image };
 
 
-        fetch("/reports/create", {
+        fetch("/api/reports/create", {
             method: "post",
             credentials: "include",
             headers: {
@@ -118,7 +118,7 @@ function ReportForm() {
                 console.log('yes!', response.json())
             }
             else {
-                console.log('no!', response.status, response.statusText)
+                console.log('no!', response.status, response.statusText, response.json())
             }
         })
 

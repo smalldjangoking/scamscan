@@ -12,6 +12,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@swyftx/api-crypto-address-validator": "^1.13.1",
+    "@tanstack/react-query": "^5.90.2",
     "@tiptap/extension-placeholder": "^3.4.4",
     "@tiptap/pm": "^3.4.4",
     "@tiptap/react": "^3.4.4",

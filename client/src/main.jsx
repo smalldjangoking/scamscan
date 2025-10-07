@@ -8,6 +8,16 @@ import Reports from "./pages/Reports";
 import './main.css'
 import AuthRequired from './pages/AuthRequired';
 import Report from './pages/Report';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 10000 * 60,
+    },
+  },
+})
 
 const router = createBrowserRouter([
     {
@@ -16,8 +26,12 @@ const router = createBrowserRouter([
         children: [
             { index: true, element: <Home /> },
             { path: 'profile', index: false, element: <AuthRequired><Profile /></AuthRequired> },
-            { path: 'reports', index: false, element: <Reports /> },
-            { path: 'report', index: false, element: <Report /> },
+            { path: 'reports', index: false, element: (
+            <QueryClientProvider client={queryClient}>
+                <Reports />
+            </QueryClientProvider>
+            ) },
+            { path: 'report', index: false, element:  <Report /> },
         ],
     },
 ]);
