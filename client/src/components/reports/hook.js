@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
-export function useReports({ search = '', page = 1, pageSize = 10 }) {
+export function useReports({ search = '', page = 1, pageSize = 10, browse = 'browse' }) {
   return useQuery({
     queryKey: ['reports', { search, page, pageSize }],
     queryFn: async () => {
@@ -10,6 +10,8 @@ export function useReports({ search = '', page = 1, pageSize = 10 }) {
       })
 
     if (search) params.append('search', search)
+    if (browse !== 'browse') params.append('filter_by_nick', browse)
+
 
       const res = await fetch(`api/reports/all?${params}`)
       if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)

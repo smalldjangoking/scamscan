@@ -12,6 +12,7 @@ import * as Yup from "yup";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import CryptoDropDownMenu from "../ui/CryptoDropDownMenu";
+import { useEffect } from "react";
 
 
 function ReportForm() {
@@ -46,17 +47,14 @@ function ReportForm() {
 
         website_url: Yup.string().when("report_subject", {
             is: "website",
-            then: (s) => s.required("Website URL is required").test("is-valid-url", "Invalid URL", (value) => validUrl.isUri(value)),
+            then: (s) => s.test("is-valid-url", "Invalid URL", (value) => validUrl.isUri(value)).required("Website URL is required"),
             otherwise: (s) => s.notRequired()
         }),
 
-        crypto_name: Yup.object().when("report_subject", {
-            is: "crypto",
-            then: (s) => s.shape({
-                name: Yup.string().required("Cryptocurrency name is required"),
-                image: Yup.string().required("Cryptocurrency image is required")
-            }).required("Please select a cryptocurrency"),
-            otherwise: (s) => s.notRequired()
+        crypto_object: Yup.object().when("report_subject", {
+          is: "crypto",
+          then: (s) => s.required("Please select a cryptocurrency"),
+          otherwise: (s) => s.notRequired(),
         }),
 
 
@@ -75,14 +73,14 @@ function ReportForm() {
 
     const { register, watch, handleSubmit, setValue, control, formState: { errors, isValid } } = useForm({
         resolver: yupResolver(schema),
-        mode: "onChange",
+        mode: "all", // вместо onChange
         defaultValues: {
             report_subject: "",
             report_title: "",
             report_description: "",
             website_url: "",
             crypto_address: "",
-            crypto_name: "",
+            crypto_object: {},
             screenshots: [],
             check_box: {accepted: false}
         }
@@ -91,17 +89,46 @@ function ReportForm() {
 
     const selectedReportSubject = watch("report_subject");
     const screenshots = watch("screenshots");
-
     const [tooltipContent, setTooltipContent] = useState("ToolTip");
 
-    const values = watch();
-    console.log('ошибки', errors)
-    console.log(values);
+    console.log("Errors:", errors);
+    console.log("Is valid:", isValid);
+    console.log("Values:", watch());
+
+
+    useEffect(() => {
+        if (selectedReportSubject === "crypto") {
+            setValue("website_url", "");
+            setValue("screenshots", []);
+        } else if (selectedReportSubject === "website") {
+            setValue("crypto_address", "");
+            setValue("crypto_object", {});
+            setValue("screenshots", []);
+        }
+    }, [selectedReportSubject, setValue]);
 
 
     const onSubmit = (data) => {
-        const {check_box, crypto_name, ...rest} = data;
-        const payload = { ...rest, crypto_name: crypto_name?.id, crypto_logo_url: crypto_name?.image };
+        const {report_subject, report_title, report_description, website_url, 
+              crypto_address, crypto_object, screenshots, check_box} = data;
+
+        let payload = {
+                report_subject,
+                report_title,
+                report_description,
+                screenshots,
+            };
+
+        if (data.report_subject === "crypto") {
+            payload = {
+                ...payload,
+                crypto_address,
+                crypto_name: crypto_object.id,
+                crypto_logo_url: crypto_object.image
+            }
+        } else if (data.report_subject === "website") {
+            payload = { ...payload, website_url };
+        }
 
 
         fetch("/api/reports/create", {
@@ -168,7 +195,7 @@ function ReportForm() {
                 ))}
             </div>
 
-
+            {/* Description */}
             <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
                 selectedReportSubject ? 'max-h-screen opacity-100 transform translate-y-0' 
                     : 'max-h-0 opacity-0 transform -translate-y-2'
@@ -196,8 +223,9 @@ function ReportForm() {
                         </div>
                     </div>
 
-                    {errors.crypto_name && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.crypto_name.message}</p>}
-
+                    {errors.crypto_object && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.crypto_object.message}</p>}
+                    
+                    {/* Report website URL */}
                     {selectedReportSubject === "website" && (
                         <div className="mt-5">
                             <Input {...register("website_url")} label="Website URL" placeholder='Enter the URL of the website you want to report' />
@@ -213,17 +241,17 @@ function ReportForm() {
                             <CircleQuestionMark size={16} onMouseEnter={() => setTooltipContent("Select a blockchain network and write an address")} className="my-anchor-element text-muted-foreground hover:text-foreground transition-colors cursor-help" /> 
                             </div>
                             <Controller
-                                name="crypto_name"
+                                name="crypto_object"
                                 control={control}
                                 render={({ field }) => (
                                     <CryptoDropDownMenu
                                         value={field.value}
                                         onChange={field.onChange}
-                                        error={!!errors.crypto_name}
+                                        error={!!errors.crypto_object}
                                     />
                                 )}
                             />
-                            {errors.crypto_name && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.crypto_name.message}</p>}
+                            {errors.crypto_object && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.crypto_object.message}</p>}
                             <Input
                                 {...register("crypto_address")}
                                 placeholder="Enter the cryptocurrency address you want to report"

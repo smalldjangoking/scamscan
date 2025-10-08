@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { User, Phone, AtSign, Calendar, Pencil, Check, X, KeyRound, ShieldAlert, FileWarning } from "lucide-react";
 import { Button } from "../components/ui/Button.jsx";
 import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate } from "react-router-dom";
 
 function Profile() {
     const [user, setUser] = useState(null);
@@ -14,6 +15,8 @@ function Profile() {
     const mockReports = []; // Replace with real data fetching
     const successToast = (data) => toast.success(data);
     const failedToast = (errorReason) => toast.error(`${errorReason}`);
+    const navigate = useNavigate();
+    
 
 
     const handleLogout = async () => {
@@ -361,9 +364,11 @@ function Profile() {
                         <div className="bg-card/80 backdrop-blur-sm border border-border rounded-2xl shadow-sm p-6 min-h-[340px] flex flex-col">
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl font-semibold">Your Reports</h2>
-                                <Button size="sm" variant="outline">
+                                <Button 
+                                    size="sm" variant="outline" 
+                                    onClick={() => navigate("/reports", { state: { user_nickname: user.nickname } })}>
                                     <FileWarning className="h-4 w-4 mr-2" />
-                                    New Report
+                                    My Reports
                                 </Button>
                             </div>
 
