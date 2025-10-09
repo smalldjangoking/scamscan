@@ -5,17 +5,19 @@ import { useReports } from "../components/reports/hook"
 import { useState } from "react"
 import LoadingSpinner from "../components/ui/loading"
 import { useLocation } from "react-router-dom";
+import Search from '../components/ui/Search'
 
 
 
 export default function Reports() {
     const location = useLocation();
-    const browseStateFromNav = location.state?.user_nickname || "browse";
+    const token = localStorage.getItem('access_token')
 
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
     const pageSize = 10
-    const [browse, setBrowse] = useState(browseStateFromNav)
+    const [browse, setBrowse] = useState({'show': location.state?.showUserReports 
+                                        ? 'user' : 'all', 'token': token})
 
     const { data, isLoading, isError, error, isFetching } = useReports({
     search,
@@ -37,13 +39,33 @@ export default function Reports() {
                     {/* menu */}
                     <div className="mt-4">
                         <div className="flex flex-wrap gap-2">
-                            <Button disabled={browse === 'browse'} variant="ghost" size="sm" onClick={() => setBrowse('browse')}>Browse</Button>
-                            <Button disabled={browse !== 'browse'} variant="ghost" size="sm" onClick={() => setBrowse('my-reports')}>My Reports</Button>
+                            <div className="flex flex-wrap gap-2">
+                              <Button
+                                disabled={browse.show === 'all'}
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setBrowse((old) => ({ ...old, show: 'all' }))}
+                              >
+                                Browse
+                              </Button>
+                              {token && (
+                                <Button
+                                  disabled={browse.show === 'user'}
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setBrowse((old) => ({ ...old, show: 'user' }))}
+                                >
+                                  My Reports
+                                </Button>
+                              )}
+                            </div>
+                            
                         </div>
 
                         <hr className="my-2" />
-                        <div className="mb-5">
+                        <div className="mb-5 flex items-center gap-2">
                             <BurgerFilterMenu />
+                            <Search />
 
                         </div>
                     </div>
@@ -51,7 +73,7 @@ export default function Reports() {
 
                     
                     {/* reports */}
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="">
                         {isLoading ? (
                                 <div className="col-span-full flex justify-center items-center py-20">
                                     <LoadingSpinner />
@@ -59,23 +81,26 @@ export default function Reports() {
                         ) : isError ? (
                             <div>Error: {error.message}</div>
                         ) : (
-                            data?.reports.map((report) => (
-                                <ul>
-                                    <ReportCard
-                                        key={report.id}
-                                        report_title={report.report_title}
-                                        report_description={report.report_description}
-                                        created_at={report.created_at}
-                                        user_id={report.user_id}
-                                        crypto_name={report?.crypto_name}
-                                        crypto_logo_url={report?.crypto_logo_url}
-                                    />
-                                </ul>
-                            ))
+                            <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                              {data?.reports.map((report) => (
+                                <ReportCard
+                                  key={report.id}
+                                  report_title={report.report_title}
+                                  report_description={report.report_description}
+                                  created_at={report.created_at}
+                                  user_id={report.user_id}
+                                  crypto_name={report?.crypto_name}
+                                  crypto_logo_url={report?.crypto_logo_url}
+                                  website_url={report?.website_url}
+                                  crypto_address={report?.crypto_address}
+                                />
+                              ))}
+                            </ul>
                         )}
                     </div>
 
                     {/* pagination */}
+                    {data?.totalPages !== 1 && (
                     <div className="flex justify-center mt-10 space-x-2">
                         <Button onClick={() => setPage((old) => Math.max(old - 1, 1))} disabled={page === 1 || isFetching}>
                             {Math.max(page - 1, 1)}
@@ -87,6 +112,8 @@ export default function Reports() {
                             {Math.max(page + 1, data?.totalPages)}
                         </Button>
                     </div>
+                    )}
+
                 </div>
             </section>
     );

@@ -65,11 +65,15 @@ async def get_all_reports(session: SessionDep, request: Request, response: Respo
     ):
 
     """Retrieve all reports by user or all from the database with optional queries and pagination"""
+    user_id = None
+
     if token:
         user_id = await validationJWT_or_401(request, response, token)
 
     query = select(ReportModel)
     
+    if user_id:
+        query = query.where(ReportModel.user_id == user_id)
     if q:
         query = query.where(ReportModel.crypto_address.ilike(f"%{q}%") | ReportModel.website_url.ilike(f"%{q}%"))
 

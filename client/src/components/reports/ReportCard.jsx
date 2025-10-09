@@ -1,9 +1,9 @@
 import { Globe, CalendarDays, MessageCircle, Eye, User } from 'lucide-react';
 import { Button } from '../ui/Button';
 import DOMPurify from 'dompurify'
+import truncate from '../../utils/truncate';
 
-
-const ReportCard = ({crypto_name, crypto_logo_url, report_title, report_description, user_id, created_at}) => {
+const ReportCard = ({crypto_name, crypto_logo_url, report_title, report_description, user_id, crypto_address, website_url, created_at}) => {
   const shortDescription = report_description.length > 100
   ? report_description.slice(0, 150) + "..."
   : report_description;
@@ -17,13 +17,9 @@ const ReportCard = ({crypto_name, crypto_logo_url, report_title, report_descript
   });
   return (
     <li className={`flex flex-col min-w-[250px] min-h-[250px] rounded border p-5 shadow-md transform transition duration-300 md:hover:scale-101 hover:shadow-lg ${user_id ? 'border-green-500' : 'border'}`}>
-        <div className="flex justify-between items-center">
-          <div className="bg-red-600/15 text-red-700 flex items-center gap-2 p-3 rounded-xl">
-            <span className="text-sm font-bold">{crypto_name ? (crypto_name) : 'WEB'}</span>
-            {crypto_name ?  (<img src={crypto_logo_url} alt={crypto_name} className="h-6 w-6" />) : (<Globe className="h-6 w-6" />)}
-          </div>
-
-
+        <div className="text-red-700 flex items-center gap-2 rounded-xl justify-between">
+          <Button className="max-w-[200px] truncate" size="sm" variant="ghost">{truncate({crypto: crypto_address, web: website_url})}</Button>
+          <Button variant="ghost" size="sm" >{crypto_name ?  (<img src={crypto_logo_url} alt={crypto_name} className="h-6 w-6" />) : (<Globe className="h-6 w-6" />)}</Button>
         </div>
         
         <div className="mt-5 max-w-full overflow-hidden">

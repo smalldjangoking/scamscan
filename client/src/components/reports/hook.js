@@ -1,8 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 
-export function useReports({ search = '', page = 1, pageSize = 10, browse = 'browse' }) {
+export function useReports({browse = {}, search = '', page = 1, pageSize = 10}) {
+  let token = ''
+  if (browse?.show == 'user' && browse?.token) {
+    token = browse.token
+  }
+
   return useQuery({
-    queryKey: ['reports', { search, page, pageSize }],
+    queryKey: ['reports', { search, page, pageSize, browse }],
     queryFn: async () => {
       const params = new URLSearchParams({
         page: page.toString(),
@@ -10,18 +15,15 @@ export function useReports({ search = '', page = 1, pageSize = 10, browse = 'bro
       })
 
     if (search) params.append('search', search)
-    if (browse !== 'browse') {
-      const token = localStorage.getItem('access_token')
-    }
+  
 
-
-      const res = await fetch(`api/reports/all?${params}`, {
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        }
-      })
-      if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
-      return res.json()
+    const res = await fetch(`api/reports/all?${params}`, {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+      }
+    })
+    if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
+    return res.json()
     },
     keepPreviousData: true,
   })

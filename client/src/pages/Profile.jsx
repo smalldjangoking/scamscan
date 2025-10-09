@@ -366,7 +366,7 @@ function Profile() {
                                 <h2 className="text-2xl font-semibold">Your Reports</h2>
                                 <Button 
                                     size="sm" variant="outline" 
-                                    onClick={() => navigate("/reports", { state: { user_nickname: user.nickname } })}>
+                                    onClick={() => navigate('/reports', { state: { showUserReports: true } })}>
                                     <FileWarning className="h-4 w-4 mr-2" />
                                     My Reports
                                 </Button>
