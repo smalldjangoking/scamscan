@@ -32,17 +32,22 @@ Ultimately, the project aims to build a safer environment for everyone by empowe
 
 - **Account**  
   - Save your search history and manage reports.
-  - Verified users gain the ability to leave comments
-  - Verified accounts have their credibility highlighted in ready reports.
+  - Ability to leave comments
+  - Green Border.
  
 - **Profile**
   - Change Password
   - Update Information
   - Сheck Нistory
-  - Check your reports
+  - Check your recent reports
   - Delete an Account
 
  - **Report Form**
-  ...
+  - Report An Address or Website
+  - Add Screenshots
+  - Write beutiful Description by Tiptap
+
+- **View Reports**
+  - Make diffrent query to find any reports
  
 **................ in a progress**  

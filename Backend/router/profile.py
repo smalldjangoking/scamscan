@@ -12,7 +12,7 @@ from schemas import UpdateUserInfoSchema
 from sqlalchemy import select
 
 
-router = APIRouter(prefix="/user", tags=["user"])
+router = APIRouter(prefix="/api/user", tags=["user"])
 
 @router.post("/me")
 async def read_user_me(session: SessionDep, user_id: str = Depends(validationJWT_or_401)):

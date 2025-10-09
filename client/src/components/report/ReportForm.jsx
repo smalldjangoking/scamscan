@@ -73,7 +73,7 @@ function ReportForm() {
 
     const { register, watch, handleSubmit, setValue, control, formState: { errors, isValid } } = useForm({
         resolver: yupResolver(schema),
-        mode: "all", // вместо onChange
+        mode: "onChange",
         defaultValues: {
             report_subject: "",
             report_title: "",

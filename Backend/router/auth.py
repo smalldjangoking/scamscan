@@ -9,7 +9,7 @@ from services import add_user, nickname_check, get_user_by_email, verify_passwor
     create_access_token, ALGORITHM
 
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 @router.post('/create', status_code=status.HTTP_201_CREATED)
 async def user_create(userbase: UserRegistrationSchema, session: SessionDep):
@@ -89,10 +89,10 @@ async def refresh_token_endpoint(refresh_token: RefreshTokenSchema):
         raise HTTPException(status_code=401, detail="Refresh token expired")
 
     except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token 3")
+        raise HTTPException(status_code=401, detail="Invalid token")
 
     except jwt.PyJWTError:
-        raise HTTPException(status_code=401, detail="Invalid token 2")
+        raise HTTPException(status_code=401, detail="Invalid token")
 
     new_access_token = create_access_token({"sub": user_id})
 

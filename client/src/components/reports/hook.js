@@ -10,10 +10,16 @@ export function useReports({ search = '', page = 1, pageSize = 10, browse = 'bro
       })
 
     if (search) params.append('search', search)
-    if (browse !== 'browse') params.append('filter_by_nick', browse)
+    if (browse !== 'browse') {
+      const token = localStorage.getItem('access_token')
+    }
 
 
-      const res = await fetch(`api/reports/all?${params}`)
+      const res = await fetch(`api/reports/all?${params}`, {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
+      })
       if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
       return res.json()
     },

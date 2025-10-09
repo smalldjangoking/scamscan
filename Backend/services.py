@@ -131,8 +131,5 @@ async def validationJWT_or_401(
             detail="Could not validate credentials"
         )
 
-
-        
-        
        
 
