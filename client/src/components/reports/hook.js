@@ -1,30 +1,33 @@
-import { useQuery } from '@tanstack/react-query'
+import {useQuery} from '@tanstack/react-query'
 
-export function useReports({browse = {}, search = '', page = 1, pageSize = 10}) {
-  let token = ''
-  if (browse?.show == 'user' && browse?.token) {
-    token = browse.token
-  }
+export function useReports({browse = {}, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = ''}) {
+    let token = ''
+    if (browse?.show == 'user' && browse?.token) {
+        token = browse.token
+    }
 
-  return useQuery({
-    queryKey: ['reports', { search, page, pageSize, browse }],
-    queryFn: async () => {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        page_size: pageSize.toString(),
-      })
+    return useQuery({
+        queryKey: ['reports', {debouncedSearch, page, pageSize, browse, filterQuery}],
+        queryFn: async () => {
+            const params = new URLSearchParams({
+                page: page.toString(),
+                page_size: pageSize.toString(),
+            })
 
-    if (search) params.append('search', search)
-  
+            if (debouncedSearch) params.append('search', debouncedSearch)
+            Object.entries(filterQuery).forEach(([key, value]) => {
+                params.append(key, value)
+            })
 
-    const res = await fetch(`api/reports/all?${params}`, {
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {})
-      }
+
+            const res = await fetch(`api/reports/all?${params}`, {
+                headers: {
+                    ...(token ? {Authorization: `Bearer ${token}`} : {})
+                }
+            })
+            if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
+            return res.json()
+        },
+        keepPreviousData: true,
     })
-    if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
-    return res.json()
-    },
-    keepPreviousData: true,
-  })
 }

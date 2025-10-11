@@ -19,6 +19,7 @@
     "@tiptap/react": "^3.4.4",
     "@tiptap/starter-kit": "^3.4.4",
     "dompurify": "^3.2.7",
+    "lodash.debounce": "^4.0.8",
     "multicoin-address-validator": "^0.5.26",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

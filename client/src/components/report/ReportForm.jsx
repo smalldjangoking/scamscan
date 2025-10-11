@@ -11,7 +11,7 @@ import Dropzone from "./FileDropZone";
 import * as Yup from "yup";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import CryptoDropDownMenu from "../ui/CryptoDropDownMenu";
+import CryptoDropDownMenu from "./CryptoDropDownMenu";
 import { useEffect } from "react";
 
 
@@ -152,19 +152,21 @@ function ReportForm() {
     }
 
     const reportOptions = [
-        {
-            id: "crypto",
-            label: "Crypto Address",
-            description: "Report suspicious cryptocurrency addresses",
-            icon: <WalletMinimal className="h-5 w-5" />,
-        },
-        {
-            id: "website",
-            label: "Website",
-            description: "Report malicious or scam websites",
-            icon: <Globe className="h-5 w-5" />,
-        }
-    ];
+            {
+                id: "crypto",
+                label: "Crypto Address",
+                description: "Report suspicious cryptocurrency addresses",
+                icon: <WalletMinimal className="h-5 w-5" />,
+            },
+            {
+                id: "website",
+                label: "Website",
+                description: "Report malicious or scam websites",
+                icon: <Globe className="h-5 w-5" />,
+            }
+        ];
+
+
 
     return (
         <form className="relative rounded-2xl border border-border bg-card/80 p-6 shadow-sm backdrop-blur-sm">

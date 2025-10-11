@@ -17,7 +17,7 @@ function Report() {
         <>
             <section className="relative">
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
-                <div className="relative container mx-auto px-4 py-20 md:py-28">
+                <div className="relative container mx-auto px-4 py-20 md:py-28 min-h-screen">
                     {/* Register proposal */}
                     {step === 1 && (
                         <>
