@@ -1,7 +1,7 @@
 import React from 'react'
 import {Button} from "../components/ui/Button.jsx"
 import {AlertTriangle, Badge, BookText, Star} from "lucide-react"
-import {SearchField} from "../components/ui/SearchField.jsx";
+import {Input} from "../components/ui/Input.jsx"
 import {ArrowRight} from "lucide-react"
 
 function Home() {
@@ -50,12 +50,17 @@ function Home() {
 
                         <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
                             Don't let scammers profit from deception. Scan any website or crypto address instantly,
-                            report fraudulent activities, and help protect the community.
+                            report fraudulent activities, and help protect the community
                         </p>
 
                         {/* Search Field */}
-                        <div className="mb-12">
-                            <SearchField/>
+                        <div className="mb-5 w-full md:w-1/2 md:mx-auto ">
+                            <Input placeholder={"Enter website URL or crypto address to scan..."} withIcon={true}/>
+
+                            <div className="mt-3">
+                                <Button>Scan</Button>
+                            </div>
+
                         </div>
 
                         {/* Action Buttons */}
@@ -68,7 +73,7 @@ function Home() {
                             </Button>
                             <Button onClick={() => window.location.href = '/reports'} size="lg" variant="outline" className="px-8 py-4">
                                 <BookText className="mr-2 h-5 w-5"/>
-                                Observe Scams
+                                Browse Reports
                             </Button>
                         </div>
                     </div>

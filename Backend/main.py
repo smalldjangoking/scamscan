@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from router import auth, profile, reports
+from router import auth, profile, reports, scan
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -21,3 +21,4 @@ async def read_root():
 app.include_router(auth.router)
 app.include_router(profile.router)
 app.include_router(reports.router)
+app.include_router(scan.router)

@@ -31,3 +31,18 @@ export function useReports({browse = {}, page = 1, pageSize = 10, filterQuery = 
         keepPreviousData: true,
     })
 }
+
+export function useScan({}) {
+    return useQuery({
+        queryKey: ['scan'],
+        queryFn: async () => {
+            const params = new URLSearchParams({
+
+            })
+            const res = await fetch(`api/scan/all?${params}`, {
+            })
+            if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
+            return res.json()
+        }
+    })
+}

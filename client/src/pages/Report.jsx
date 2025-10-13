@@ -148,11 +148,11 @@ function Report() {
                     {step === 2 && (
                         <>
                             {/* Header */}
-                            <div className="mx-auto mb-12 max-w-6xl text-center">
-                                <h1 className="mb-4 text-4xl tracking-tight md:text-5xl">
+                            <div className="mb-12 max-w-6xl">
+                                <h1 className="text-4xl font-bold">
                                     Fraud <span className="text-primary">Report</span> Submission
                                 </h1>
-                                <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
+                                <p className="text-muted-foreground max-w-2xl text-lg">
                                     By sharing accurate details, you help protect others from fraud and make it easier to identify scammers
                                 </p>
                             </div>

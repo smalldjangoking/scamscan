@@ -1,7 +1,7 @@
 import {Button} from "../components/ui/Button"
 import BurgerFilterMenu from "../components/reports/dropdown"
 import ReportCard from '../components/reports/ReportCard'
-import {useReports} from "../components/reports/hook"
+import {useReports} from "../utils/hook.js"
 import React, {useState, useEffect} from "react"
 import LoadingSpinner from "../components/ui/Loading"
 import {useLocation} from "react-router-dom";
@@ -26,7 +26,7 @@ export default function Reports() {
     const debounceSearch = debounce((val) => setDebouncedSearch(val), 1000);
 
 
-    const {data, isLoading, isError, error, isFetching} = useReports({
+    const {data, isLoading, isError, isFetching} = useReports({
         debouncedSearch,
         page,
         pageSize,
