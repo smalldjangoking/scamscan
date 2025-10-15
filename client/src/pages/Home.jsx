@@ -2,7 +2,7 @@ import React from 'react'
 import {Button} from "../components/ui/Button.jsx"
 import {AlertTriangle, Badge, BookText, Star} from "lucide-react"
 import {Input} from "../components/ui/Input.jsx"
-import {ArrowRight} from "lucide-react"
+import {ArrowRight, Search } from "lucide-react"
 
 function Home() {
     return (
@@ -55,7 +55,7 @@ function Home() {
 
                         {/* Search Field */}
                         <div className="mb-5 w-full md:w-1/2 md:mx-auto ">
-                            <Input placeholder={"Enter website URL or crypto address to scan..."} withIcon={true}/>
+                            <Input placeholder={"Enter website URL or crypto address to scan..."} icon={Search}/>
 
                             <div className="mt-3">
                                 <Button>Scan</Button>

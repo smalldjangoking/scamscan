@@ -1,10 +1,7 @@
-from ast import Try
-from hmac import new
 from fastapi import APIRouter
-from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException
 from database_settings import SessionDep
-from services import validationJWT_or_401
+from services import validation_jwt_or_401
 from models import UserModel
 from services import verify_password, hash_password
 from schemas import ChagnePasswordSchema
@@ -15,7 +12,7 @@ from sqlalchemy import select
 router = APIRouter(prefix="/api/user", tags=["user"])
 
 @router.post("/me")
-async def read_user_me(session: SessionDep, user_id: str = Depends(validationJWT_or_401)):
+async def read_user_me(session: SessionDep, user_id: str = Depends(validation_jwt_or_401)):
     data = await session.get(UserModel, user_id)
 
     if data:
@@ -32,7 +29,7 @@ async def read_user_me(session: SessionDep, user_id: str = Depends(validationJWT
 
 
 @router.post('/change-password')
-async def change_password(passwordSchema: ChagnePasswordSchema, session: SessionDep, user_id: str = Depends(validationJWT_or_401)):
+async def change_password(passwordSchema: ChagnePasswordSchema, session: SessionDep, user_id: str = Depends(validation_jwt_or_401)):
     data = await session.get(UserModel, user_id)
 
     if verify_password(passwordSchema.old_password, data.hashed_password):
@@ -48,7 +45,7 @@ async def change_password(passwordSchema: ChagnePasswordSchema, session: Session
     
 
 @router.patch('/update-user-info')
-async def update_user_info(userInfoSchema: UpdateUserInfoSchema, session: SessionDep, user_id: str = Depends(validationJWT_or_401)):
+async def update_user_info(userInfoSchema: UpdateUserInfoSchema, session: SessionDep, user_id: str = Depends(validation_jwt_or_401)):
     data = await session.get(UserModel, user_id)
 
     if userInfoSchema.phone:

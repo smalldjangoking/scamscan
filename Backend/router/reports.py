@@ -3,7 +3,7 @@ from database_settings import SessionDep
 from schemas import ReportSchema
 from sqlalchemy import select, func, or_
 from models import ReportModel
-from services import validationJWT_or_401
+from services import validation_jwt_or_401
 from fastapi.security import OAuth2PasswordBearer
 import bleach
 from math import ceil
@@ -20,7 +20,7 @@ async def create_report(schema: ReportSchema, session: SessionDep,
     user_id = None
 
     if token:
-        user_id = await validationJWT_or_401(request, response, token)
+        user_id = await validation_jwt_or_401(request, response, token)
 
     try:
         db_report = ReportModel(**schema.model_dump())
@@ -70,7 +70,7 @@ async def get_all_reports(session: SessionDep, request: Request, response: Respo
                           ):
     """Retrieve all reports by user or all from the database with optional queries and pagination"""
     user_id = None
-    if token: user_id = await validationJWT_or_401(request, response, token)
+    if token: user_id = await validation_jwt_or_401(request, response, token)
 
     query = select(ReportModel)
 

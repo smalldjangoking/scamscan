@@ -7,9 +7,12 @@ from database_settings import SessionDep
 from schemas import UserRegistrationSchema, UserLoginSchema, RefreshTokenSchema
 from services import add_user, nickname_check, get_user_by_email, verify_password, create_refresh_token, \
     create_access_token, ALGORITHM
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+
 
 @router.post('/create', status_code=status.HTTP_201_CREATED)
 async def user_create(userbase: UserRegistrationSchema, session: SessionDep):
@@ -42,10 +45,10 @@ async def user_login(userbase: UserLoginSchema, session: SessionDep, response: R
 
 
     if user is None:
-        raise HTTPException(status_code=400, detail="Incorrect credentials")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect credentials")
 
     if not verify_password(userbase.password, user.hashed_password):
-        raise HTTPException(status_code=400, detail="Incorrect credentials")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect credentials")
 
     refresh_token = create_refresh_token({"sub": str(user.id)})
     access_token = create_access_token({"sub": str(user.id)})
@@ -84,15 +87,15 @@ async def refresh_token_endpoint(refresh_token: RefreshTokenSchema):
         payload = jwt.decode(refresh_token.refresh_token, os.getenv('SECRET_KEY'), algorithms=[ALGORITHM])
         user_id = payload.get("sub")
         if not user_id:
-            raise HTTPException(status_code=401, detail="Invalid token")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token")
     except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Refresh token expired")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Refresh token expired")
 
     except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token")
 
     except jwt.PyJWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token")
 
     new_access_token = create_access_token({"sub": user_id})
 

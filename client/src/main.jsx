@@ -27,20 +27,12 @@ const router = createBrowserRouter([
         children: [
             { index: true, element: <Home /> },
             { path: 'profile', index: false, element: <AuthRequired><Profile /></AuthRequired> },
-            { path: 'reports', index: false, element: (
-            <QueryClientProvider client={queryClient}>
-                <Reports />
-            </QueryClientProvider>
-            ) },
-            { path: 'scan', index: false, element: (
-                    <QueryClientProvider client={queryClient}>
-                        <Scan />
-                    </QueryClientProvider>
-                ) },
+            { path: 'reports', index: false, element: (<Reports />) },
+            { path: 'scan', index: false, element: (<Scan />) },
             { path: 'report', index: false, element:  <Report /> },
         ],
     },
 ]);
 createRoot(document.getElementById('root')).render(
-    <RouterProvider router={router}></RouterProvider>
+    <QueryClientProvider client={queryClient}><RouterProvider router={router}></RouterProvider></QueryClientProvider>
 )

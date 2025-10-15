@@ -4,8 +4,8 @@ import ReportForm from "../components/report/ReportForm"
 import {Coins, Globe, Plus, HelpCircle, SquareDashedTopSolid, MoveLeft, Cog, BadgeCheck, ShieldUser, UserX, Shield, MessageCircle, CheckCircle, TrendingUp, History, AlertTriangle, Users, Eye } from 'lucide-react';
 
 function Report() {
-    const [step, setStep] = useState(2);
-    const accessToken = localStorage.getItem("access_token"); // Исправлено название ключа
+    const [step, setStep] = useState(1);
+    const accessToken = localStorage.getItem("access_token");
 
     useEffect(() => {
         if (accessToken) {

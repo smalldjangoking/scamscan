@@ -2,17 +2,16 @@
 import {Slot} from "@radix-ui/react-slot";
 import {cva} from "class-variance-authority";
 import {cn} from "./utils";
-import {SearchIcon} from "lucide-react";
 
 const inputVariants = cva(
-    "flex min-w-0 rounded-md border px-3 py-1 text-base transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed",
+    "flex min-w-0 rounded-md border text-base transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed",
     {
         variants: {
             variant: {
-                default: "w-full file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input bg-input-background file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:border-ring focus-visible:ring-ring/15 focus-visible:ring-[2px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive md:text-sm",
-                },
+                default: "w-full flex items-center rounded-md border dark:border-input bg-input-background dark:bg-input/30 pl-2 text-sm text-black dark:text-white font-medium placeholder:text-sidebar-ring selection:bg-primary selection:text-primary-foreground outline-none transition-colors focus:ring-1 focus:ring-primary disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+            },
             size: {
-                default: "h-9",
+                default: "min-h-0 h-10",
             },
         },
         defaultVariants: {
@@ -31,7 +30,7 @@ function Input({
                    label,
                    placeholder,
                    callBack,
-                   withIcon = false,
+                   icon: Icon,
                    ...props
                }) {
     const Comp = asChild ? Slot : "input";
@@ -39,16 +38,19 @@ function Input({
     return (
         <div className="flex flex-col gap-1 w-full">
             {label && (
-                <label htmlFor={label} className="text-muted-foreground max-w-2xl text-lg">
+                <label
+                    htmlFor={label}
+                    className="text-muted-foreground max-w-2xl text-lg"
+                >
                     {label}
                 </label>
             )}
 
             {/* 👇 Контейнер для иконки и инпута */}
-            <div className="relative w-full">
-                {withIcon && (
-                    <SearchIcon
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 pointer-events-none"
+            <div className="relative w-full p-[1px] overflow-visible">
+                {Icon && (
+                    <Icon
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 pointer-events-none"
                     />
                 )}
 
@@ -59,7 +61,7 @@ function Input({
                     placeholder={placeholder}
                     className={cn(
                         inputVariants({ variant, size }),
-                        withIcon && "pl-9",
+                        Icon && "pl-10",
                         className
                     )}
                     onChange={(e) => callBack?.(e.target.value)}
@@ -69,6 +71,7 @@ function Input({
         </div>
     );
 }
+
 
 export {Input, inputVariants};
 export default Input;

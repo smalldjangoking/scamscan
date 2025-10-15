@@ -1,5 +1,4 @@
 import os
-from urllib import response
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import jwt
@@ -18,8 +17,6 @@ REFRESH_TOKEN_EXPIRE_DAYS = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
-
-
 
 
 def hash_password(password: str) -> str:
@@ -79,7 +76,7 @@ def create_access_token(data: dict, expires_in: int = ACCESS_TOKEN_EXPIRE_MINUTE
 
 
 
-async def validationJWT_or_401(
+async def validation_jwt_or_401(
     request: Request,
     response: Response,
     token: str = Depends(oauth2_scheme)
@@ -102,7 +99,7 @@ async def validationJWT_or_401(
             refresh_token = request.cookies.get("refresh_token", None)
 
             if not refresh_token:
-                raise HTTPException(status_code=401, detail="Could not validate credentials")
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
 
             try:
                 user_id = jwt.decode(refresh_token, JWT_SECRET_KEY, algorithms=[ALGORITHM]).get("sub")
@@ -113,11 +110,11 @@ async def validationJWT_or_401(
             except jwt.ExpiredSignatureError:
                 response.headers["X-New-Access-Token"] = ""
                 response.delete_cookie("refresh_token")
-                raise HTTPException(status_code=401, detail="Could not validate credentials")
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
             except jwt.DecodeError:
-                raise HTTPException(status_code=401, detail="Could not validate credentials")
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
             except Exception:
-                raise HTTPException(status_code=401, detail="Could not validate credentials")
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
 
 
         if isinstance(e, jwt.InvalidTokenError):

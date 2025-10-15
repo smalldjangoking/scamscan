@@ -1,4 +1,4 @@
-import {useQuery} from '@tanstack/react-query'
+import {useQuery, useMutation } from '@tanstack/react-query'
 
 export function useReports({browse = {}, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = ''}) {
     let token = ''
@@ -32,17 +32,67 @@ export function useReports({browse = {}, page = 1, pageSize = 10, filterQuery = 
     })
 }
 
-export function useScan({}) {
-    return useQuery({
-        queryKey: ['scan'],
-        queryFn: async () => {
-            const params = new URLSearchParams({
 
-            })
-            const res = await fetch(`api/scan/all?${params}`, {
-            })
-            if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
-            return res.json()
-        }
-    })
+export function useLogin({ onSuccess, onError } = {}) {
+
+  return useMutation({
+    mutationFn: async ({ email, password }) => {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, password: password }),
+      });
+
+      if (!res.ok) {
+          const error = new Error("Login failed");
+          error.status = res.status; // 👈 добавляем статус!
+          throw error;
+      }
+
+
+      const data = await res.json();
+      localStorage.setItem("access_token", data.access_token);
+      return data;
+    },
+    onSuccess,
+    onError,
+  });
 }
+
+
+export function useRegister({ onSuccess, onError } = {}) {
+    return useMutation({
+        mutationFn: async ({ emailInput, passwordInput, password2Input, nicknameInput}) => {
+            const res = await fetch("/api/auth/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: emailInput,
+                    password: passwordInput,
+                    password_confirmation: password2Input,
+                    nickname: nicknameInput }),
+            });
+
+            if (!res.ok) {
+                let message = '';
+                try {
+                    const data = await res.json();
+                    message = data.detail || data.message || message;
+                } catch {}
+
+                if (message.length > 0) {
+                    message = 'Server is unable to register. Try again later.';
+                }
+                const error = new Error(message);
+                error.status = res.status;
+                throw error;
+            }
+
+            const data = await res.json();
+            return data;
+        },
+        onSuccess,
+        onError,
+    });
+}
+
