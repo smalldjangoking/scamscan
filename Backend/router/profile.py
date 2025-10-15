@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from fastapi import Depends, HTTPException
 from database_settings import SessionDep
 from services import validation_jwt_or_401
-from models import UserModel
+from models import Users
 from services import verify_password, hash_password
 from schemas import ChagnePasswordSchema
 from schemas import UpdateUserInfoSchema
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/user", tags=["user"])
 
 @router.post("/me")
 async def read_user_me(session: SessionDep, user_id: str = Depends(validation_jwt_or_401)):
-    data = await session.get(UserModel, user_id)
+    data = await session.get(Users, user_id)
 
     if data:
         return {
@@ -30,7 +30,7 @@ async def read_user_me(session: SessionDep, user_id: str = Depends(validation_jw
 
 @router.post('/change-password')
 async def change_password(passwordSchema: ChagnePasswordSchema, session: SessionDep, user_id: str = Depends(validation_jwt_or_401)):
-    data = await session.get(UserModel, user_id)
+    data = await session.get(Users, user_id)
 
     if verify_password(passwordSchema.old_password, data.hashed_password):
         data.hashed_password = hash_password(passwordSchema.new_password)
@@ -46,17 +46,17 @@ async def change_password(passwordSchema: ChagnePasswordSchema, session: Session
 
 @router.patch('/update-user-info')
 async def update_user_info(userInfoSchema: UpdateUserInfoSchema, session: SessionDep, user_id: str = Depends(validation_jwt_or_401)):
-    data = await session.get(UserModel, user_id)
+    data = await session.get(Users, user_id)
 
     if userInfoSchema.phone:
-        result = await session.execute(select(UserModel).where(UserModel.phone == userInfoSchema.phone))
+        result = await session.execute(select(Users).where(Users.phone == userInfoSchema.phone))
         phone_user = result.scalar_one_or_none()
 
         if phone_user:
             raise HTTPException(status_code=400, detail="Phone is already in use")
 
     if userInfoSchema.nickname:
-        result = await session.execute(select(UserModel).where(UserModel.nickname == userInfoSchema.nickname))
+        result = await session.execute(select(Users).where(Users.nickname == userInfoSchema.nickname))
         nickname_user = result.scalar_one_or_none()
 
         if nickname_user:

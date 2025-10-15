@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Query, status, Depends, Request, R
 from database_settings import SessionDep
 from schemas import ReportSchema
 from sqlalchemy import select, func, or_
-from models import ReportModel
+from models import Reports
 from services import validation_jwt_or_401
 from fastapi.security import OAuth2PasswordBearer
 import bleach
@@ -23,7 +23,7 @@ async def create_report(schema: ReportSchema, session: SessionDep,
         user_id = await validation_jwt_or_401(request, response, token)
 
     try:
-        db_report = ReportModel(**schema.model_dump())
+        db_report = Reports(**schema.model_dump())
         db_report.report_description = bleach.clean(db_report.report_description, tags=["b", "i", "p"], strip=True)
 
         if user_id:
@@ -46,7 +46,7 @@ async def get_all_reports(session: SessionDep, request: Request, response: Respo
                               default=None,
                               alias="search",
                               min_length=1,
-                              max_length=100,
+                              max_length=150,
                               description="Search value for filtering results. Crypto address, website or title are accepted"
                           ),
                           page: int = Query(
@@ -72,25 +72,25 @@ async def get_all_reports(session: SessionDep, request: Request, response: Respo
     user_id = None
     if token: user_id = await validation_jwt_or_401(request, response, token)
 
-    query = select(ReportModel)
+    query = select(Reports)
 
     if category:
-        query = query.where(ReportModel.report_subject == category)
+        query = query.where(Reports.report_subject == category)
     if user_id:
-        query = query.where(ReportModel.user_id == user_id)
+        query = query.where(Reports.user_id == user_id)
     if q:
         query = query.where(
             or_(
-                ReportModel.report_title.ilike(f"{q}%"),
-                ReportModel.crypto_address.ilike(f"%{q}%"),
-                ReportModel.website_url.ilike(f"%{q}%")
+                Reports.report_title.ilike(f"{q}%"),
+                Reports.crypto_address.ilike(f"%{q}%"),
+                Reports.website_url.ilike(f"%{q}%")
             )
         )
     if orderby:
         if orderby == "newest":  # default
-            query = query.order_by(ReportModel.id.desc())
+            query = query.order_by(Reports.id.desc())
         if orderby == "oldest":
-            query = query.order_by(ReportModel.id)
+            query = query.order_by(Reports.id)
 
     count_query = select(func.count()).select_from(query.subquery())
     total_count = (await session.execute(count_query)).scalar()

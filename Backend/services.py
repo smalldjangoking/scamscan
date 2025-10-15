@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import jwt
 from sqlalchemy import select, exists
-from models import UserModel
+from models import Users
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, Request, Response, status
 from fastapi.security import OAuth2PasswordBearer
@@ -30,14 +30,14 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 async def get_user_by_email(email: str, session: dict):
     """check if user with given email exists, gives none if not"""
-    stmt = select(UserModel).where(UserModel.email == email)
+    stmt = select(Users).where(Users.email == email)
     result = await session.execute(stmt)
     user = result.scalar_one_or_none()
     return user
 
 async def nickname_check(nickname: str , session: dict):
     stmt = select(
-        exists().where(UserModel.nickname == nickname)
+        exists().where(Users.nickname == nickname)
     )
     return await session.scalar(stmt)
 
@@ -48,7 +48,7 @@ async def add_user(userbase: dict, session: dict):
         user_data = userbase.model_dump()
         user_data['hashed_password'] = hash_password(user_data.pop('password'))
         user_data.pop('password_confirmation')
-        session.add(UserModel(**user_data))
+        session.add(Users(**user_data))
         await session.commit()
         return True
 
