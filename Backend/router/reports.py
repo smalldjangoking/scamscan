@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Request, Response
-from sqlalchemy.orm import joinedload, selectinload
+from sqlalchemy.orm import selectinload
 
 from database_settings import SessionDep
 from schemas import ReportSchema, ReportsListAPISchema, ReportAPISchema

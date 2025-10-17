@@ -9,6 +9,7 @@ import './main.css'
 import AuthRequired from './pages/AuthRequired';
 import Report from './pages/Report';
 import Scan from './pages/Scan';
+import ScanDetail from './pages/ScanDetail';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 const queryClient = new QueryClient({
@@ -29,6 +30,8 @@ const router = createBrowserRouter([
             { path: 'profile', index: false, element: <AuthRequired><Profile /></AuthRequired> },
             { path: 'reports', index: false, element: (<Reports />) },
             { path: 'scan', index: false, element: (<Scan />) },
+            { path: 'scan/website/:web_url', index: true, element: (<ScanDetail/>) },
+            { path: 'scan/crypto/:crypto_address', index: true, element: (<ScanDetail/>) },
             { path: 'report', index: false, element:  <Report /> },
         ],
     },

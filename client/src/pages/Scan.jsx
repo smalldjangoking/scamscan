@@ -1,29 +1,18 @@
 import {Button} from '../components/ui/Button.jsx'
 import Input from "../components/ui/Input.jsx";
 import {CircleQuestionMark, TriangleAlert, Bot } from "lucide-react";
-import {Tooltip} from "react-tooltip";
-import {useState} from "react";
+import SearchAddress from "../components/ui/SearchAddress.jsx";
+
 
 export default function Scan() {
-    const [search, setSearch] = useState("");
 
-    const test = false
 
     return (
         <section className="relative h-screen">
             <div
                 className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"/>
             <div className="relative container mx-auto py-10 px-2 md:py-20">
-                <div className={'bg-card/80 backdrop-blur-sm border border-border rounded-2xl shadow-sm p-6'}>
-                    <CircleQuestionMark size={20} className="scan-help absolute top-5 right-5"/>
-
-                    <Input label={'Enter websites & wallets'} placeholder={'https:// or 0x...'} value={search} callBack={setSearch}/>
-
-                    <div className="flex justify-start items-center gap-4 mt-4">
-                        <Button>Search</Button>
-                        <Button variant='ghost'>Scan with <Bot size={20}/></Button>
-                    </div>
-                </div>
+                <SearchAddress />
 
                 <div
                     className="mt-5 flex items-center p-4 mb-4 text-sm text-muted-foreground border"
@@ -39,11 +28,6 @@ export default function Scan() {
                 <div
                     className="mt-6 flex flex-col border border-dashed border-border rounded-md bg-card/80 backdrop-blur-sm ">
 
-                    <div role="status" className="max-w-sm animate-pulse blur-[25%] min-h-[120px] opacity-30">
-                        <div className="flex items-center gap-2">
-                            <div className="w-24 h-2 bg-muted-foreground"></div>
-                        </div>
-                    </div>
                 </div>
 
                 <div
@@ -53,12 +37,6 @@ export default function Scan() {
                     </p>
                 </div>
             </div>
-
-            <Tooltip
-                anchorSelect=".scan-help"
-                content={`If no results are found, it simply means there’s no information available yet.\nIt doesn’t necessarily indicate anything positive or negative`}
-                style={{whiteSpace: 'pre-line'}}
-            />
         </section>
     )
 }

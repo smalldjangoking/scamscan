@@ -1,7 +1,7 @@
 import { Globe, CalendarDays, MessageCircle, Eye, User } from 'lucide-react';
 import { Button } from '../ui/Button';
 import DOMPurify from 'dompurify'
-import truncate from '../../utils/truncate';
+import {truncate} from '../../utils/helpers.js';
 
 const ReportCard = ({crypto_name, crypto_logo_url, report_title, report_description, user_id, crypto_address, website_url, created_at}) => {
   const shortDescription = report_description.length > 100
