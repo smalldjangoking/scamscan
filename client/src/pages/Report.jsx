@@ -1,11 +1,14 @@
-﻿import { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { Button } from "../components/ui/Button";
 import ReportForm from "../components/report/ReportForm"
-import {Coins, Globe, Plus, HelpCircle, SquareDashedTopSolid, MoveLeft, Cog, BadgeCheck, ShieldUser, UserX, Shield, MessageCircle, CheckCircle, TrendingUp, History, AlertTriangle, Users, Eye } from 'lucide-react';
+import {SquareDashedTopSolid, Cog, Captions, ShieldUser, UserX, Shield, MessageCircle, TrendingUp, History, AlertTriangle, Users, Eye } from 'lucide-react';
+import Authentication from "../components/Authentication.jsx";
 
 function Report() {
     const [step, setStep] = useState(1);
     const accessToken = localStorage.getItem("access_token");
+    const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const toggleAuth = () => setIsAuthOpen(prev => !prev);
 
     useEffect(() => {
         if (accessToken) {
@@ -16,6 +19,8 @@ function Report() {
     return (
         <>
             <section className="relative">
+                <Authentication isOpen={isAuthOpen} onClose={toggleAuth} authVar='register' />
+
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
                 <div className="relative container mx-auto px-4 py-20 md:py-28 min-h-screen">
                     {/* Register proposal */}
@@ -59,10 +64,6 @@ function Report() {
                                                 <span className="text-sm font-medium">Access to comment section</span>
                                             </div>
                                             <div className="flex items-center gap-3 border-primary/20 p-3">
-                                                <BadgeCheck className="h-5 w-5 flex-shrink-0 text-blue-400" />
-                                                <span className="text-sm font-medium">Verified community badge</span>
-                                            </div>
-                                            <div className="flex items-center gap-3 border-primary/20 p-3">
                                                 <TrendingUp className="h-5 w-5 flex-shrink-0 text-primary" />
                                                 <span className="text-sm font-medium">Earn reputation points</span>
                                             </div>
@@ -70,12 +71,14 @@ function Report() {
                                                 <History className="h-5 w-5 flex-shrink-0 text-primary" />
                                                 <span className="text-sm font-medium">Save & view search history</span>
                                             </div>
+                                            <div className="flex items-center gap-3 border-primary/20 p-3">
+                                                <Captions className="h-5 w-5 flex-shrink-0 text-primary" />
+                                                <span className="text-sm font-medium">No more CAPTCHA interruptions</span>
+                                            </div>
                                         </fieldset>
 
-                                                
-
                                         <div className="mt-8 flex w-full">
-                                            <Button size="lg" className="w-full">
+                                            <Button onClick={() => setIsAuthOpen(true)} size="lg" className="w-full">
                                                 Get Protected Now
                                                 <Shield className="ml-2 h-4 w-4" />
                                             </Button>
@@ -131,17 +134,6 @@ function Report() {
             </div>
         </div>
     </div>
-
-               {/* Bottom CTA */}
-               <div className="mt-12 text-center">
-                   <p className="text-muted-foreground mb-4">
-                       Join <span className="font-semibold text-primary">thousands</span> of users protecting the community
-                   </p>
-                   <Button onClick={() => window.location.href = '/'} variant="ghost" size="sm">
-                       <MoveLeft className="mr-2 h-4 w-4" />
-                       Go back
-                   </Button>
-               </div>
            </>
                     )}
 

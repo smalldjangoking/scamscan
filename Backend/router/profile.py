@@ -4,7 +4,7 @@ from database_settings import SessionDep
 from services import validation_jwt_or_401
 from models import Users
 from services import verify_password, hash_password
-from schemas import ChagnePasswordSchema
+from schemas import ChangePasswordSchema
 from schemas import UpdateUserInfoSchema
 from sqlalchemy import select
 
@@ -29,7 +29,7 @@ async def read_user_me(session: SessionDep, user_id: str = Depends(validation_jw
 
 
 @router.post('/change-password')
-async def change_password(passwordSchema: ChagnePasswordSchema, session: SessionDep, user_id: str = Depends(validation_jwt_or_401)):
+async def change_password(passwordSchema: ChangePasswordSchema, session: SessionDep, user_id: str = Depends(validation_jwt_or_401)):
     data = await session.get(Users, user_id)
 
     if verify_password(passwordSchema.old_password, data.hashed_password):

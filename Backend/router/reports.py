@@ -1,12 +1,15 @@
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Request, Response
+from sqlalchemy.orm import joinedload, selectinload
+
 from database_settings import SessionDep
-from schemas import ReportSchema
+from schemas import ReportSchema, ReportsListAPISchema, ReportAPISchema
 from sqlalchemy import select, func, or_
-from models import Reports
+from models import Reports, Addresses
 from services import validation_jwt_or_401
 from fastapi.security import OAuth2PasswordBearer
 import bleach
 from math import ceil
+from slugify import slugify
 
 router = APIRouter(prefix="/api/reports", tags=["reports"])
 oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
@@ -23,16 +26,30 @@ async def create_report(schema: ReportSchema, session: SessionDep,
         user_id = await validation_jwt_or_401(request, response, token)
 
     try:
-        db_report = Reports(**schema.model_dump())
-        db_report.report_description = bleach.clean(db_report.report_description, tags=["b", "i", "p"], strip=True)
-
-        if user_id:
-            db_report.user_id = int(user_id)
-
-        session.add(db_report)
+        address_data = {
+            "website_url": schema.website_url,
+            "crypto_address": schema.crypto_address,
+            "crypto_name": schema.crypto_name,
+            "crypto_logo_url": schema.crypto_logo_url,
+            "subject": schema.subject,
+        }
+        slug = slugify(schema.report_title)
+        report_data = schema.model_dump(exclude=set(address_data.keys()))
+        address = Addresses(**address_data)
+        session.add(address)
         await session.commit()
 
-        return {"message": "Report created successfully", "report_id": db_report.id}
+        report = Reports(**report_data, address_id=address.id, slug=slug)
+        report.report_description = bleach.clean(report.report_description, tags=["b", "i", "p"], strip=True)
+
+
+        if user_id:
+            report.user_id = int(user_id)
+
+        session.add(report)
+        await session.commit()
+
+        return {"message": "Report created successfully", "report_id": report.id}
 
     except Exception as e:
         await session.rollback()
@@ -72,18 +89,18 @@ async def get_all_reports(session: SessionDep, request: Request, response: Respo
     user_id = None
     if token: user_id = await validation_jwt_or_401(request, response, token)
 
-    query = select(Reports)
+    query = select(Reports).options(selectinload(Reports.address))
 
     if category:
-        query = query.where(Reports.report_subject == category)
+        query = query.where(Reports.subject == category)
     if user_id:
         query = query.where(Reports.user_id == user_id)
     if q:
         query = query.where(
             or_(
                 Reports.report_title.ilike(f"{q}%"),
-                Reports.crypto_address.ilike(f"%{q}%"),
-                Reports.website_url.ilike(f"%{q}%")
+                Addresses.crypto_address.ilike(f"%{q}%"),
+                Addresses.website_url.ilike(f"%{q}%")
             )
         )
     if orderby:
@@ -100,4 +117,8 @@ async def get_all_reports(session: SessionDep, request: Request, response: Respo
 
     result = await session.execute(query)
     reports = result.scalars().all()
-    return {"reports": reports, "totalPages": total_pages}
+
+    return ReportsListAPISchema(
+        reports=[ReportAPISchema.model_validate(report) for report in reports],
+        totalPages=total_pages
+    )

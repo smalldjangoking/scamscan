@@ -103,8 +103,8 @@ async def validation_jwt_or_401(
 
             try:
                 user_id = jwt.decode(refresh_token, JWT_SECRET_KEY, algorithms=[ALGORITHM]).get("sub")
-                new_accessJWT = create_access_token({"sub": user_id})
-                response.headers["X-New-Access-Token"] = new_accessJWT
+                new_jwt_token = create_access_token({"sub": user_id})
+                response.headers["X-New-Access-Token"] = new_jwt_token
                 return user_id
 
             except jwt.ExpiredSignatureError:

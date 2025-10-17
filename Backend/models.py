@@ -36,26 +36,27 @@ class Reports(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
-    report_subject: Mapped[str] = mapped_column(String, nullable=False)
     report_title: Mapped[str] = mapped_column(String(50), nullable=False)
     report_description: Mapped[str] = mapped_column(String(2000), nullable=False)
     screenshots: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
 
-    address: Mapped[str] = mapped_column(ForeignKey("addresses.id"), nullable=False, index=True)
+    address_id: Mapped[int] = mapped_column(ForeignKey("addresses.id", ondelete="CASCADE"), nullable=False)
+    slug: Mapped[str] = mapped_column(String, nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
     views: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
-    
+    address: Mapped["Addresses"] = relationship(back_populates="reports")
     user: Mapped["Users"] = relationship(back_populates="reports")
     comments: Mapped[list["Comments"]] = relationship(back_populates="report")
 
 
 class Addresses(Base):
-    __tablename__ = "address"
+    __tablename__ = "addresses"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    subject: Mapped[str] = mapped_column(nullable=False)
     website_url: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
     crypto_address: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
     crypto_name: Mapped[str | None] = mapped_column(String, nullable=True)
@@ -63,8 +64,10 @@ class Addresses(Base):
 
     likes: Mapped[int] = mapped_column(Integer, default=0)
     dislikes: Mapped[int] = mapped_column(Integer, default=0)
-
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    reports: Mapped[list["Reports"]] = relationship(back_populates="address", cascade="all, delete-orphan",
+                                                    passive_deletes=True)
 
 
 class Comments(Base):

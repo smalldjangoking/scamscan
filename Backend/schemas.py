@@ -1,4 +1,6 @@
-from pydantic import BaseModel, EmailStr, model_validator
+from datetime import datetime
+
+from pydantic import BaseModel, EmailStr, model_validator, ConfigDict
 
 
 class UserRegistrationSchema(BaseModel):
@@ -17,7 +19,7 @@ class RefreshTokenSchema(BaseModel):
     refresh_token: str
 
 
-class ChagnePasswordSchema(BaseModel):
+class ChangePasswordSchema(BaseModel):
     old_password: str
     new_password: str
 
@@ -29,7 +31,7 @@ class UpdateUserInfoSchema(BaseModel):
     phone: str | None = None
 
 class ReportSchema(BaseModel):
-    report_subject: str
+    subject: str
     report_title: str
     report_description: str
     website_url: str | None = None
@@ -40,17 +42,43 @@ class ReportSchema(BaseModel):
 
     @model_validator(mode="after")
     def both_subjects_not_allowed(cls, data):
-        if data.report_subject == "crypto" and (data.website_url is not None):
-            raise ValueError("website_url must be None when report_subject is 'crypto'")
-        if data.report_subject == "website" and (data.crypto_address is not None or data.crypto_name is not None):
-            raise ValueError("crypto_address and crypto_name must be None when report_subject is 'website'")
+        if data.subject == "crypto" and (data.website_url is not None):
+            raise ValueError("website_url must be None when subject is 'crypto'")
+        if data.subject == "website" and (data.crypto_address is not None or data.crypto_name is not None):
+            raise ValueError("crypto_address and crypto_name must be None when subject is 'website'")
         return data
     
     @model_validator(mode="after")
     def subject_one_of_two(cls, data):
-        if data.report_subject not in ["crypto", "website"]:
-            raise ValueError("report_subject must be either 'crypto' or 'website'")
+        if data.subject not in ["crypto", "website"]:
+            raise ValueError("subject must be either 'crypto' or 'website'")
         return data
+
+class AddressAPISchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    website_url: str | None = None
+    crypto_address: str | None = None
+    crypto_name: str | None = None
+    crypto_logo_url: str | None = None
+    subject: str
+
+
+class ReportAPISchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    report_title: str
+    report_description: str
+    address: AddressAPISchema
+    slug: str
+    created_at: datetime
+    views: int
+
+class ReportsListAPISchema(BaseModel):
+    reports: list[ReportAPISchema]
+    totalPages: int
+
 
 
 

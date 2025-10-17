@@ -20,7 +20,7 @@ function ReportForm() {
 
     const schema = Yup.object().shape({
 
-        report_subject: Yup.string()
+        subject: Yup.string()
             .oneOf(["crypto", "website"], "Select a valid subject")
             .required("Please select a subject"),
 
@@ -45,21 +45,21 @@ function ReportForm() {
                 )
             ),
 
-        website_url: Yup.string().when("report_subject", {
+        website_url: Yup.string().when("subject", {
             is: "website",
             then: (s) => s.test("is-valid-url", "Invalid URL", (value) => validUrl.isUri(value)).required("Website URL is required"),
             otherwise: (s) => s.notRequired()
         }),
 
-        crypto_object: Yup.object().when("report_subject", {
+        crypto_object: Yup.object().when("subject", {
           is: "crypto",
           then: (s) => s.required("Please select a cryptocurrency"),
           otherwise: (s) => s.notRequired(),
         }),
 
 
-        crypto_address: Yup.string().when(["report_subject"], {
-            is: (report_subject) => report_subject === "crypto",
+        crypto_address: Yup.string().when(["subject"], {
+            is: (subject) => subject === "crypto",
             then: (s) => s.min(15, "Crypto address must be at least 15 characters").required("Crypto address is required"),
             otherwise: (s) => s.notRequired()
         }),
@@ -75,7 +75,7 @@ function ReportForm() {
         resolver: yupResolver(schema),
         mode: "onChange",
         defaultValues: {
-            report_subject: "",
+            subject: "",
             report_title: "",
             report_description: "",
             website_url: "",
@@ -87,7 +87,7 @@ function ReportForm() {
     });
 
 
-    const selectedReportSubject = watch("report_subject");
+    const selectedReportSubject = watch("subject");
     const screenshots = watch("screenshots");
     const [tooltipContent, setTooltipContent] = useState("ToolTip");
 
@@ -109,24 +109,24 @@ function ReportForm() {
 
 
     const onSubmit = (data) => {
-        const {report_subject, report_title, report_description, website_url, 
+        const {subject, report_title, report_description, website_url, 
               crypto_address, crypto_object, screenshots, check_box} = data;
 
         let payload = {
-                report_subject,
+                subject,
                 report_title,
                 report_description,
                 screenshots,
             };
 
-        if (data.report_subject === "crypto") {
+        if (data.subject === "crypto") {
             payload = {
                 ...payload,
                 crypto_address,
                 crypto_name: crypto_object.id,
                 crypto_logo_url: crypto_object.image
             }
-        } else if (data.report_subject === "website") {
+        } else if (data.subject === "website") {
             payload = { ...payload, website_url };
         }
 
@@ -181,10 +181,10 @@ function ReportForm() {
                     <label key={option.id} className="mt-4 flex cursor-pointer items-center gap-3 rounded-lg border border-border p-4 backdrop-blur-sm transition-colors hover:bg-accent/50">
                         <input
                             type="radio"
-                            name="report_subject"
+                            name="subject"
                             value={option.id}
                             className="radio-custom"
-                            {...register("report_subject")}
+                            {...register("subject")}
                         />
                         <div className={`p-2 rounded-full bg-accent/50 hidden md:flex`}>
                             {option.icon}
@@ -237,10 +237,10 @@ function ReportForm() {
 
                     {/* Report crypto Address */}
                     {selectedReportSubject === "crypto" && (
-                        <div className="mt-5">
+                        <div className="mt-5 flex flex-col gap-3">
                             <div className="flex items-center gap-3">
                                <h3 className="text-lg font-medium tracking-wider text-foreground">Report an address</h3>
-                            <CircleQuestionMark size={16} onMouseEnter={() => setTooltipContent("Select a blockchain network and write an address")} className="my-anchor-element text-muted-foreground hover:text-foreground transition-colors cursor-help" /> 
+                            <CircleQuestionMark size={16} onMouseEnter={() => setTooltipContent("Select a blockchain network and write an address")} className=" my-anchor-element text-muted-foreground hover:text-foreground transition-colors cursor-help" />
                             </div>
                             <Controller
                                 name="crypto_object"

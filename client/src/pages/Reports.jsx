@@ -57,7 +57,7 @@ export default function Reports() {
         return () => debounceSearch.cancel();
     }, [search]);
 
-
+    console.log(data)
     return (
         <section className="relative">
             <div
@@ -137,10 +137,10 @@ export default function Reports() {
                                         report_description={report.report_description}
                                         created_at={report.created_at}
                                         user_id={report.user_id}
-                                        crypto_name={report?.crypto_name}
-                                        crypto_logo_url={report?.crypto_logo_url}
-                                        website_url={report?.website_url}
-                                        crypto_address={report?.crypto_address}
+                                        crypto_name={report?.address.crypto_name}
+                                        crypto_logo_url={report?.address.crypto_logo_url}
+                                        website_url={report?.address.website_url}
+                                        crypto_address={report?.address.crypto_address}
                                     />
                                 ))}
                             </ul>)
