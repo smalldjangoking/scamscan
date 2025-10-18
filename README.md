@@ -47,10 +47,13 @@ Ultimately, the project aims to build a safer environment for everyone by empowe
   - Add Screenshots
   - Write beutiful Description by Tiptap
  
- - **View Reports**
-  - Make diffrent query to find any reports
+- **View Reports**  
+  - Explore community reports using flexible search filters.  
+  - Find detailed records about suspicious websites and crypto addresses.
 
- - **Scan URLs&Addresses**
-  - Make a different query to find any information available on the platform.
+- **Scan URLs & Addresses**  
+  - Instantly check any website or crypto address for existing reports.  
+  - Get insights and trust indicators from community data.
+
  
 **................ in a progress**  
