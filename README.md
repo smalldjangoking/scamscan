@@ -40,14 +40,17 @@ Ultimately, the project aims to build a safer environment for everyone by empowe
   - Update Information
   - Сheck Нistory
   - Check your recent reports
-  - Delete an Account
+  - Delete an Account (It also deletes all Reports)
 
  - **Report Form**
   - Report An Address or Website
   - Add Screenshots
   - Write beutiful Description by Tiptap
-
-- **View Reports**
+ 
+ - **View Reports**
   - Make diffrent query to find any reports
+
+ - **Scan URLs&Addresses**
+  - Make a different query to find any information available on the platform.
  
 **................ in a progress**  
