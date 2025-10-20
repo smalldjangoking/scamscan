@@ -40,14 +40,20 @@ Ultimately, the project aims to build a safer environment for everyone by empowe
   - Update Information
   - Сheck Нistory
   - Check your recent reports
-  - Delete an Account
+  - Delete an Account (It also deletes all Reports)
 
- - **Report Form**
-  - Report An Address or Website
-  - Add Screenshots
-  - Write beutiful Description by Tiptap
+- **Report Form**  
+  - Report an address or website  
+  - Add screenshots  
+  - Write beautiful descriptions using Tiptap
+ 
+- **View Reports**  
+  - Explore community reports using flexible search filters.  
+  - Find detailed records about suspicious websites and crypto addresses.
 
-- **View Reports**
-  - Make diffrent query to find any reports
+- **Scan URLs & Addresses**  
+  - Instantly check any website or crypto address for existing reports.  
+  - Get insights and trust indicators from community data.
+
  
 **................ in a progress**  
