@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Query, status, Depends, Request, R
 from sqlalchemy.orm import selectinload
 
 from database_settings import SessionDep
-from schemas import ReportSchema, ReportsListAPISchema, ReportAPISchema
+from schemas import ReportSchema, ReportsListAPISchema, ReportAPISchema, AddressListReportSchema, AddressReportSchema
 from sqlalchemy import select, func, or_
 from models import Reports, Addresses
 from services import validation_jwt_or_401
@@ -41,7 +41,6 @@ async def create_report(schema: ReportSchema, session: SessionDep,
 
         report = Reports(**report_data, address_id=address.id, slug=slug)
         report.report_description = bleach.clean(report.report_description, tags=["b", "i", "p"], strip=True)
-
 
         if user_id:
             report.user_id = int(user_id)
@@ -83,6 +82,11 @@ async def get_all_reports(session: SessionDep, request: Request, response: Respo
                           orderby: str = Query(
                               default='newest',
                               description="Sort order of the reports"
+                          ),
+                          address_id: str = Query(
+                              default=None,
+                              alias="address_id",
+                              description="Sort Reports by Address ID. You don't need to use Search then."
                           )
                           ):
     """Retrieve all reports by user or all from the database with optional queries and pagination"""
@@ -90,6 +94,8 @@ async def get_all_reports(session: SessionDep, request: Request, response: Respo
     if token: user_id = await validation_jwt_or_401(request, response, token)
 
     query = select(Reports).options(selectinload(Reports.address))
+    if address_id:
+        query = select(Reports).where(Reports.address_id == address_id)
 
     if category:
         query = query.where(Addresses.subject == category)
@@ -117,6 +123,12 @@ async def get_all_reports(session: SessionDep, request: Request, response: Respo
 
     result = await session.execute(query)
     reports = result.scalars().all()
+
+    if address_id:
+        return AddressListReportSchema(
+            reports=[AddressReportSchema.model_validate(report) for report in reports],
+            totalPages=total_pages
+        )
 
     return ReportsListAPISchema(
         reports=[ReportAPISchema.model_validate(report) for report in reports],

@@ -59,5 +59,6 @@ async def router_check(session: SessionDep,
     return {
         "address": address,
         "reports": reports,
+        'total_reports': total_count,
         "total_pages": total_pages,
     }

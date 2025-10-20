@@ -9,7 +9,6 @@ import Input from '../components/ui/Input'
 import {Menu, ListFilter, FileWarning} from "lucide-react"
 import debounce from 'lodash.debounce';
 
-
 export default function Reports() {
     const location = useLocation();
     const token = localStorage.getItem('access_token')

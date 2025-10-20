@@ -1,13 +1,13 @@
 import {useQuery, useMutation } from '@tanstack/react-query'
 
-export function useReports({browse = {}, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = ''}) {
+export function useReports({browse = {}, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = '', address_id = ''}) {
     let token = ''
     if (browse?.show == 'user' && browse?.token) {
         token = browse.token
     }
 
     return useQuery({
-        queryKey: ['reports', {debouncedSearch, page, pageSize, browse, filterQuery}],
+        queryKey: ['reports', {debouncedSearch, page, pageSize, browse, filterQuery, address_id}],
         queryFn: async () => {
             const params = new URLSearchParams({
                 page: page.toString(),
@@ -15,6 +15,7 @@ export function useReports({browse = {}, page = 1, pageSize = 10, filterQuery = 
             })
 
             if (debouncedSearch) params.append('search', debouncedSearch)
+            if (address_id) params.append('address_id', address_id)
             Object.entries(filterQuery).forEach(([key, value]) => {
                 params.append(key, value)
             })

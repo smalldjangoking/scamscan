@@ -61,7 +61,7 @@ class AddressAPISchema(BaseModel):
     crypto_address: str | None = None
     crypto_name: str | None = None
     crypto_logo_url: str | None = None
-    subject: str
+    subject: str | None = None
 
 
 class ReportAPISchema(BaseModel):
@@ -70,13 +70,28 @@ class ReportAPISchema(BaseModel):
     id: int
     report_title: str
     report_description: str
-    address: AddressAPISchema
+    address: AddressAPISchema | None = None
     slug: str
     created_at: datetime
     views: int
 
 class ReportsListAPISchema(BaseModel):
     reports: list[ReportAPISchema]
+    totalPages: int
+
+class AddressReportSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    report_title: str
+    report_description: str
+    address_id: int | None = None
+    slug: str
+    created_at: datetime
+    views: int
+
+class AddressListReportSchema(BaseModel):
+    reports: list[AddressReportSchema]
     totalPages: int
 
 
