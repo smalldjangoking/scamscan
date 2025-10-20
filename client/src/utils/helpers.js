@@ -12,13 +12,17 @@ export function truncate({ crypto = false, web = false }) {
 
 
 export function isValidUrl(str) {
+  const urlRegex = /^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/i;
+  if (!urlRegex.test(str)) return false;
+
+
   try {
     new URL(str);
     return true;
   } catch {
     try {
       const url = new URL(`https://${str}`);
-      return url.hostname.includes('.') || url.hostname === 'localhost';
+      return url.hostname.includes('.');
     } catch {
       return false;
     }

@@ -57,9 +57,9 @@ class Addresses(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     subject: Mapped[str] = mapped_column(nullable=False)
-    website_url: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
-    crypto_address: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
-    crypto_name: Mapped[str | None] = mapped_column(String, nullable=True)
+    website_url: Mapped[str | None] = mapped_column(String, nullable=True, index=True, unique=True)
+    crypto_address: Mapped[str | None] = mapped_column(String, nullable=True, index=True, unique=True)
+    crypto_name: Mapped[str | None] = mapped_column(String, nullable=True, unique=True)
     crypto_logo_url: Mapped[str | None] = mapped_column(String, nullable=True)
 
     likes: Mapped[int] = mapped_column(Integer, default=0)

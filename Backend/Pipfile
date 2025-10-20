@@ -14,7 +14,6 @@ pyjwt = "*"
 dotenv = "*"
 bcrypt = "4.0.1"
 bleach = "*"
-linkify-it-py = "*"
 pytest = "*"
 httpx = "*"
 

@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from enum import Enum
 from pydantic import BaseModel, EmailStr, model_validator, ConfigDict
 
 
@@ -79,6 +79,10 @@ class ReportsListAPISchema(BaseModel):
     reports: list[ReportAPISchema]
     totalPages: int
 
+
+class SubjectEnum(str, Enum):
+    crypto = "crypto"
+    website = "website"
 
 
 

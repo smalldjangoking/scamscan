@@ -4,7 +4,6 @@ import { Button } from "../ui/Button";
 
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
-import validUrl from "valid-url";
 import { Input } from "../ui/Input";
 import Tiptap from './TipTapEditor';
 import Dropzone from "./FileDropZone";
@@ -13,6 +12,8 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import CryptoDropDownMenu from "./CryptoDropDownMenu";
 import { useEffect } from "react";
+import {isValidUrl} from "../../utils/helpers.js";
+
 
 
 function ReportForm() {
@@ -47,8 +48,8 @@ function ReportForm() {
 
         website_url: Yup.string().when("subject", {
             is: "website",
-            then: (s) => s.test("is-valid-url", "Invalid URL", (value) => validUrl.isUri(value)).required("Website URL is required"),
-            otherwise: (s) => s.notRequired()
+            then: (s) => s.test('test-url', 'URL link is not correct', (value) => (isValidUrl(value))).required("Website URL is required"),
+            otherwise: (s) => s.notRequired(),
         }),
 
         crypto_object: Yup.object().when("subject", {

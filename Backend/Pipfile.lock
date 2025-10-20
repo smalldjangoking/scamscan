@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "13b6ce550e9eeb34ebccbbdb5f539343517ba80fdb873388be9477398d1cc9dc"
+            "sha256": "de36991ee1efa4e781bf8e4fe191f2ae84e2034dd519a195ec1b58ae5dec2fe0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -234,15 +234,6 @@
             ],
             "markers": "python_version >= '3.8'",
             "version": "==2.1.0"
-        },
-        "linkify-it-py": {
-            "hashes": [
-                "sha256:68cda27e162e9215c17d786649d1da0021a451bdc436ef9e0fa0ba5234b9b048",
-                "sha256:6bcbc417b0ac14323382aef5c5192c0075bf8a9d6b41820a2b66371eac6b6d79"
-            ],
-            "index": "pypi",
-            "markers": "python_version >= '3.7'",
-            "version": "==2.0.3"
         },
         "packaging": {
             "hashes": [
@@ -513,14 +504,6 @@
             ],
             "markers": "python_version >= '3.9'",
             "version": "==0.4.2"
-        },
-        "uc-micro-py": {
-            "hashes": [
-                "sha256:d321b92cff673ec58027c04015fcaa8bb1e005478643ff4a500882eaab88c48a",
-                "sha256:db1dffff340817673d7b466ec86114a9dc0e9d4d9b5ba229d9d60e5c12600cd5"
-            ],
-            "markers": "python_version >= '3.7'",
-            "version": "==1.0.3"
         },
         "uvicorn": {
             "hashes": [

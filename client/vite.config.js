@@ -9,7 +9,8 @@ export default defineConfig({
         proxy: {
             '/api/auth': 'http://localhost:8000',
             '/api/user': 'http://localhost:8000',
-            '/api/reports': 'http://localhost:8000'
+            '/api/reports': 'http://localhost:8000',
+            '/api/scan': 'http://localhost:8000'
         }
     },
 

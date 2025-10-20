@@ -20,12 +20,35 @@ export function useReports({browse = {}, page = 1, pageSize = 10, filterQuery = 
             })
 
 
-            const res = await fetch(`api/reports/all?${params}`, {
+            const res = await fetch(`/api/reports/all?${params}`, {
                 headers: {
                     ...(token ? {Authorization: `Bearer ${token}`} : {})
                 }
             })
             if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
+            return res.json()
+        },
+        keepPreviousData: true,
+    })
+}
+
+
+export function useAddress({value, subject, page = 1, pageSize = 10}) {
+
+    return useQuery({
+        queryKey: ['addresses', {value, subject, page, pageSize}],
+        queryFn: async () => {
+            const params = new URLSearchParams({
+                value: value.toString(),
+                subject: subject.toString(),
+                page: page.toString(),
+                page_size: pageSize.toString(),
+            })
+
+            const res = await fetch(`/api/scan/address?${params}`)
+
+            if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
+
             return res.json()
         },
         keepPreviousData: true,

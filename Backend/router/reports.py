@@ -92,7 +92,7 @@ async def get_all_reports(session: SessionDep, request: Request, response: Respo
     query = select(Reports).options(selectinload(Reports.address))
 
     if category:
-        query = query.where(Reports.subject == category)
+        query = query.where(Addresses.subject == category)
     if user_id:
         query = query.where(Reports.user_id == user_id)
     if q:

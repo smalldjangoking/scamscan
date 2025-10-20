@@ -57,7 +57,7 @@ export default function Reports() {
         return () => debounceSearch.cancel();
     }, [search]);
 
-    console.log(data)
+
     return (
         <section className="relative">
             <div
