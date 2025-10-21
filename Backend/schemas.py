@@ -57,11 +57,13 @@ class ReportSchema(BaseModel):
 class AddressAPISchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
+    id: int | None = None
     website_url: str | None = None
     crypto_address: str | None = None
     crypto_name: str | None = None
     crypto_logo_url: str | None = None
     subject: str | None = None
+    created_at: datetime | None = None
 
 
 class ReportAPISchema(BaseModel):

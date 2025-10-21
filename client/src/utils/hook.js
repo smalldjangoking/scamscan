@@ -1,13 +1,13 @@
 import {useQuery, useMutation } from '@tanstack/react-query'
 
-export function useReports({browse = {}, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = '', address_id = ''}) {
+export function useReports({browse = {}, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = ''}) {
     let token = ''
     if (browse?.show == 'user' && browse?.token) {
         token = browse.token
     }
 
     return useQuery({
-        queryKey: ['reports', {debouncedSearch, page, pageSize, browse, filterQuery, address_id}],
+        queryKey: ['reports', {debouncedSearch, page, pageSize, browse, filterQuery}],
         queryFn: async () => {
             const params = new URLSearchParams({
                 page: page.toString(),
@@ -15,7 +15,6 @@ export function useReports({browse = {}, page = 1, pageSize = 10, filterQuery = 
             })
 
             if (debouncedSearch) params.append('search', debouncedSearch)
-            if (address_id) params.append('address_id', address_id)
             Object.entries(filterQuery).forEach(([key, value]) => {
                 params.append(key, value)
             })
@@ -34,16 +33,14 @@ export function useReports({browse = {}, page = 1, pageSize = 10, filterQuery = 
 }
 
 
-export function useAddress({value, subject, page = 1, pageSize = 10}) {
+export function useAddress({value, subject}) {
 
     return useQuery({
-        queryKey: ['addresses', {value, subject, page, pageSize}],
+        queryKey: ['addresses', {value, subject}],
         queryFn: async () => {
             const params = new URLSearchParams({
                 value: value.toString(),
                 subject: subject.toString(),
-                page: page.toString(),
-                page_size: pageSize.toString(),
             })
 
             const res = await fetch(`/api/scan/address?${params}`)
@@ -53,6 +50,26 @@ export function useAddress({value, subject, page = 1, pageSize = 10}) {
             return res.json()
         },
         keepPreviousData: true,
+    })
+}
+
+export function useAddrReports({page = 1, pageSize = 10, address_id = ''}) {
+    return useQuery({
+        queryKey: ['reports', {page, pageSize, address_id}],
+        queryFn: async () => {
+            const params = new URLSearchParams({
+                page: page.toString(),
+                page_size: pageSize.toString(),
+            })
+
+            if (address_id) params.append('address_id', address_id)
+
+            const res = await fetch(`/api/scan/address/reports?${params}`)
+            if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
+            return res.json()
+        },
+        keepPreviousData: true,
+        enabled: !!address_id,
     })
 }
 

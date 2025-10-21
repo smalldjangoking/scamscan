@@ -26,6 +26,18 @@ async def create_report(schema: ReportSchema, session: SessionDep,
         user_id = await validation_jwt_or_401(request, response, token)
 
     try:
+        response = await session.execute(
+            select(Addresses).where(
+                or_(
+                    Addresses.crypto_address == schema.crypto_address,
+                    Addresses.website_url == schema.website_url,
+                )
+            )
+        )
+
+        address = response.scalar_one_or_none()
+
+
         address_data = {
             "website_url": schema.website_url,
             "crypto_address": schema.crypto_address,
@@ -33,11 +45,14 @@ async def create_report(schema: ReportSchema, session: SessionDep,
             "crypto_logo_url": schema.crypto_logo_url,
             "subject": schema.subject,
         }
+
         slug = slugify(schema.report_title)
         report_data = schema.model_dump(exclude=set(address_data.keys()))
-        address = Addresses(**address_data)
-        session.add(address)
-        await session.commit()
+
+        if not address:
+            address = Addresses(**address_data)
+            session.add(address)
+            await session.flush()
 
         report = Reports(**report_data, address_id=address.id, slug=slug)
         report.report_description = bleach.clean(report.report_description, tags=["b", "i", "p"], strip=True)
@@ -82,11 +97,6 @@ async def get_all_reports(session: SessionDep, request: Request, response: Respo
                           orderby: str = Query(
                               default='newest',
                               description="Sort order of the reports"
-                          ),
-                          address_id: str = Query(
-                              default=None,
-                              alias="address_id",
-                              description="Sort Reports by Address ID. You don't need to use Search then."
                           )
                           ):
     """Retrieve all reports by user or all from the database with optional queries and pagination"""
@@ -94,8 +104,6 @@ async def get_all_reports(session: SessionDep, request: Request, response: Respo
     if token: user_id = await validation_jwt_or_401(request, response, token)
 
     query = select(Reports).options(selectinload(Reports.address))
-    if address_id:
-        query = select(Reports).where(Reports.address_id == address_id)
 
     if category:
         query = query.where(Addresses.subject == category)
@@ -124,11 +132,6 @@ async def get_all_reports(session: SessionDep, request: Request, response: Respo
     result = await session.execute(query)
     reports = result.scalars().all()
 
-    if address_id:
-        return AddressListReportSchema(
-            reports=[AddressReportSchema.model_validate(report) for report in reports],
-            totalPages=total_pages
-        )
 
     return ReportsListAPISchema(
         reports=[ReportAPISchema.model_validate(report) for report in reports],

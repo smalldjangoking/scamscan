@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
 import SearchAddress from '../components/ui/SearchAddress.jsx'
-import {useAddress, useReports} from "../utils/hook.js";
+import {useAddress, useAddrReports} from "../utils/hook.js";
 import LoadingSpinner from "../components/ui/Loading.jsx";
 import React, {useEffect} from "react";
-import {FileWarning, Globe, ThumbsDown, ThumbsUp} from "lucide-react";
+import {FileWarning, Globe} from "lucide-react";
 import {Button} from "../components/ui/Button.jsx";
 import LikeDislike from "../components/scan/LikesDislike.jsx";
 import {Flag, Clock8, RefreshCcw   } from "lucide-react"
@@ -37,11 +37,10 @@ export default function ScanDetail() {
         isLoading: isReportsLoading,
         isError: isReportError,
         isFetching: isReportFetching,
-    } = useReports({
+    } = useAddrReports({
         address_id: addressId,
         page,
         pageSize,
-        enabled: !!addressId && !isAddressFetching, // только после загрузки address
     });
 
     useEffect(() => {
