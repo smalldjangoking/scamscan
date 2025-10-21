@@ -1,24 +1,32 @@
-import { useParams } from "react-router-dom";
-import SearchAddress from '../components/ui/SearchAddress.jsx'
+import React, {useEffect, useState} from "react";
+import {useParams} from "react-router-dom";
 import {useAddress, useAddrReports} from "../utils/hook.js";
+
+import SearchAddress from "../components/ui/SearchAddress.jsx";
 import LoadingSpinner from "../components/ui/Loading.jsx";
-import React, {useEffect} from "react";
-import {FileWarning, Globe} from "lucide-react";
 import {Button} from "../components/ui/Button.jsx";
 import LikeDislike from "../components/scan/LikesDislike.jsx";
-import {Flag, Clock8, RefreshCcw   } from "lucide-react"
-import {useState} from "react";
 import ReportCard from "../components/reports/ReportCard.jsx";
+import {Tooltip} from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
+import Pagination from '../components/ui/Paginator.jsx'
+
+import {
+    FileWarning,
+    Globe,
+    Flag,
+    Clock8,
+} from "lucide-react";
 
 export default function ScanDetail() {
-    const { web_url, crypto_address } = useParams();
+    const {web_url, crypto_address} = useParams();
 
     const queryValue = web_url || crypto_address;
-    const querySubject = web_url ? 'website': 'crypto';
+    const querySubject = web_url ? "website" : "crypto";
+
     const [formatted, setFormatted] = useState(null);
     const [page, setPage] = useState(1);
     const pageSize = 10;
-
 
     const {
         data: addressData,
@@ -44,130 +52,196 @@ export default function ScanDetail() {
     });
 
     useEffect(() => {
-        if (addressData && !isAddressFetching ) {
-            console.log(addressData)
+        if (addressData && !isAddressFetching) {
             const date = new Date(addressData.address.created_at);
-            const formattedDate = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth()+1).toString().padStart(2,'0')}.${date.getFullYear()} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
+            const formattedDate = `${date.getDate().toString().padStart(2, "0")}.${(
+                date.getMonth() + 1
+            )
+                .toString()
+                .padStart(2, "0")}.${date.getFullYear()} ${date
+                .getHours()
+                .toString()
+                .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
             setFormatted(formattedDate);
         }
     }, [addressData, isAddressFetching]);
 
-
-
     return (
-        <section className="relative h-screen">
+        <section className="relative min-h-screen">
+            {/* background gradient */}
             <div
                 className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"/>
 
-            <div className="relative container mx-auto py-10 px-2 md:py-20">
+            <div className="relative container mx-auto px-2 py-10 md:py-20">
                 <SearchAddress onValue={queryValue}/>
 
                 <div
-                    className="mt-6 flex flex-col border border-dashed border-border rounded-xl bg-card/80 backdrop-blur-sm min-h-[150px]">
+                    className="mt-6 flex flex-col rounded-xl border border-dashed border-border bg-card/80 backdrop-blur-sm min-h-[200px]">
+                    {/* ========== Address Loading/Error ========== */}
                     {isAddressLoading ? (
-                        <div
-                            className="mt-6 flex flex-col items-center text-center border border-dashed border-border rounded-xl py-16 px-4 bg-card/50 backdrop-blur-sm">
-                            <p className="text-sm text-muted-foreground/80 mt-2 max-w-sm">
-                                loading
+                        <div className="flex flex-col items-center justify-center py-16">
+                            <LoadingSpinner/>
+                            <p className="text-sm text-muted-foreground mt-3">
+                                Loading address details...
                             </p>
                         </div>
                     ) : isAddressError ? (
-                        <p>Error</p>
+                        <div className="flex flex-col items-center justify-center py-20 text-center">
+                            <FileWarning className="h-10 w-10 text-muted-foreground mb-3"/>
+                            <p className="text-muted-foreground">
+                                Address not found or failed to load.
+                            </p>
+                        </div>
                     ) : (
-                        <div className="p-5">
-                            <div className="flex items-center justify-between items-center">
-                                <div className="flex gap-2 items-center flex">
-                                    {crypto_address ?
-                                        (<img src={addressData.address.crypto_logo_url} alt={addressData.address.crypto_name} className="h-6 w-6" />
-                                        ) :
-                                        (<Globe className="h-6 w-6" />)
-                                    }
-                                    {crypto_address ? (addressData.address.crypto_address) : (addressData.address.website_url)}
-                                </div>
-
-                                <div className="flex items-center">
-                                    <div className="flex gap-2">{formatted} <RefreshCcw /></div>
-                                </div>
-                            </div>
-                            <hr className="mt-5 mb-5"/>
-                            <div className="flex flex-wrap">
-                                {addressData.address.website_url ? (
-                                    <div className="flex-1 flex-col items-center justify-center p-2 border min-w-0">
-                                        <p className="flex justify-center text-muted-foreground">Useful links</p>
-
-                                        <div className="flex items-center">
-                                            <Button variant="ghost"><img className="w-25" src="/VirusTotal.svg" alt="Virustotal" /></Button>
-                                            <Button variant="ghost"><img className="w-25" src="/WaybackMachine.svg" alt="Logo" /></Button>
-                                            <Button variant="ghost"><img className="w-25"   src="/whois.svg" alt="Whois" /></Button>
-                                        </div>
+                        addressData && (
+                            <div className="p-5">
+                                {/* Header: Address Info */}
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        {crypto_address ? (
+                                            <img
+                                                src={addressData.address.crypto_logo_url}
+                                                alt={addressData.address.crypto_name}
+                                                data-tooltip-id="info-tooltip"
+                                                data-tooltip-content={addressData.address.crypto_name}
+                                                className="h-6 w-6"
+                                            />
+                                        ) : (
+                                            <Globe
+                                                className="h-6 w-6 text-muted-foreground"
+                                                data-tooltip-id="info-tooltip"
+                                                data-tooltip-content="Website"
+                                            />
+                                        )}
+                                        <span className="truncate font-medium">
+                      {crypto_address
+                          ? addressData.address.crypto_address
+                          : addressData.address.website_url}
+                    </span>
                                     </div>
-                                ) : null}
 
-                                <LikeDislike/>
-                            </div>
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <Clock8
+                                            className="h-4 w-4"
+                                            data-tooltip-id="info-tooltip"
+                                            data-tooltip-content="First Report Created at"
 
-                            <h4 className='flex flex-row items-center mt-10 gap-2'><Flag/> Reports </h4>
-                            <hr className="mt-5 mb-5"/>
-                            {/* List of Reports */}
-                            <div className="">
-                                {
-                                    isReportsLoading ? (
-                                        <div className="col-span-full flex justify-center items-center py-20">
-                                            <LoadingSpinner />
-                                        </div>
-                                    ) : isReportError ? (
-                                        <div>Error</div>
-                                    ) : reportsData?.reports.length > 0 ? (
-                                        (<ul className="grid grid-cols-1">
-                                            {reportsData?.reports.map((report) => (
-                                                <ReportCard
-                                                    key={report.id}
-                                                    report_title={report.report_title}
-                                                    report_description={report.report_description}
-                                                    created_at={report.created_at}
-                                                    user_id={report.user_id}
+                                        />
+                                        {formatted}
+                                    </div>
+                                </div>
 
-                                                />
-                                            ))}
-                                        </ul>)
-                                    ) : (
-                                        <div className="flex flex-1 items-center justify-center min-h-[250px]">
-                                            <div className="text-center">
-                                                <div
-                                                    className="mx-auto mb-4 h-14 w-14 rounded-full border border-dashed flex items-center justify-center">
-                                                    <FileWarning className="h-7 w-7 text-muted-foreground" />
-                                                </div>
-                                                <p className="text-muted-foreground">
-                                                    We couldn’t find anything. Try updating your search or filters
-                                                </p>
+                                <hr className="my-5 border-border/70"/>
+
+                                {/* Useful Links + LikeDislike */}
+                                <div className="flex flex-wrap gap-4">
+                                    {addressData.address.website_url && (
+                                        <div className="flex flex-col flex-1 border rounded-lg p-3 min-w-[220px]">
+                                            <p className="text-sm text-center text-muted-foreground mb-2">
+                                                Useful links
+                                            </p>
+                                            <div className="flex justify-center gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    asChild
+                                                >
+                                                    <a
+                                                        href={`https://www.virustotal.com/gui/home/search/${addressData.address.website_url}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        <img
+                                                            className="h-6"
+                                                            src="/VirusTotal.svg"
+                                                            alt="VirusTotal"
+                                                        />
+                                                    </a>
+                                                </Button>
+                                                <Button variant="ghost" asChild>
+                                                    <a
+                                                        href={`https://web.archive.org/web/*/${addressData.address.website_url}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        <img
+                                                            className="h-6"
+                                                            src="/WaybackMachine.svg"
+                                                            alt="Wayback Machine"
+                                                        />
+                                                    </a>
+                                                </Button>
+                                                <Button variant="ghost" asChild>
+                                                    <a
+                                                        href={`https://whois.com/whois/${addressData.address.website_url}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        <img
+                                                            className="h-6"
+                                                            src="/whois.svg"
+                                                            alt="Whois"
+                                                        />
+                                                    </a>
+                                                </Button>
                                             </div>
                                         </div>
-                                    )
-                                }
-                            </div>
-                            {/* Pagination */}
+                                    )}
 
-                            {/* pagination */}
-                            {reportsData?.totalPages !== 1 && (
-                                <div className="flex justify-center mt-10 space-x-2">
-                                    <Button onClick={() => setPage((old) => Math.max(old - 1, 1))}
-                                            disabled={page === 1 || isReportFetching}>
-                                        {Math.max(page - 1, 1)}
-                                    </Button>
-
-                                    <Button variant="ghost" className="cursor-default">{page} of {reportsData?.totalPages}</Button>
-
-                                    <Button className="disabled:hidden"
-                                            onClick={() => setPage((old) => Math.min(old + 1, reportsData?.totalPages))}
-                                            disabled={page === reportsData?.totalPages || isReportFetching}>
-                                        {Math.max(page + 1, reportsData?.totalPages)}
-                                    </Button>
+                                    <LikeDislike/>
                                 </div>
-                            )}
-                        </div>
+
+                                {/* Reports Section */}
+                                <h4 className="flex items-center gap-2 mt-10 font-semibold text-lg">
+                                    <Flag className="h-5 w-5 text-accent"/> Reports
+                                </h4>
+                                <hr className="my-5 border-border/70"/>
+
+                                {/* Reports List */}
+                                {isReportsLoading ? (
+                                    <div className="flex justify-center items-center py-20">
+                                        <LoadingSpinner/>
+                                    </div>
+                                ) : isReportError ? (
+                                    <div className="text-center text-muted-foreground py-10">
+                                        Failed to load reports.
+                                    </div>
+                                ) : reportsData?.reports.length > 0 ? (
+                                    <ul className="space-y-4">
+                                        {reportsData.reports.map((report) => (
+                                            <ReportCard
+                                                key={report.id}
+                                                report_title={report.report_title}
+                                                report_description={report.report_description}
+                                                created_at={report.created_at}
+                                                user_id={report.user_id}
+                                            />
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                                        <div
+                                            className="h-14 w-14 rounded-full border border-dashed flex items-center justify-center mb-4">
+                                            <FileWarning className="h-7 w-7 text-muted-foreground"/>
+                                        </div>
+                                        <p className="text-muted-foreground">
+                                            No reports yet for this address.
+                                        </p>
+                                    </div>
+                                )}
+
+                                {/* Pagination */}
+                                <Pagination
+                                    page={page}
+                                    totalPages={reportsData?.totalPages}
+                                    isFetching={isReportFetching}
+                                    onPageChange={setPage}
+                                />
+                            </div>
+                        )
                     )}
                 </div>
             </div>
+            <Tooltip id="info-tooltip"/>
         </section>
     );
 }

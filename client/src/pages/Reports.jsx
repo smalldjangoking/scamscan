@@ -8,6 +8,7 @@ import {useLocation} from "react-router-dom";
 import Input from '../components/ui/Input'
 import {Menu, ListFilter, FileWarning} from "lucide-react"
 import debounce from 'lodash.debounce';
+import Pagination from "../components/ui/Paginator.jsx";
 
 export default function Reports() {
     const location = useLocation();
@@ -160,22 +161,12 @@ export default function Reports() {
                 </div>
 
                 {/* pagination */}
-                {data?.totalPages !== 1 && (
-                    <div className="flex justify-center mt-10 space-x-2">
-                        <Button onClick={() => setPage((old) => Math.max(old - 1, 1))}
-                                disabled={page === 1 || isFetching}>
-                            {Math.max(page - 1, 1)}
-                        </Button>
-
-                        <Button variant="ghost" className="cursor-default">{page} of {data?.totalPages}</Button>
-
-                        <Button className="disabled:hidden"
-                                onClick={() => setPage((old) => Math.min(old + 1, data?.totalPages))}
-                                disabled={page === data?.totalPages || isFetching}>
-                            {Math.max(page + 1, data?.totalPages)}
-                        </Button>
-                    </div>
-                )}
+                <Pagination
+                    page={page}
+                    totalPages={data?.totalPages}
+                    isFetching={isFetching}
+                    onPageChange={setPage}
+                />
 
             </div>
         </section>
