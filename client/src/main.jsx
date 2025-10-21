@@ -11,6 +11,7 @@ import Report from './pages/Report';
 import Scan from './pages/Scan';
 import ScanDetail from './pages/ScanDetail';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import ReportDetail from "./pages/ReportDetail.jsx";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,6 +34,7 @@ const router = createBrowserRouter([
             { path: 'scan/website/:web_url', index: true, element: (<ScanDetail/>) },
             { path: 'scan/crypto/:crypto_address', index: true, element: (<ScanDetail/>) },
             { path: 'report', index: false, element:  <Report /> },
+            { path: 'report/show/:id/:slug', index: true, element: (<ReportDetail />) },
         ],
     },
 ]);
