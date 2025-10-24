@@ -53,6 +53,27 @@ export function useAddress({value, subject}) {
     })
 }
 
+export function useComments({report_id, comment_page}) {
+
+    return useQuery({
+        queryKey: ['comments', {report_id, comment_page}],
+        queryFn: async () => {
+            const params = new URLSearchParams({
+                page: comment_page.toString(),
+                report_id: report_id.toString(),
+            })
+
+            const res = await fetch(`/api/scan/address?${params}`)
+
+            if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
+
+            return res.json()
+        },
+        keepPreviousData: true,
+    })
+}
+
+
 export function useAddrReports({page = 1, pageSize = 10, address_id = ''}) {
     return useQuery({
         queryKey: ['reports', {page, pageSize, address_id}],
@@ -62,14 +83,25 @@ export function useAddrReports({page = 1, pageSize = 10, address_id = ''}) {
                 page_size: pageSize.toString(),
             })
 
-            if (address_id) params.append('address_id', address_id)
-
-            const res = await fetch(`/api/scan/address/reports?${params}`)
+            const res = await fetch(`/api/scan/${address_id}/reports?${params}`)
             if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
             return res.json()
         },
         keepPreviousData: true,
         enabled: !!address_id,
+    })
+}
+
+export function useSingleReport(id) {
+    return useQuery({
+        queryKey: ['report', id],
+        queryFn: async () => {
+            const res = await fetch(`/api/reports/id/${id}`)
+            if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
+            return res.json()
+        },
+        keepPreviousData: true,
+        enabled: !!id,
     })
 }
 
@@ -86,7 +118,7 @@ export function useLogin({ onSuccess, onError } = {}) {
 
       if (!res.ok) {
           const error = new Error("Login failed");
-          error.status = res.status; // 👈 добавляем статус!
+          error.status = res.status;
           throw error;
       }
 

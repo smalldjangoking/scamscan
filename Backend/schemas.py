@@ -102,6 +102,49 @@ class SubjectEnum(str, Enum):
     website = "website"
 
 
+class SingleReport(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int | None
+    user_id: str | None = None
+    report_title: str
+    report_description: str
+    address_id: int
+    slug: str
+    created_at: datetime
+    views: int
+
+class PublicUserAPISchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    user_id: int
+    nickname: str
+
+class SingleReportSchema(BaseModel):
+    address: AddressAPISchema
+    report: SingleReport
+    user: PublicUserAPISchema | None = None
+
+class CommentSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    user_id: int
+    comment: str
+    created_at: datetime
+
+class CommentsSchema(BaseModel):
+    comments: list[CommentSchema]
+    comments_total: int
+    total_pages: int
+
+
+
+
+
+
+
+
+
 
 
     

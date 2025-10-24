@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from fastapi import Depends, HTTPException
 from database_settings import SessionDep
-from services import validation_jwt_or_401
 from models import Users
+from router.auth import access_token_valid
 from services import verify_password, hash_password
 from schemas import ChangePasswordSchema
 from schemas import UpdateUserInfoSchema
@@ -12,7 +12,7 @@ from sqlalchemy import select
 router = APIRouter(prefix="/api/user", tags=["user"])
 
 @router.post("/me")
-async def read_user_me(session: SessionDep, user_id: str = Depends(validation_jwt_or_401)):
+async def read_user_me(session: SessionDep, user_id: str = Depends(access_token_valid)):
     data = await session.get(Users, user_id)
 
     if data:
@@ -29,7 +29,7 @@ async def read_user_me(session: SessionDep, user_id: str = Depends(validation_jw
 
 
 @router.post('/change-password')
-async def change_password(passwordSchema: ChangePasswordSchema, session: SessionDep, user_id: str = Depends(validation_jwt_or_401)):
+async def change_password(passwordSchema: ChangePasswordSchema, session: SessionDep, user_id: str = Depends(access_token_valid)):
     data = await session.get(Users, user_id)
 
     if verify_password(passwordSchema.old_password, data.hashed_password):
@@ -40,12 +40,10 @@ async def change_password(passwordSchema: ChangePasswordSchema, session: Session
     else:
         raise HTTPException(status_code=400, detail="Old password is incorrect")
 
-    raise HTTPException(status_code=400, detail="Bad request")
-
     
 
 @router.patch('/update-user-info')
-async def update_user_info(userInfoSchema: UpdateUserInfoSchema, session: SessionDep, user_id: str = Depends(validation_jwt_or_401)):
+async def update_user_info(userInfoSchema: UpdateUserInfoSchema, session: SessionDep, user_id: str = Depends(access_token_valid)):
     data = await session.get(Users, user_id)
 
     if userInfoSchema.phone:

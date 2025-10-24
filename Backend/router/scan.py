@@ -17,7 +17,7 @@ async def get_address(session: SessionDep,
                                      min_length=5),
                       s: SubjectEnum = Query(alias="subject", description="[crypto, website] are allowed.")
                       ):
-    """Finds Address by Input, checks by subject"""
+    """Finds Address by Input, Filers by subject"""
 
     if s == SubjectEnum.crypto:
         address_query = select(Addresses).where(
@@ -39,9 +39,9 @@ async def get_address(session: SessionDep,
     return {"address": AddressAPISchema.model_validate(address)}
 
 
-@router.get('/address/reports', status_code=status.HTTP_200_OK)
+@router.get('/{address_id}/reports', status_code=status.HTTP_200_OK)
 async def get_reports(session: SessionDep,
-                      address_id: int = Query(alias="address_id", description="Address_id is required"),
+                      address_id: int,
                       page: int = Query(
                           default=1,
                           ge=1,
@@ -53,7 +53,7 @@ async def get_reports(session: SessionDep,
                           description="Number of reports per page"
                       )
                       ):
-    """Returns Reports filtering by address_id"""
+    """Returns Reports by address_id"""
 
     base_query = select(Reports).where(Reports.address_id == address_id)
 

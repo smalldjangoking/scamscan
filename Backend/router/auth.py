@@ -2,11 +2,11 @@ import logging
 import os
 import jwt
 
-from fastapi import APIRouter, status, HTTPException, Response
+from fastapi import APIRouter, status, HTTPException, Security, Request, Response
 from database_settings import SessionDep
 from schemas import UserRegistrationSchema, UserLoginSchema, RefreshTokenSchema
 from services import add_user, nickname_check, get_user_by_email, verify_password, create_refresh_token, \
-    create_access_token, ALGORITHM
+    create_access_token, ALGORITHM, JWT_SECRET_KEY
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
 
@@ -74,30 +74,37 @@ async def logout(response: Response):
         logout endpoint, clears the refresh token cookie
     """
     response.delete_cookie(key="refresh_token")
-
     return {'status': 'ok'}
 
 
+@router.get('/token', status_code=status.HTTP_200_OK)
+async def access_token_valid(token: str = Security(oauth2_scheme)):
+    """Validate JWT (access_token) returns user_id from it"""
+    try:
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("sub")
+        return user_id
+
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Access token expired")
+
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid or tampered token")
+
+
 @router.post("/refresh")
-async def refresh_token_endpoint(refresh_token: RefreshTokenSchema):
+async def web_refresh_token_validator(request: Request, response: Response):
     """
         refresh token endpoint, requires refresh token in cookie
     """
     try:
-        payload = jwt.decode(refresh_token.refresh_token, os.getenv('SECRET_KEY'), algorithms=[ALGORITHM])
+        refresh_token = request.cookies.get("refresh_token")
+        payload = jwt.decode(refresh_token, os.getenv('SECRET_KEY'), algorithms=[ALGORITHM])
         user_id = payload.get("sub")
-        if not user_id:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token")
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Refresh token expired")
 
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token")
+        new_access_token = create_access_token({"sub": user_id})
+        return {"access_token": new_access_token, "token_type": "bearer"}
 
     except jwt.PyJWTError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token")
-
-    new_access_token = create_access_token({"sub": user_id})
-
-    return {"access_token": new_access_token, "token_type": "bearer"}
-
+        response.delete_cookie("refresh_token")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token")

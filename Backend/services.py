@@ -5,7 +5,6 @@ import jwt
 from sqlalchemy import select, exists
 from models import Users
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, Request, Response, status
 from fastapi.security import OAuth2PasswordBearer
 
 load_dotenv()
@@ -23,6 +22,7 @@ def hash_password(password: str) -> str:
     """transform user's password to hashed password"""
     return pwd_context.hash(password)
 
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify that the login password matches the hashed password from the database"""
     return pwd_context.verify(plain_password, hashed_password)
@@ -35,7 +35,8 @@ async def get_user_by_email(email: str, session: dict):
     user = result.scalar_one_or_none()
     return user
 
-async def nickname_check(nickname: str , session: dict):
+
+async def nickname_check(nickname: str, session: dict):
     stmt = select(
         exists().where(Users.nickname == nickname)
     )
@@ -73,60 +74,3 @@ def create_access_token(data: dict, expires_in: int = ACCESS_TOKEN_EXPIRE_MINUTE
     payload.update({'exp': exp})
     token = jwt.encode(payload, os.getenv('SECRET_KEY'), algorithm=ALGORITHM)
     return token
-
-
-
-async def validation_jwt_or_401(
-    request: Request,
-    response: Response,
-    token: str = Depends(oauth2_scheme)
-):
-    """
-    Accepts access_token -> gives user_id if token is valid
-    _____________________________________________________________
-    Validates the JWT token, checks access_token or creates new access_token using refresh_token
-       or raises 401 error if both tokens are invalid
-    ______________________________________________________________
-    """
-
-    try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = payload.get("sub")
-        return user_id
-
-    except Exception as e:
-        if isinstance(e, jwt.ExpiredSignatureError):
-            refresh_token = request.cookies.get("refresh_token", None)
-
-            if not refresh_token:
-                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
-
-            try:
-                user_id = jwt.decode(refresh_token, JWT_SECRET_KEY, algorithms=[ALGORITHM]).get("sub")
-                new_jwt_token = create_access_token({"sub": user_id})
-                response.headers["X-New-Access-Token"] = new_jwt_token
-                return user_id
-
-            except jwt.ExpiredSignatureError:
-                response.headers["X-New-Access-Token"] = ""
-                response.delete_cookie("refresh_token")
-                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
-            except jwt.DecodeError:
-                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
-            except Exception:
-                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
-
-
-        if isinstance(e, jwt.InvalidTokenError):
-            raise HTTPException(status_code=401, detail="Could not validate credentials")
-
-        if isinstance(e, jwt.DecodeError):
-            raise HTTPException(status_code=401, detail="Could not validate credentials")
-
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials"
-        )
-
-       
-

@@ -40,7 +40,7 @@ function Input({
             {label && (
                 <label
                     htmlFor={label}
-                    className="text-muted-foreground max-w-2xl text-lg"
+                    className="text-muted-foreground max-w-2xl text-sm"
                 >
                     {label}
                 </label>

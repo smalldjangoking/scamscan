@@ -19,6 +19,7 @@ class Users(Base):
     phone: Mapped[str | None] = mapped_column(String, nullable=True)
     nickname: Mapped[str | None] = mapped_column(String, unique=True, nullable=False)
 
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_verified: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     is_superuser: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     is_email_verified: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
@@ -76,6 +77,9 @@ class Comments(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     report_id: Mapped[int] = mapped_column(ForeignKey("reports.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+
+    comment: Mapped[str] = mapped_column(String(250), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     report: Mapped["Reports"] = relationship(back_populates="comments")
     user: Mapped["Users"] = relationship(back_populates="comments")
