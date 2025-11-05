@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import { StrictMode, createContext } from "react";
 import { createRoot } from 'react-dom/client'
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import Layout from "./Layout";
@@ -12,6 +12,7 @@ import Scan from './pages/Scan';
 import ScanDetail from './pages/ScanDetail';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import ReportDetail from "./pages/ReportDetail.jsx";
+import Store from './store/store'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,6 +22,9 @@ const queryClient = new QueryClient({
     },
   },
 })
+
+const store = new Store()
+export const Context = createContext({store})
 
 const router = createBrowserRouter([
     {
@@ -39,5 +43,11 @@ const router = createBrowserRouter([
     },
 ]);
 createRoot(document.getElementById('root')).render(
-    <QueryClientProvider client={queryClient}><RouterProvider router={router}></RouterProvider></QueryClientProvider>
+  <StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <Context.Provider value={{ store }}>
+        <RouterProvider router={router} />
+      </Context.Provider>
+    </QueryClientProvider>
+  </StrictMode>
 )

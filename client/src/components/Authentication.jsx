@@ -1,62 +1,22 @@
-import {Mail, Key, X, ShieldUser, UserRoundCheck, Loader2} from "lucide-react";
+import {Mail, Key, X, ShieldUser, UserRoundCheck, Loader2, TriangleAlert} from "lucide-react";
 import {Button} from "./ui/Button.jsx";
-import React, {useEffect, useRef, useState} from "react";
-import {useLogin, useRegister} from "../utils/hook.js";
-import toast, {Toaster} from 'react-hot-toast';
+import React, {useEffect, useRef, useState, useContext} from "react";
 import Input from "./ui/Input.jsx";
 import {createPortal} from "react-dom";
+import {Context} from '../main'
+import { observer } from "mobx-react-lite"
 
 
-export default function Authentication({isOpen, onClose, authVar}) {
+export default observer(function Authentication({isOpen, onClose, authVar}) {
     const [authVariant, setAuthVariant] = useState('register');
     const AuthenticationSectionRef = useRef(null)
-    const failedToast = (errorReason) => toast.error(`${errorReason}`);
+    const {store} = useContext(Context)
 
-    const [emailInput, setEmailInput] = useState('')
-    const [passwordInput, setPasswordInput] = useState('')
-    const [password2Input, setPassword2Input] = useState('')
-    const [nicknameInput, setNicknameInput] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [password2, setPassword2] = useState('')
+    const [nickname, setNickname] = useState('')
     const [accountCreated, setAccountCreated] = useState(false)
-
-
-    const {mutate: login, isLoading: isLoginLoading} = useLogin({
-        onSuccess: () => {
-
-        },
-        onError: (error) => {
-            if (error.status === 401) {
-                failedToast('Passwords do not match. Try again or reset your password');
-            }
-
-            if (error.status === 422) {
-                failedToast('fields do not match the expected format.');
-            }
-
-            if (error.status === 500) {
-                failedToast('Something went wrong. Please try again later.');
-            }
-
-
-        }
-    });
-
-    const {mutate: register, isLoading: isRegisterLoading} = useRegister({
-        onSuccess: () => {
-            setAccountCreated(true)
-            setAuthVariant('login');
-        },
-
-        onError: (error) => {
-            if (error) {
-                if (error.status === 500) {
-                    failedToast('Something went wrong. Please try again later.');
-                } else {
-                    failedToast(error.message);
-                }
-
-            }
-        }
-    })
 
 
     useEffect(() => {
@@ -82,21 +42,50 @@ export default function Authentication({isOpen, onClose, authVar}) {
     if (!isOpen) return null
 
     const isRegisterDisabled =
-        !emailInput ||
-        !passwordInput ||
-        !password2Input ||
-        !nicknameInput ||
-        passwordInput !== password2Input;
+        !email ||
+        !password ||
+        !password2 ||
+        !nickname ||
+        password !== password2;
 
 
-    const isLoginDisabled = !emailInput || !passwordInput;
+    const isLoginDisabled = !email || !password;
 
     return createPortal(
         <section className="fixed inset-0 bg-muted/70 z-50">
-            <Toaster/>
             <div className="fixed top-0 left-0 md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-40" ref={AuthenticationSectionRef}>
                 <div
                     className="flex flex-col justify-center w-screen h-screen md:max-w-[500px] md:h-fit bg-card/80 backdrop-blur-sm border border-border rounded-2xl shadow-sm p-6">
+                        {accountCreated && authVariant === 'login' && (
+                            <div
+                                className="flex items-center gap-3 bg-green-600/90 text-white px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all">
+                                <span>
+                                    <UserRoundCheck className="w-6 h-6 text-white"/>
+                                </span>
+                                    <div>
+                                        <div className="font-bold text-lg">Account created!</div>
+                                        <div className="text-sm font-medium opacity-90">You can now sign in to your
+                                            account.
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {store.errorText && (
+                                <div
+                                    className="flex items-center gap-3 bg-red-600/90 text-white px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all">
+                                <span>
+                                    <TriangleAlert className="w-6 h-6 text-white"/>
+                                </span>
+                                    <div>
+                                        <div className="font-bold text-lg">An Error!</div>
+                                        <div className="text-sm font-medium opacity-90">
+                                            {store.errorText}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
 
                     {authVariant === 'register' && (
                         <>
@@ -117,36 +106,42 @@ export default function Authentication({isOpen, onClose, authVar}) {
                                     type="email"
                                     placeholder="Email"
                                     icon={Mail}
-                                    onChange={() => setEmailInput(event.target.value)}
+                                    onChange={() => setEmail(event.target.value)}
                                 />
 
                                 <Input
                                     type="password"
                                     placeholder="Password"
                                     icon={Key}
-                                    onChange={() => setPasswordInput(event.target.value)}
+                                    onChange={() => setPassword(event.target.value)}
                                 />
 
                                 <Input
                                     type="password"
                                     placeholder="Password"
                                     icon={Key}
-                                    onChange={() => setPassword2Input(event.target.value)}
+                                    onChange={() => setPassword2(event.target.value)}
                                 />
 
                                 <Input
                                     type="text"
                                     placeholder="Nickname"
                                     icon={ShieldUser}
-                                    onChange={() => setNicknameInput(event.target.value)}
+                                    onChange={() => setNickname(event.target.value)}
                                 />
                             </div>
 
-                            <Button onClick={() => register({emailInput, passwordInput, password2Input, nicknameInput})}
+                            <Button onClick={async () => {
+                                const ok = await store.registration(email, password, password2, nickname)
+                                if (ok) {
+                                    setAccountCreated(true)
+                                    setAuthVariant('login')
+                                }
+                            }}
                                     variant="default" size="sm"
                                     className="flex w-full mt-5"
-                                    disabled={isRegisterDisabled}>
-                                {isRegisterLoading ? <Loader2 className="w-4 h-4 animate-spin"/> : 'Register'}
+                                    disabled={isRegisterDisabled || store.isLoading}>
+                                {store.isLoading ? <Loader2 className="w-4 h-4 animate-spin"/> : 'Register'}
                             </Button>
 
                             <Button className="font-medium"
@@ -167,21 +162,6 @@ export default function Authentication({isOpen, onClose, authVar}) {
                                 </Button>
                             </div>
 
-                            {accountCreated && (
-                                <div
-                                    className="flex items-center gap-3 bg-green-600/90 text-white px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all">
-                                <span>
-                                    <UserRoundCheck className="w-6 h-6 text-white"/>
-                                </span>
-                                    <div>
-                                        <div className="font-bold text-lg">Account created!</div>
-                                        <div className="text-sm font-medium opacity-90">You can now sign in to your
-                                            profile.
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
                             <div className="relative mb-5">
                                 <div
                                     className="absolute left-3 top-1/2 p-transform -translate-y-1/2 flex items-center gap-2">
@@ -190,7 +170,7 @@ export default function Authentication({isOpen, onClose, authVar}) {
                                 <Input
                                     type="email"
                                     placeholder="Email"
-                                    onChange={() => setEmailInput(event.target.value)}
+                                    onChange={() => setEmail(event.target.value)}
                                 />
                             </div>
 
@@ -203,7 +183,7 @@ export default function Authentication({isOpen, onClose, authVar}) {
                                 <Input
                                     type="password"
                                     placeholder="Password"
-                                    onChange={() => setPasswordInput(event.target.value)}
+                                    onChange={() => setPassword(event.target.value)}
                                 />
                             </div>
                             <div className="relative flex gap-2 mt-5 justify-between">
@@ -220,15 +200,15 @@ export default function Authentication({isOpen, onClose, authVar}) {
                             </div>
 
 
-                            <Button onClick={() => login({email: emailInput, password: passwordInput})}
-                                    disabled={isLoginDisabled} variant="default" size="sm"
+                            <Button onClick={() => store.login(email, password)}
+                                    disabled={isLoginDisabled || store.isLoading} variant="default" size="sm"
                                     className="flex mt-5">
-                                {isLoginLoading ? <Loader2 className="w-4 h-4 animate-spin"/> : 'Login'}
+                                {store.isLoading ? <Loader2 className="w-4 h-4 animate-spin"/> : 'Login'}
                             </Button>
 
                             <Button className="font-medium p-0"
                                     variant='link' onClick={() => setAuthVariant('register')}>
-                                Don't have an accountyet?
+                                Don't have an account yet?
                             </Button>
                         </>
                     )}
@@ -238,4 +218,4 @@ export default function Authentication({isOpen, onClose, authVar}) {
         </section>,
         document.body
     )
-}
+})

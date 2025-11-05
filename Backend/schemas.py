@@ -6,7 +6,7 @@ from pydantic import BaseModel, EmailStr, model_validator, ConfigDict
 class UserRegistrationSchema(BaseModel):
     email: EmailStr
     password: str
-    password_confirmation: str
+    password2: str
     nickname: str
 
 

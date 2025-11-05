@@ -36,7 +36,7 @@ const Tiptap = ({ content, onChange, onBlur, error }: {
         },
         editorProps: {
             attributes: {
-                class: 'prose prose-sm focus:outline-none min-h-[150px] p-4 text-foreground',
+                class: 'block prose prose-sm max-h-[500px] overflow-y-auto focus:outline-none min-h-[150px] p-4 text-foreground',
             },
         },
     })

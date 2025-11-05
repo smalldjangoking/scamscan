@@ -8,10 +8,8 @@ function Navbar() {
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const [authVariant, setAuthVariant] = useState('register');
     const toggleAuth = () => setIsAuthOpen(prev => !prev);
-    const accessToken = localStorage.getItem('access_token');
+    const [accessToken, setAccessToken] = useState(localStorage.getItem("access_token"))
 
-
-    
     const openAuth = (variant) => {
         setAuthVariant(variant);
         toggleAuth();

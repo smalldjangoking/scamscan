@@ -10,9 +10,10 @@ from fastapi.security import OAuth2PasswordBearer
 import bleach
 from math import ceil
 from slugify import slugify
+from services import access_token_valid
 
 router = APIRouter(prefix="/api/reports", tags=["reports"])
-oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
 
 
 @router.post("/create", status_code=status.HTTP_200_OK)
@@ -23,7 +24,7 @@ async def create_report(schema: ReportSchema,
     user_id = None
 
     if token:
-        user_id = await access_token_valid(request, response, token)
+        user_id = access_token_valid(token)
 
     try:
         response = await session.execute(
@@ -101,7 +102,7 @@ async def get_all_reports(session: SessionDep, request: Request, response: Respo
                           ):
     """Retrieve all reports by user or all from the database with optional queries and pagination"""
     user_id = None
-    if token: user_id = await validation_jwt_or_401(request, response, token)
+    if token: user_id = access_token_valid(token)
 
     query = select(Reports).options(selectinload(Reports.address))
 

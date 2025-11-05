@@ -5,7 +5,7 @@ import jwt
 from fastapi import APIRouter, status, HTTPException, Security, Request, Response
 from database_settings import SessionDep
 from schemas import UserRegistrationSchema, UserLoginSchema, RefreshTokenSchema
-from services import add_user, nickname_check, get_user_by_email, verify_password, create_refresh_token, \
+from services import add_user, nickname_check, get_user_by_email, verify_password, access_token_valid, create_refresh_token, \
     create_access_token, ALGORITHM, JWT_SECRET_KEY
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
@@ -17,7 +17,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 @router.post('/create', status_code=status.HTTP_201_CREATED)
 async def user_create(userbase: UserRegistrationSchema, session: SessionDep):
     """Registration endpoint."""
-    if userbase.password != userbase.password_confirmation:
+    if userbase.password != userbase.password2:
         raise HTTPException(status_code=400, detail="Passwords do not match")
 
     if await get_user_by_email(userbase.email, session):
@@ -28,7 +28,6 @@ async def user_create(userbase: UserRegistrationSchema, session: SessionDep):
 
     try:
         await add_user(userbase, session)
-        return {'status': 201, 'message': 'User created'}
 
     except Exception as error:
         logging.exception(error)
@@ -78,19 +77,10 @@ async def logout(response: Response):
 
 
 @router.get('/token', status_code=status.HTTP_200_OK)
-async def access_token_valid(token: str = Security(oauth2_scheme)):
+async def access_token_validation(token: str = Security(oauth2_scheme)):
     """Validate JWT (access_token) returns user_id from it"""
-    try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = payload.get("sub")
-        return user_id
 
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Access token expired")
-
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid or tampered token")
-
+    return access_token_valid(token)
 
 @router.post("/refresh")
 async def web_refresh_token_validator(request: Request, response: Response):

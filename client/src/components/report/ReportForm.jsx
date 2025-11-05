@@ -200,10 +200,10 @@ function ReportForm() {
 
             {/* Description */}
             <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                selectedReportSubject ? 'max-h-screen opacity-100 transform translate-y-0' 
+                selectedReportSubject ? 'opacity-100 transform translate-y-0' 
                     : 'max-h-0 opacity-0 transform -translate-y-2'
             }`}>
-                    <div className="mt-5">
+                    <div className="block mt-5">
                         <Input aria-invalid={!!errors.report_title} {...register("report_title")} label="Title" placeholder='Enter a clear and descriptive title for your scam report' />
                         {errors.report_title && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.report_title.message}</p>}
                         <div className="mt-5">
