@@ -1,13 +1,13 @@
-import logging
 import os
 import jwt
-
+import asyncio
 from fastapi import APIRouter, status, HTTPException, Security, Request, Response
 from database_settings import SessionDep
 from schemas import UserRegistrationSchema, UserLoginSchema, RefreshTokenSchema
 from services import add_user, nickname_check, get_user_by_email, verify_password, access_token_valid, create_refresh_token, \
-    create_access_token, ALGORITHM, JWT_SECRET_KEY
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+    create_access_token, ALGORITHM, JWT_SECRET_KEY, create_token_verify
+from fastapi.security import OAuth2PasswordBearer
+from smtp.smtp import send_confirm_email
 
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -15,23 +15,24 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 
 @router.post('/create', status_code=status.HTTP_201_CREATED)
-async def user_create(userbase: UserRegistrationSchema, session: SessionDep):
+async def user_create(user: UserRegistrationSchema, session: SessionDep):
     """Registration endpoint."""
-    if userbase.password != userbase.password2:
+    if user.password != user.password2:
         raise HTTPException(status_code=400, detail="Passwords do not match")
 
-    if await get_user_by_email(userbase.email, session):
+    if await get_user_by_email(user.email, session):
         raise HTTPException(status_code=400, detail="Email is already taken")
 
-    if await nickname_check(userbase.nickname, session):
+    if await nickname_check(user.nickname, session):
         raise HTTPException(status_code=400, detail="Nickname is already taken")
 
     try:
-        await add_user(userbase, session)
+        user = await add_user(user, session)
+        token = await create_token_verify(user.id, purpose='email', session=session)
+        await asyncio.create_task(send_confirm_email(user.email, user.nickname, token))
 
     except Exception as error:
-        logging.exception(error)
-        raise HTTPException(status_code=500, detail="Server is dead at the moment")
+        raise HTTPException(status_code=500, detail=str(error))
 
 
 @router.post('/login')
@@ -42,12 +43,17 @@ async def user_login(userbase: UserLoginSchema, session: SessionDep, response: R
 
     user = await get_user_by_email(userbase.email, session)
 
-
     if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect credentials")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect credentials")
 
     if not verify_password(userbase.password, user.hashed_password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect credentials")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect credentials")
+
+    if not user.is_active:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Your account is not active')
+    
+    if not user.is_email_verified:
+        return {}
 
     refresh_token = create_refresh_token({"sub": str(user.id)})
     access_token = create_access_token({"sub": str(user.id)})
@@ -59,7 +65,6 @@ async def user_login(userbase: UserLoginSchema, session: SessionDep, response: R
         secure=False,
         samesite="lax" 
     )
-    
     
     return {
         "access_token": access_token,
@@ -98,3 +103,11 @@ async def web_refresh_token_validator(request: Request, response: Response):
     except jwt.PyJWTError:
         response.delete_cookie("refresh_token")
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token")
+
+@router.patch('/email/verify/{token}')
+def verify_email(token: str, session: SessionDep) -> str:
+    ...
+
+@router.patch('/password_change/verify/{token}')
+def password_change(token: str, session: SessionDep) -> str:
+    ...

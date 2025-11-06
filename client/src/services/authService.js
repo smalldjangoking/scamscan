@@ -8,4 +8,8 @@ export default class AuthService {
     static async registration(email, password, password2, nickname) {
         return $api.post('/auth/create', {email, password, password2, nickname})
     }
+
+    static async tokenConfirm(option, token) {
+        return $api.patch(`/auth/${option}/verify/${token}`)
+    }
 }

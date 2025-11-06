@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Confirm your email — ScamScan.io</title>
+  </head>
+  <body style="font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial; color:#111; line-height:1.6; padding:24px;">
+    <div style="max-width:600px; margin:0 auto;">
+      <h2 style="margin-bottom:8px;">Hi {{nickname}} 👋</h2>
+      <p>Thanks for joining <strong>ScamScan.io</strong> — the community that reports and analyzes suspicious crypto addresses and websites.</p>
+
+      <p style="margin:24px 0;">
+        <a href="{{confirm_url}}" style="display:inline-block; background:#111; color:#fff; padding:12px 24px; border-radius:8px; font-weight:600; text-decoration:none;">Confirm Email</a>
+      </p>
+
+      <p style="font-size:14px; color:#555;">If the button doesn’t work, paste this link into your browser:<br>
+        <a href="{{confirm_url}}">{{confirm_url}}</a>
+      </p>
+
+      <hr style="border:none; border-top:1px solid #eee; margin:24px 0;">
+      <p style="font-size:13px; color:#777;">This link will expire in {{expiry_minutes}} minutes. If you didn’t register, please ignore this email.</p>
+      <p style="font-size:13px; color:#777; margin-top:12px;">Best regards,<br>The ScamScan.io Team — <a href="https://scamscan.io">scamscan.io</a></p>
+    </div>
+  </body>
+</html>

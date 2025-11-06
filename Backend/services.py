@@ -6,6 +6,9 @@ from sqlalchemy import select, exists
 from models import Users
 from passlib.context import CryptContext
 from fastapi import HTTPException, status
+import secrets
+from models import Email_tokens
+import logging
 
 load_dotenv()
 
@@ -47,9 +50,11 @@ async def add_user(userbase: dict, session: dict):
         user_data = userbase.model_dump()
         user_data['hashed_password'] = hash_password(user_data.pop('password'))
         user_data.pop('password2')
-        session.add(Users(**user_data))
+        user = Users(**user_data)
+        session.add(user)
+        await session.flush()
         await session.commit()
-        return True
+        return user     
 
     except Exception as e:
         await session.rollback()
@@ -87,3 +92,21 @@ def access_token_valid(token):
 
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid or tampered token")
+    
+async def create_token_verify(user_id: int, purpose: str, session) -> str:
+    """creates verify token to verify users"""
+    try:
+        token = secrets.token_urlsafe(48)
+
+        new_record = Email_tokens(
+        user_id=user_id,
+        token=token,
+        purpose=purpose
+        )
+
+        session.add(new_record)
+        await session.commit()
+        return token
+    
+    except Exception as e:
+        logging.error(e)

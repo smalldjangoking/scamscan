@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from sqlalchemy import DateTime, func, String, Boolean, JSON, Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
@@ -83,6 +83,19 @@ class Comments(Base):
 
     report: Mapped["Reports"] = relationship(back_populates="comments")
     user: Mapped["Users"] = relationship(back_populates="comments")
+
+
+class Email_tokens(Base):
+    __tablename__ = "email_tokens"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    purpose: Mapped[str] = mapped_column(String(100), nullable=False)
+    token: Mapped[str] = mapped_column(String(250), nullable=False, unique=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), 
+              default=lambda: datetime.now(timezone.utc) + timedelta(minutes=60), nullable=False)
+    
 
 
 

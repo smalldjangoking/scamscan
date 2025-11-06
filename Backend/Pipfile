@@ -17,6 +17,8 @@ bleach = "*"
 pytest = "*"
 httpx = "*"
 slugify = "*"
+aiosmtplib = "*"
+jinja2 = "*"
 
 [dev-packages]
 

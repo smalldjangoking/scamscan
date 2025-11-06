@@ -10,6 +10,7 @@ import AuthRequired from './pages/AuthRequired';
 import Report from './pages/Report';
 import Scan from './pages/Scan';
 import ScanDetail from './pages/ScanDetail';
+import Confirm from "./pages/confirm.jsx";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import ReportDetail from "./pages/ReportDetail.jsx";
 import Store from './store/store'
@@ -39,6 +40,7 @@ const router = createBrowserRouter([
             { path: 'scan/crypto/:crypto_address', index: true, element: (<ScanDetail/>) },
             { path: 'report', index: false, element:  <Report /> },
             { path: 'report/show/:id/:slug', index: true, element: (<ReportDetail />) },
+            { path: 'confirm/:option/:token', index: false, element: (<Confirm />) },
         ],
     },
 ]);

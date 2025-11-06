@@ -28,7 +28,7 @@ export default class Store {
         } finally {
             this.setIsLoading(false)
         }
-    }
+    };
 
     async registration(email, password, password2, nickname) {
         this.setIsLoading(true);
@@ -43,5 +43,18 @@ export default class Store {
         } finally {
             this.setIsLoading(false)
         }
-    } 
+    };
+
+    async confirm(option, token) {
+        this.setIsLoading(true)
+        this.errorText = ''
+        try {
+            await AuthService.confirm(option, token)
+            return true
+        } catch (e) {
+            this.setErrorText(e.response?.data?.detail)
+            return false
+    } finally {
+        this.setIsLoading(false)
+    }}
 }
