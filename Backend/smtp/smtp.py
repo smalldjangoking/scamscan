@@ -37,7 +37,8 @@ async def send_confirm_email(to_email: str, nickname: str, token: str) -> None:
 
     await send_email(msg)
 
-async def send_reset_password(to_email: str, nickname: str, reset_url: str) -> None:
+async def send_reset_password(to_email: str, nickname: str, token: str) -> None:
+    reset_url = WEBSITE_URL + 'confirm/password/' + token
     subject = "Reset your password — ScamScan.io"
     plain = (
         f"Hi {nickname},\n\n"

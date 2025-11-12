@@ -137,6 +137,11 @@ class CommentsSchema(BaseModel):
     comments_total: int
     total_pages: int
 
+class PasswordRestore(BaseModel):
+    password: str | None = None
+
+class EmailRequest(BaseModel):
+    email: EmailStr
 
 
 

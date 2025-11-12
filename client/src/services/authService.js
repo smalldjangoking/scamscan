@@ -12,4 +12,8 @@ export default class AuthService {
     static async tokenConfirm(option, token) {
         return $api.patch(`/auth/${option}/verify/${token}`)
     }
+
+    static async passwordTokenReq(email) {
+        return $api.post('auth/password/token/create', {email})
+    }
 }

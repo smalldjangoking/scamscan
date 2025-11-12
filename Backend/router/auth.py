@@ -1,13 +1,18 @@
 import os
 import jwt
 import asyncio
-from fastapi import APIRouter, status, HTTPException, Security, Request, Response
+from fastapi import APIRouter, status, HTTPException, Security, Request, Response, Path
 from database_settings import SessionDep
-from schemas import UserRegistrationSchema, UserLoginSchema, RefreshTokenSchema
+from schemas import UserRegistrationSchema, UserLoginSchema, PasswordRestore, EmailRequest
 from services import add_user, nickname_check, get_user_by_email, verify_password, access_token_valid, create_refresh_token, \
-    create_access_token, ALGORITHM, JWT_SECRET_KEY, create_token_verify
+    create_access_token, ALGORITHM, JWT_SECRET_KEY, create_token_verify, hash_password
 from fastapi.security import OAuth2PasswordBearer
-from smtp.smtp import send_confirm_email
+from smtp.smtp import send_confirm_email, send_reset_password
+from models import Email_tokens
+from datetime import datetime, timezone
+from sqlalchemy import select
+from sqlalchemy.orm import joinedload
+from models import Users
 
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -50,10 +55,18 @@ async def user_login(userbase: UserLoginSchema, session: SessionDep, response: R
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect credentials")
 
     if not user.is_active:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Your account is not active')
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Your account is not active')
     
     if not user.is_email_verified:
-        return {}
+        old_token = await session.scalar(select(Email_tokens).where(Email_tokens.user_id == user.id))
+
+        if old_token:
+            session.delete(old_token)
+            session.commit()
+
+        token = await create_token_verify(user.id, purpose='email', session=session)
+        await asyncio.create_task(send_confirm_email(user.email, user.nickname, token))
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Verification email has been sent to your address')
 
     refresh_token = create_refresh_token({"sub": str(user.id)})
     access_token = create_access_token({"sub": str(user.id)})
@@ -104,10 +117,115 @@ async def web_refresh_token_validator(request: Request, response: Response):
         response.delete_cookie("refresh_token")
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token")
 
-@router.patch('/email/verify/{token}')
-def verify_email(token: str, session: SessionDep) -> str:
-    ...
+@router.patch('/email/verify/{token}', status_code=status.HTTP_200_OK)
+async def verify_email(token: str, session: SessionDep) -> None:    
+    token_db = await session.execute(
+        select(Email_tokens)
+        .where(Email_tokens.token == token)
+        .options(joinedload(Email_tokens.user)))
+    
+    result = token_db.scalar_one_or_none()
 
-@router.patch('/password_change/verify/{token}')
-def password_change(token: str, session: SessionDep) -> str:
-    ...
+    if not result:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Token doesnt exists. Please log in to request a new confirmation email.")
+    
+
+    exp = result.expires_at
+    if exp.tzinfo is None:  # костыль для sqlite
+        exp = exp.replace(tzinfo=timezone.utc)
+
+    if exp < datetime.now(timezone.utc):
+        await session.delete(result)
+        await session.commit()
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="Token is expired. Please log in to request a new confirmation email.")
+    
+    if result.purpose != "email":
+        raise HTTPException(status_code=400, detail="Wrong token purpose")
+    
+    result.user.is_email_verified = True
+    await session.delete(result)
+    await session.commit()
+    
+
+@router.patch('/password/verify/{token}', status_code=status.HTTP_200_OK)
+async def password_change(
+    session: SessionDep,
+    token: str
+    ) -> dict:
+    token_db = await session.execute(
+        select(Email_tokens)
+        .where(Email_tokens.token == token))
+    
+    result = token_db.scalar_one_or_none()
+
+    if not result:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail="Token doesnt exists. Please create a new token through password restore form")
+
+    exp = result.expires_at
+    if exp.tzinfo is None:  # костыль для sqlite
+        exp = exp.replace(tzinfo=timezone.utc)
+
+    if exp < datetime.now(timezone.utc):
+        await session.delete(result)
+        await session.commit()
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="Token doesnt exists. Please create a new token through password restore form")
+    
+    if result.purpose != "password":
+        raise HTTPException(status_code=400, detail="Wrong token purpose")
+
+    return {'status': 'ok'}
+
+
+@router.patch('/password/change/{token}')
+async def password_change(
+    payload: PasswordRestore,
+    session: SessionDep,
+    token: str = Path(..., description="Reset token from email"),
+    ) -> dict:
+    token_db = await session.execute(
+        select(Email_tokens)
+        .where(Email_tokens.token == token)
+        .options(joinedload(Email_tokens.user)))
+    
+    result = token_db.scalar_one_or_none()
+
+    if not result:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail="Token doesnt exists. Please create a new token through password restore form")
+
+    exp = result.expires_at
+    if exp.tzinfo is None:  # костыль для sqlite
+        exp = exp.replace(tzinfo=timezone.utc)
+
+    if exp < datetime.now(timezone.utc):
+        await session.delete(result)
+        await session.commit()
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="Token doesnt exists. Please create a new token through password restore form")
+    
+    if result.purpose != "password":
+        raise HTTPException(status_code=400, detail="Wrong token purpose")
+    
+    if payload.password:
+        result.user.hashed_password = hash_password(payload.password)
+        session.delete(result)
+        session.commit()
+        return {'status': 'ok', 'detail': 'Password is successfully changed'}
+    return {'status': 'ok'}
+
+
+
+@router.post('/password/token/create', status_code=status.HTTP_201_CREATED)
+async def restore_password_token_create(payload: EmailRequest, session: SessionDep) -> dict:
+    """creates token and saves token to db for restoring password"""
+    user = await session.scalar(select(Users).where(Users.email == payload.email))
+
+    if not user:
+        return {'status': 'ok', 'detail': "Password reset link has been sent"}
+    
+    token = await create_token_verify(user.id, 'password', session=session)
+    await asyncio.create_task(send_reset_password(user.email, user.nickname, token))
+
+
+    return {'status': 'ok', 'detail': "Password reset link has been sent"}
+

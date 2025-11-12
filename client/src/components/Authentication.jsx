@@ -23,9 +23,16 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [nickname, setNickname] = useState("");
-  const [accountCreated, setAccountCreated] = useState(false);
 
   useEffect(() => {
+    if (store.errorText) {
+      store.setErrorText('')
+    }
+
+    if (store.setVerifyText) {
+      store.setVerifyText('')
+    }
+
     if (authVar) {
       setAuthVariant(authVar);
     }
@@ -60,20 +67,6 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
         ref={AuthenticationSectionRef}
       >
         <div className="flex flex-col justify-center w-screen h-screen md:max-w-[500px] md:h-fit bg-card/80 backdrop-blur-sm border border-border rounded-2xl shadow-sm p-6">
-          {accountCreated && authVariant === "login" && (
-            <div className="flex items-center gap-3 bg-green-600/90 text-white px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all">
-              <span>
-                <UserRoundCheck className="w-6 h-6 text-white" />
-              </span>
-              <div>
-                <div className="font-bold text-lg">Account created!</div>
-                <div className="text-sm font-medium opacity-90">
-                  Please confirm your email to activate your account
-                </div>
-              </div>
-            </div>
-          )}
-
           {store.errorText && (
             <div className="flex items-center gap-3 bg-red-600/90 text-white px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all">
               <span>
@@ -142,8 +135,7 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
                     nickname
                   );
                   if (ok) {
-                    setAccountCreated(true);
-                    setAuthVariant("login");
+                    setAuthVariant("email_confirm");
                   }
                 }}
                 variant="default"
@@ -168,6 +160,44 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
             </>
           )}
 
+          {authVariant === "email_confirm" && (
+            <>
+              <div className="flex items-center justify-end mb-5">
+                <Button
+                  className="group"
+                  variant="ghost"
+                  size="icon"
+                  onClick={onClose}
+                >
+                  <X className="group-hover:rotate-255 transition-normal" />
+                </Button>
+              </div>
+
+              <h1 className="font-bold text-2xl flex items-center justify-center gap-2 mb-5">
+                🎉 Congratulations!
+              </h1>
+
+              <div className="flex items-start gap-4 px-6 py-4 rounded-2xl shadow-lg mb-6 animate-fade-in transition-all">
+                <span className="mt-1">
+                  <Mail className="w-7 h-7 drop-shadow-md" />
+                </span>
+                <div>
+                  <div className="font-semibold text-lg">
+                    Your verification email has been sent!
+                  </div>
+                  <p className="text-sm font-medium opacity-90 mt-1 leading-relaxed">
+                    Please check your{" "}
+                    <span className="font-semibold">Spam</span> or{" "}
+                    <span className="font-semibold">Promotions</span> folder if
+                    you don’t see it within a few minutes. If you still haven’t
+                    received it, simply log in again — we’ll automatically
+                    resend a new confirmation email for you.
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
+
           {authVariant === "login" && (
             <>
               <div className="flex items-center justify-between mb-10">
@@ -182,6 +212,21 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
                   <X className="group-hover:rotate-255 transition-normal" />
                 </Button>
               </div>
+
+              {store.verifyText && (
+                <div className="flex items-center gap-3 bg-green-600/90 text-white px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all">
+                  <span>
+                    <Mail className="w-6 h-6 text-white" />
+                  </span>
+                  <div>
+                    <div className="font-bold text-lg">{store.verifyText}</div>
+                    <div className="text-sm font-medium opacity-90">
+                      Please check your Spam or Promotions folder if you don’t
+                      see it within a few minutes.
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="relative mb-5">
                 <div className="absolute left-3 top-1/2 p-transform -translate-y-1/2 flex items-center gap-2">
@@ -211,9 +256,9 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
                   <span className="">Remember me</span>
                 </div>
 
-                <a className="" href="#">
+                <Button variant='link' onClick={() => setAuthVariant('reset_password')}>
                   Forgot password?
-                </a>
+                </Button>
               </div>
 
               <Button
@@ -236,6 +281,75 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
                 onClick={() => setAuthVariant("register")}
               >
                 Don't have an account yet?
+              </Button>
+            </>
+          )}
+
+          {authVariant === "reset_password" && (
+            <>
+              <div className="flex items-center justify-between mb-10">
+                <h1 className="font-bold text-2xl">Reset Password</h1>
+
+                <Button
+                  className="group"
+                  variant="ghost"
+                  size="icon"
+                  onClick={onClose}
+                >
+                  <X className="group-hover:rotate-255 transition-normal" />
+                </Button>
+              </div>
+
+              {store.verifyText && (
+                <div className="flex items-center gap-3 bg-green-600/90 text-white px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all">
+                  <span>
+                    <Mail className="w-6 h-6 text-white" />
+                  </span>
+                  <div>
+                    <div className="font-bold text-lg">{store.verifyText}</div>
+                    <div className="text-sm font-medium opacity-90">
+                      Please check your Spam or Promotions folder if you don’t
+                      see it within a few minutes.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {!store.verifyText && (
+                <>
+                    <div className="relative mb-5">
+                <div className="absolute left-3 top-1/2 p-transform -translate-y-1/2 flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-black/55" />
+                </div>
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  onChange={() => setEmail(event.target.value)}
+                />
+              </div>
+
+              <Button
+                onClick={() => store.passwordTokenReq(email)}
+                disabled={!!!email || store.isLoading}
+                variant="default"
+                size="sm"
+                className="flex"
+              >
+                {store.isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Send Restore link"
+                )}
+              </Button>
+                </>
+              )}
+
+              <Button
+                className="font-medium p-0"
+                variant="link"
+                onClick={() => setAuthVariant("login")}
+              >
+                Log in to your account
               </Button>
             </>
           )}

@@ -20,9 +20,9 @@ class Users(Base):
     nickname: Mapped[str | None] = mapped_column(String, unique=True, nullable=False)
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    is_verified: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
-    is_superuser: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
-    is_email_verified: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    is_verified: Mapped[bool | None] = mapped_column(Boolean, default=False)
+    is_superuser: Mapped[bool | None] = mapped_column(Boolean, default=False)
+    is_email_verified: Mapped[bool | None] = mapped_column(Boolean, default=False)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
@@ -94,7 +94,10 @@ class Email_tokens(Base):
     token: Mapped[str] = mapped_column(String(250), nullable=False, unique=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), 
-              default=lambda: datetime.now(timezone.utc) + timedelta(minutes=60), nullable=False)
+              default=lambda: datetime.now(timezone.utc) + timedelta(minutes=60),
+              nullable=False)
+    
+    user: Mapped["Users"] = relationship("Users")
     
 
 

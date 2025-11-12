@@ -2,9 +2,10 @@ import { useParams } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Context } from "../main";
-import { MailCheck, MailWarning } from "lucide-react";
+import { MailCheck, MailWarning, TriangleAlert } from "lucide-react";
 import { Button } from "../components/ui/Button";
-import Authentication from '../components/Authentication'
+import Authentication from "../components/Authentication";
+import Input from "../components/ui/Input";
 
 export default observer(function Confirm() {
   const { option, token } = useParams();
@@ -12,17 +13,23 @@ export default observer(function Confirm() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authVariant, setAuthVariant] = useState("login");
   const toggleAuth = () => setIsAuthOpen((prev) => !prev);
+  const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
+
+  const confirmWithPassword = async () => {
+    if (!password || !password2) return false;
+    if (password !== password2) return false;
+  };
 
   useEffect(() => {
-    const confirm = async () => {
-      return await store.confirm(option, token);
+    const tokenCheck = async () => {
+      return await store.tokenCheck(option, token);
     };
 
-    confirm();
-  }, [option, token, store]);
+    tokenCheck();
+  }, [option, token]);
 
   return (
-    <>
       <section className="relative">
         <Authentication
           isOpen={isAuthOpen}
@@ -35,7 +42,7 @@ export default observer(function Confirm() {
 
           {option == "email" && !store.isLoading && (
             <>
-              {!confirm && (
+              {!store.errorText && store.errorStatus && (
                 <div className="bg-card/80 flex flex-col items-center justify-center gap-3 rounded-2xl p-6 shadow-md text-center">
                   <MailCheck className="h-12 w-12 text-green-500" />
                   <h2 className="text-xl font-semibold text-foreground">
@@ -48,21 +55,24 @@ export default observer(function Confirm() {
                 </div>
               )}
 
-              {confirm && (
+              {store.errorText && (
                 <div className="bg-card/80 flex flex-col items-center justify-center gap-3 rounded-2xl p-6 shadow-md text-center">
                   <MailWarning className="h-12 w-12 text-red-500" />
                   <h2 className="text-xl font-semibold text-foreground">
                     Email is not confirmed!
                   </h2>
-                  <p className="text-muted-foreground">
-                    {store.errorText}. Please log in to request a new confirmation email.
-                  </p>
+                  <p className="text-muted-foreground">{store.errorText}</p>
+
+                  <Button onClick={() => setIsAuthOpen(true)}>Login</Button>
                 </div>
               )}
             </>
           )}
+
+          {option == "password" && !store.isLoading && (
+            <></>
+          )}
         </div>
       </section>
-    </>
   );
 });

@@ -94,7 +94,7 @@ def access_token_valid(token):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid or tampered token")
     
 async def create_token_verify(user_id: int, purpose: str, session) -> str:
-    """creates verify token to verify users"""
+    """creates verify token to verify user"""
     try:
         token = secrets.token_urlsafe(48)
 
