@@ -3,7 +3,7 @@ import AuthService from "../services/authService";
 
 export default class Store {
   isLoading = false;
-  errors = [];
+  errors = new Set();
 
   constructor() {
     makeAutoObservable(this);
@@ -13,9 +13,13 @@ export default class Store {
     this.isLoading = val;
   }
 
-  addError(msg) 
-    if (!msg) return;
-    this.errors.add(String(msg))}
+  addError(msg) {
+    this.errors.add(String(msg));
+  }
+
+  clearErorrs() {
+    this.errors.clear();
+  }
 
   errorValid(e) {
     const res = e?.response;
@@ -36,14 +40,13 @@ export default class Store {
 
   async login(email, password) {
     this.setIsLoading(true);
+    this.clearErorrs();
     try {
       const response = await AuthService.login(email, password);
       localStorage.setItem("access_token", response.data.access_token);
     } catch (e) {
-
-      } else {
-        this.errors.add(e.response.data.detail)
-      }
+      console.log(e)
+      this.errorValid(e)
     } finally {
       this.setIsLoading(false);
     }
@@ -60,8 +63,7 @@ export default class Store {
       );
       return true;
     } catch (e) {
-      this.setErrorText(e.response?.data?.detail || "Invalid or expired token");
-      return false;
+      this.errorValid(e)
     } finally {
       this.setIsLoading(false);
     }
@@ -77,9 +79,9 @@ export default class Store {
       }
       return true;
     } catch (e) {
-      return false;
+      this.errorValid(e)
     } finally {
-      set.setIsLoading(false);
+      this.setIsLoading(false);
     }
   }
 
@@ -88,6 +90,7 @@ export default class Store {
     try {
       await AuthService.tokenConfirm(option, token);
     } catch (e) {
+      this.errorValid(e)
     } finally {
       this.setIsLoading(false);
     }

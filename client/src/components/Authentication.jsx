@@ -3,7 +3,6 @@ import {
   Key,
   X,
   ShieldUser,
-  UserRoundCheck,
   Loader2,
   TriangleAlert,
 } from "lucide-react";
@@ -25,14 +24,10 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
   const [nickname, setNickname] = useState("");
 
   useEffect(() => {
-    if (store.errorText) {
-      store.setErrorText('')
-    }
+    store.clearErorrs();
+  }, [authVariant]);
 
-    if (store.setVerifyText) {
-      store.setVerifyText('')
-    }
-
+  useEffect(() => {
     if (authVar) {
       setAuthVariant(authVar);
     }
@@ -67,18 +62,22 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
         ref={AuthenticationSectionRef}
       >
         <div className="flex flex-col justify-center w-screen h-screen md:max-w-[500px] md:h-fit bg-card/80 backdrop-blur-sm border border-border rounded-2xl shadow-sm p-6">
-          {store.errorText && (
-            <div className="flex items-center gap-3 bg-red-600/90 text-white px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all">
-              <span>
-                <TriangleAlert className="w-6 h-6 text-white" />
-              </span>
-              <div>
-                <div className="font-bold text-lg">An Error!</div>
-                <div className="text-sm font-medium opacity-90">
-                  {store.errorText}
+          {store.errors.size > 0 && (
+            Array.from(store.errors).map((item, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-3 bg-red-600/90 text-white px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all"
+              >
+                <span>
+                  <TriangleAlert className="w-6 h-6 text-white" />
+                </span>
+                <div>
+                  <div className="text-sm font-bold opacity-90">
+                    {item}
+                  </div>
                 </div>
               </div>
-            </div>
+            ))
           )}
 
           {authVariant === "register" && (
@@ -317,30 +316,30 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
 
               {!store.verifyText && (
                 <>
-                    <div className="relative mb-5">
-                <div className="absolute left-3 top-1/2 p-transform -translate-y-1/2 flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-black/55" />
-                </div>
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  onChange={() => setEmail(event.target.value)}
-                />
-              </div>
+                  <div className="relative mb-5">
+                    <div className="absolute left-3 top-1/2 p-transform -translate-y-1/2 flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-black/55" />
+                    </div>
+                    <Input
+                      type="email"
+                      placeholder="Email"
+                      onChange={() => setEmail(event.target.value)}
+                    />
+                  </div>
 
-              <Button
-                onClick={() => store.passwordTokenReq(email)}
-                disabled={!!!email || store.isLoading}
-                variant="default"
-                size="sm"
-                className="flex"
-              >
-                {store.isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  "Send Restore link"
-                )}
-              </Button>
+                  <Button
+                    onClick={() => store.passwordTokenReq(email)}
+                    disabled={!!!email || store.isLoading}
+                    variant="default"
+                    size="sm"
+                    className="flex"
+                  >
+                    {store.isLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      "Send Restore link"
+                    )}
+                  </Button>
                 </>
               )}
 
