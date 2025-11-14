@@ -16,9 +16,9 @@ bcrypt = "4.0.1"
 bleach = "*"
 pytest = "*"
 httpx = "*"
-slugify = "*"
 aiosmtplib = "*"
 jinja2 = "*"
+python-slugify = "*"
 
 [dev-packages]
 

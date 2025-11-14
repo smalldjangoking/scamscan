@@ -141,6 +141,8 @@ export default function Reports() {
                                         crypto_logo_url={report?.address.crypto_logo_url}
                                         website_url={report?.address.website_url}
                                         crypto_address={report?.address.crypto_address}
+                                        slug={report.slug}
+                                        id={report.id}
                                     />
                                 ))}
                             </ul>)

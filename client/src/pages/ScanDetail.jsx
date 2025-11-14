@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
-import {useAddress, useAddrReports} from "../utils/hook.js";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useAddress, useAddrReports } from "../utils/hook.js";
 
 import SearchAddress from "../components/ui/SearchAddress.jsx";
 import LoadingSpinner from "../components/ui/Loading.jsx";
-import {Button} from "../components/ui/Button.jsx";
+import { Button } from "../components/ui/Button.jsx";
 import LikeDislike from "../components/scan/LikesDislike.jsx";
 import ReportCard from "../components/reports/ReportCard.jsx";
-import {Tooltip} from 'react-tooltip';
+import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 import Pagination from '../components/ui/Paginator.jsx'
 
@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 export default function ScanDetail() {
-    const {web_url, crypto_address} = useParams();
+    const { web_url, crypto_address } = useParams();
 
     const queryValue = web_url || crypto_address;
     const querySubject = web_url ? "website" : "crypto";
@@ -59,9 +59,9 @@ export default function ScanDetail() {
             )
                 .toString()
                 .padStart(2, "0")}.${date.getFullYear()} ${date
-                .getHours()
-                .toString()
-                .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+                    .getHours()
+                    .toString()
+                    .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
             setFormatted(formattedDate);
         }
     }, [addressData, isAddressFetching]);
@@ -70,24 +70,24 @@ export default function ScanDetail() {
         <section className="relative min-h-screen">
             {/* background gradient */}
             <div
-                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"/>
+                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
 
             <div className="relative container mx-auto px-2 py-10 md:py-20">
-                <SearchAddress onValue={queryValue}/>
+                <SearchAddress onValue={queryValue} />
 
                 <div
                     className="mt-6 flex flex-col rounded-xl border border-dashed border-border bg-card/80 backdrop-blur-sm min-h-[200px]">
                     {/* ========== Address Loading/Error ========== */}
                     {isAddressLoading ? (
                         <div className="flex flex-col items-center justify-center py-16">
-                            <LoadingSpinner/>
+                            <LoadingSpinner />
                             <p className="text-sm text-muted-foreground mt-3">
                                 Loading address details...
                             </p>
                         </div>
                     ) : isAddressError ? (
                         <div className="flex flex-col items-center justify-center py-20 text-center">
-                            <FileWarning className="h-10 w-10 text-muted-foreground mb-3"/>
+                            <FileWarning className="h-10 w-10 text-muted-foreground mb-3" />
                             <p className="text-muted-foreground">
                                 Address not found or failed to load.
                             </p>
@@ -114,10 +114,10 @@ export default function ScanDetail() {
                                             />
                                         )}
                                         <span className="truncate font-medium">
-                      {crypto_address
-                          ? addressData.address.crypto_address
-                          : addressData.address.website_url}
-                    </span>
+                                            {crypto_address
+                                                ? addressData.address.crypto_address
+                                                : addressData.address.website_url}
+                                        </span>
                                     </div>
 
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -131,7 +131,7 @@ export default function ScanDetail() {
                                     </div>
                                 </div>
 
-                                <hr className="my-5 border-border/70"/>
+                                <hr className="my-5 border-border/70" />
 
                                 {/* Useful Links + LikeDislike */}
                                 <div className="flex flex-wrap gap-4">
@@ -187,19 +187,19 @@ export default function ScanDetail() {
                                         </div>
                                     )}
 
-                                    <LikeDislike/>
+                                    <LikeDislike />
                                 </div>
 
                                 {/* Reports Section */}
                                 <h4 className="flex items-center gap-2 mt-10 font-semibold text-lg">
-                                    <Flag className="h-5 w-5 text-accent"/> Reports
+                                    <Flag className="h-5 w-5 text-accent" /> Reports
                                 </h4>
-                                <hr className="my-5 border-border/70"/>
+                                <hr className="my-5 border-border/70" />
 
                                 {/* Reports List */}
                                 {isReportsLoading ? (
                                     <div className="flex justify-center items-center py-20">
-                                        <LoadingSpinner/>
+                                        <LoadingSpinner />
                                     </div>
                                 ) : isReportError ? (
                                     <div className="text-center text-muted-foreground py-10">
@@ -210,10 +210,12 @@ export default function ScanDetail() {
                                         {reportsData.reports.map((report) => (
                                             <ReportCard
                                                 key={report.id}
+                                                id={report.id}
                                                 report_title={report.report_title}
                                                 report_description={report.report_description}
                                                 created_at={report.created_at}
                                                 user_id={report.user_id}
+                                                slug={report.slug}
                                             />
                                         ))}
                                     </ul>
@@ -221,7 +223,7 @@ export default function ScanDetail() {
                                     <div className="flex flex-col items-center justify-center py-16 text-center">
                                         <div
                                             className="h-14 w-14 rounded-full border border-dashed flex items-center justify-center mb-4">
-                                            <FileWarning className="h-7 w-7 text-muted-foreground"/>
+                                            <FileWarning className="h-7 w-7 text-muted-foreground" />
                                         </div>
                                         <p className="text-muted-foreground">
                                             No reports yet for this address.
@@ -241,7 +243,7 @@ export default function ScanDetail() {
                     )}
                 </div>
             </div>
-            <Tooltip id="info-tooltip"/>
+            <Tooltip id="info-tooltip" />
         </section>
     );
 }

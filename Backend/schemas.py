@@ -121,7 +121,7 @@ class SingleReport(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int | None
-    user_id: str | None = None
+    user_id: int | None = None
     report_title: str
     report_description: str
     address_id: int
@@ -132,7 +132,7 @@ class SingleReport(BaseModel):
 class PublicUserAPISchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    user_id: int
+    user_id: int = Field(alias="id")
     nickname: str
 
 class SingleReportSchema(BaseModel):

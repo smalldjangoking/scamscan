@@ -1,13 +1,13 @@
-import {useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-export function useReports({browse = {}, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = ''}) {
+export function useReports({ browse = {}, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = '' }) {
     let token = ''
     if (browse?.show == 'user' && browse?.token) {
         token = browse.token
     }
 
     return useQuery({
-        queryKey: ['reports', {debouncedSearch, page, pageSize, browse, filterQuery}],
+        queryKey: ['reports', { debouncedSearch, page, pageSize, browse, filterQuery }],
         queryFn: async () => {
             const params = new URLSearchParams({
                 page: page.toString(),
@@ -22,7 +22,7 @@ export function useReports({browse = {}, page = 1, pageSize = 10, filterQuery = 
 
             const res = await fetch(`/api/reports/all?${params}`, {
                 headers: {
-                    ...(token ? {Authorization: `Bearer ${token}`} : {})
+                    ...(token ? { Authorization: `Bearer ${token}` } : {})
                 }
             })
             if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
@@ -33,10 +33,10 @@ export function useReports({browse = {}, page = 1, pageSize = 10, filterQuery = 
 }
 
 
-export function useAddress({value, subject}) {
+export function useAddress({ value, subject }) {
 
     return useQuery({
-        queryKey: ['addresses', {value, subject}],
+        queryKey: ['addresses', { value, subject }],
         queryFn: async () => {
             const params = new URLSearchParams({
                 value: value.toString(),
@@ -53,10 +53,10 @@ export function useAddress({value, subject}) {
     })
 }
 
-export function useComments({report_id, comment_page}) {
+export function useComments({ report_id, comment_page }) {
 
     return useQuery({
-        queryKey: ['comments', {report_id, comment_page}],
+        queryKey: ['comments', { report_id, comment_page }],
         queryFn: async () => {
             const params = new URLSearchParams({
                 page: comment_page.toString(),
@@ -74,9 +74,9 @@ export function useComments({report_id, comment_page}) {
 }
 
 
-export function useAddrReports({page = 1, pageSize = 10, address_id = ''}) {
+export function useAddrReports({ page = 1, pageSize = 10, address_id = '' }) {
     return useQuery({
-        queryKey: ['reports', {page, pageSize, address_id}],
+        queryKey: ['reports', { page, pageSize, address_id }],
         queryFn: async () => {
             const params = new URLSearchParams({
                 page: page.toString(),
@@ -93,15 +93,22 @@ export function useAddrReports({page = 1, pageSize = 10, address_id = ''}) {
 }
 
 export function useSingleReport(id) {
-    return useQuery({
-        queryKey: ['report', id],
-        queryFn: async () => {
-            const res = await fetch(`/api/reports/id/${id}`)
-            if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
-            return res.json()
-        },
-        keepPreviousData: true,
-        enabled: !!id,
-    })
-}
+  return useQuery({
+    queryKey: ['report', id],
+    enabled: !!id,
+    keepPreviousData: true,
+    queryFn: async () => {
+      const res = await fetch(`/api/reports/id/${id}`);
 
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("❌ useSingleReport bad response:", res.status, text);
+        throw new Error(`Request failed with status ${res.status}`);
+      }
+
+      const data = await res.json();
+      console.log("✅ useSingleReport data:", data);
+      return data;
+    },
+  });
+}

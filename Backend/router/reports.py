@@ -147,9 +147,10 @@ async def get_report(session: SessionDep,
 
     query = (
         select(Reports)
-        .options(joinedload(Reports.address), joinedload(Reports.user))
         .where(Reports.id == report_id)
-    )
+        .options(joinedload(Reports.address), joinedload(Reports.user)))
+    
+    
     result = await session.execute(query)
     report_data = result.scalar_one_or_none()
 

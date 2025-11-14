@@ -1,5 +1,5 @@
-import React, {useEffect} from "react";
-import {useNavigate, useParams} from "react-router-dom";
+import React, { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import TiptapViewer from "../components/reports/ReportDescription.jsx";
 
 import {
@@ -12,25 +12,23 @@ import {
     FileWarning,
     Edit,
     Trash2,
-    Copy
+    Copy,
+    Globe
 } from "lucide-react";
-import {Button} from "../components/ui/Button.jsx";
+import { Button } from "../components/ui/Button.jsx";
 import LoadingSpinner from "../components/ui/Loading.jsx";
-import {Tooltip} from "react-tooltip";
-import {useComments, useSingleReport} from "../utils/hook.js"
+import { Tooltip } from "react-tooltip";
+import { useComments, useSingleReport } from "../utils/hook.js"
 import Input from "../components/ui/Input.jsx";
 
 export default function ReportDetail() {
     const navigate = useNavigate();
-    const {id} = useParams();
+    const { id, slug } = useParams();
 
-    const {data: reportData, isLoading: reportIsLoading, isError: reportIsError} = useSingleReport(id);
-    const {data: commentData, isLoading: commentIsLoading, isError: commentIsError} = useComments(id);
+    console.log('id', id, typeof (id))
 
-
-    useEffect(() => {
-        console.log(commentData)
-    }, [commentData])
+    const { data: reportData, isLoading: reportIsLoading, isError: reportIsError } = useSingleReport(id);
+    const { data: commentData, isLoading: commentIsLoading, isError: commentIsError } = useComments(id);
 
     const isLoading = false;
     const report = {
@@ -40,7 +38,7 @@ export default function ReportDetail() {
             is_anonymous: false,
         },
         comments: [
-            {id: 1, user: "Anonymous", text: "Thanks for warning!", created_at: "2025-10-19T11:32:00"},
+            { id: 1, user: "Anonymous", text: "Thanks for warning!", created_at: "2025-10-19T11:32:00" },
             {
                 id: 2,
                 user: "ProtectedUser",
@@ -53,7 +51,7 @@ export default function ReportDetail() {
     if (isLoading)
         return (
             <div className="flex flex-col items-center justify-center py-20">
-                <LoadingSpinner/>
+                <LoadingSpinner />
                 <p className="text-sm text-muted-foreground mt-3">
                     Loading report details...
                 </p>
@@ -63,7 +61,7 @@ export default function ReportDetail() {
     return (
         <section className="relative min-h-screen">
             <div
-                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"/>
+                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
             <div className="relative container mx-auto py-10 px-2 md:py-20">
                 <div className="flex justify-between items-center">
                     <Button
@@ -71,17 +69,17 @@ export default function ReportDetail() {
                         variant="ghost"
                         className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition"
                     >
-                        <ArrowLeft className="h-4 w-4"/>
+                        <ArrowLeft className="h-4 w-4" />
                         <span>Back</span>
                     </Button>
 
 
                     <div className="flex items-center">
                         <Button variant='ghost'>
-                            <Edit/>
+                            <Edit />
                         </Button>
                         <Button variant='ghost'>
-                            <Trash2/>
+                            <Trash2 />
                         </Button>
 
                     </div>
@@ -92,7 +90,7 @@ export default function ReportDetail() {
                 {
                     reportIsLoading ? (
                         <div className="col-span-full flex justify-center items-center py-20">
-                            <LoadingSpinner/>
+                            <LoadingSpinner />
                         </div>
                     ) : reportIsError ? (
                         <div>Error</div>
@@ -104,7 +102,7 @@ export default function ReportDetail() {
                                     <div className="flex items-center">
                                         {report.user.is_anonymous ? (
                                             <div className="flex items-center gap-2 text-muted-foreground">
-                                                <Shield className="h-6 w-6"/>
+                                                <Shield className="h-6 w-6" />
                                                 <span>Anonymous Reporter</span>
                                             </div>
                                         ) : (
@@ -143,11 +141,11 @@ export default function ReportDetail() {
                                             >
                                                 {reportData?.address.website_url ?
                                                     (<p className="flex items-center gap-1">
-                                                        <Globe/> {reportData.address.website_url}</p>)
+                                                        <Globe /> {reportData.address.website_url}</p>)
                                                     :
                                                     (<p className="flex items-center gap-1"><img className="w-6 h-6"
-                                                                                                 src={reportData.address.crypto_logo_url}
-                                                                                                 alt={reportData.address.crypto_name}/>
+                                                        src={reportData.address.crypto_logo_url}
+                                                        alt={reportData.address.crypto_name} />
                                                         {reportData.address.crypto_address}</p>)}
                                             </Button>
                                         </div>
@@ -162,14 +160,14 @@ export default function ReportDetail() {
                                             className="shrink-0 hover:bg-accent hover:text-accent-foreground"
                                             title="Copy address"
                                         >
-                                            <Copy className="h-4 w-4"/>
+                                            <Copy className="h-4 w-4" />
                                         </Button>
                                     </div>
                                 </div>
 
                                 <div className="flex flex-col gap-2">
                                     <span className="text-muted-foreground text-sm">Description</span>
-                                    <TiptapViewer html={reportData?.report.report_description}/>
+                                    <TiptapViewer html={reportData?.report.report_description} />
                                 </div>
 
                                 <div className="flex justify-between items-center border-t pt-2">
@@ -189,7 +187,7 @@ export default function ReportDetail() {
                                         variant="outline"
                                         className="flex items-center gap-2 text-muted-foreground"
                                     >
-                                        <Share2 className="h-4 w-4"/>
+                                        <Share2 className="h-4 w-4" />
                                         <span>Share</span>
                                     </Button>
                                 </div>
@@ -200,7 +198,7 @@ export default function ReportDetail() {
                             <div className="text-center">
                                 <div
                                     className="mx-auto mb-4 h-14 w-14 rounded-full border border-dashed flex items-center justify-center">
-                                    <FileWarning className="h-7 w-7 text-muted-foreground"/>
+                                    <FileWarning className="h-7 w-7 text-muted-foreground" />
                                 </div>
                                 <p className="text-muted-foreground">
                                     123
@@ -213,7 +211,7 @@ export default function ReportDetail() {
                 {/* Comments Section */}
                 <div className="mt-10 border rounded-xl bg-card/80 backdrop-blur-sm p-6">
                     <h3 className="flex items-center gap-2 mb-4">
-                        <MessageSquare className="h-5 w-5 text-muted-foreground"/>
+                        <MessageSquare className="h-5 w-5 text-muted-foreground" />
                         <p className="font-semibold text-foreground">Comments ({report.comments.length})</p>
                     </h3>
 
@@ -266,7 +264,7 @@ export default function ReportDetail() {
                     )}
                 </div>
             </div>
-            <Tooltip id="info-tooltip"/>
+            <Tooltip id="info-tooltip" />
         </section>
     );
 }
