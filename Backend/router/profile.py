@@ -11,6 +11,7 @@ from sqlalchemy import select
 
 router = APIRouter(prefix="/api/user", tags=["user"])
 
+
 @router.post("/me")
 async def read_user_me(session: SessionDep, user_id: str = Depends(access_token_valid)):
     data = await session.get(Users, user_id)

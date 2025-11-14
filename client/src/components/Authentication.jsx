@@ -55,6 +55,8 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
 
   const isLoginDisabled = !email || !password;
 
+  if (store.accessToken) return;
+
   return createPortal(
     <section className="fixed inset-0 bg-muted/70 z-50">
       <div
@@ -212,13 +214,13 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
                 </Button>
               </div>
 
-              {store.verifyText && (
+              {store.successAlerts && (
                 <div className="flex items-center gap-3 bg-green-600/90 text-white px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all">
                   <span>
                     <Mail className="w-6 h-6 text-white" />
                   </span>
                   <div>
-                    <div className="font-bold text-lg">{store.verifyText}</div>
+                    <div className="font-bold text-lg">Email was sent!</div>
                     <div className="text-sm font-medium opacity-90">
                       Please check your Spam or Promotions folder if you don’t
                       see it within a few minutes.
@@ -299,13 +301,13 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
                 </Button>
               </div>
 
-              {store.verifyText && (
+              {store.successAlerts && (
                 <div className="flex items-center gap-3 bg-green-600/90 text-white px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all">
                   <span>
                     <Mail className="w-6 h-6 text-white" />
                   </span>
                   <div>
-                    <div className="font-bold text-lg">{store.verifyText}</div>
+                    <div className="font-bold text-lg">{store.successAlerts}</div>
                     <div className="text-sm font-medium opacity-90">
                       Please check your Spam or Promotions folder if you don’t
                       see it within a few minutes.
@@ -314,34 +316,30 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
                 </div>
               )}
 
-              {!store.verifyText && (
-                <>
-                  <div className="relative mb-5">
-                    <div className="absolute left-3 top-1/2 p-transform -translate-y-1/2 flex items-center gap-2">
-                      <Mail className="h-4 w-4 text-black/55" />
-                    </div>
-                    <Input
-                      type="email"
-                      placeholder="Email"
-                      onChange={() => setEmail(event.target.value)}
-                    />
-                  </div>
+              <div className="relative mb-5">
+                <div className="absolute left-3 top-1/2 p-transform -translate-y-1/2 flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-black/55" />
+                </div>
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  onChange={() => setEmail(event.target.value)}
+                />
+              </div>
 
-                  <Button
-                    onClick={() => store.passwordTokenReq(email)}
-                    disabled={!!!email || store.isLoading}
-                    variant="default"
-                    size="sm"
-                    className="flex"
-                  >
-                    {store.isLoading ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      "Send Restore link"
-                    )}
-                  </Button>
-                </>
-              )}
+              <Button
+                onClick={() => store.passwordTokenReq(email)}
+                disabled={!!!email || store.isLoading}
+                variant="default"
+                size="sm"
+                className="flex"
+              >
+                {store.isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Send Restore link"
+                )}
+              </Button>
 
               <Button
                 className="font-medium p-0"

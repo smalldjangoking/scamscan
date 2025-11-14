@@ -30,49 +30,49 @@ export default observer(function Confirm() {
   }, [option, token]);
 
   return (
-      <section className="relative">
-        <Authentication
-          isOpen={isAuthOpen}
-          onClose={toggleAuth}
-          authVar={authVariant}
-        />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
-        <div className="relative container mx-auto px-4 py-20 md:py-28 min-h-screen">
-          {store.isLoading && <>loading...</>}
+    <section className="relative">
+      <Authentication
+        isOpen={isAuthOpen}
+        onClose={toggleAuth}
+        authVar={authVariant}
+      />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
+      <div className="relative container mx-auto px-4 py-20 md:py-28 min-h-screen">
+        {store.isLoading && <>loading...</>}
 
-          {option == "email" && !store.isLoading && (
-            <>
-              {!store.errorText && store.errorStatus && (
-                <div className="bg-card/80 flex flex-col items-center justify-center gap-3 rounded-2xl p-6 shadow-md text-center">
-                  <MailCheck className="h-12 w-12 text-green-500" />
-                  <h2 className="text-xl font-semibold text-foreground">
-                    Email confirmed 🎉
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Your email address has been successfully verified.
-                  </p>
-                  <Button onClick={() => setIsAuthOpen(true)}>Login</Button>
-                </div>
-              )}
+        {option == "email" && !store.isLoading && (
+          <>
+            {store.errors.size > 0 ? (
+              <div className="bg-card/80 flex flex-col items-center justify-center gap-3 rounded-2xl p-6 shadow-md text-center">
+                <MailWarning className="h-12 w-12 text-red-500" />
+                <h2 className="text-xl font-semibold text-foreground">
+                  Email is not confirmed!
+                </h2>
+                {Array.from(store.errors).map((item, index) => (
+                  <p id={index} className="text-muted-foreground">{item}</p>
+                ))}
 
-              {store.errorText && (
-                <div className="bg-card/80 flex flex-col items-center justify-center gap-3 rounded-2xl p-6 shadow-md text-center">
-                  <MailWarning className="h-12 w-12 text-red-500" />
-                  <h2 className="text-xl font-semibold text-foreground">
-                    Email is not confirmed!
-                  </h2>
-                  <p className="text-muted-foreground">{store.errorText}</p>
+                <Button onClick={() => setIsAuthOpen(true)}>Login</Button>
+              </div>
+            ) : (
+              <div className="bg-card/80 flex flex-col items-center justify-center gap-3 rounded-2xl p-6 shadow-md text-center">
+                <MailCheck className="h-12 w-12 text-green-500" />
+                <h2 className="text-xl font-semibold text-foreground">
+                  Email confirmed 🎉
+                </h2>
+                <p className="text-muted-foreground">
+                  Your email address has been successfully verified.
+                </p>
+                <Button onClick={() => setIsAuthOpen(true)}>Login</Button>
+              </div>
+            )}
+          </>
+        )}
 
-                  <Button onClick={() => setIsAuthOpen(true)}>Login</Button>
-                </div>
-              )}
-            </>
-          )}
-
-          {option == "password" && !store.isLoading && (
-            <></>
-          )}
-        </div>
-      </section>
+        {option == "password" && !store.isLoading && (
+          <></>
+        )}
+      </div>
+    </section>
   );
 });

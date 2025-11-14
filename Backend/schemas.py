@@ -1,13 +1,28 @@
 from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel, EmailStr, model_validator, ConfigDict
+from pydantic import BaseModel, EmailStr, model_validator, ConfigDict, Field
+from typing import Annotated
 
 
 class UserRegistrationSchema(BaseModel):
     email: EmailStr
-    password: str
+    password: Annotated[
+        str,
+        Field(
+            min_length=8,
+            max_length=64,
+            pattern=r'^[A-Za-z0-9@#$%^&+=!?._-]+$'
+        )
+    ]
     password2: str
-    nickname: str
+    nickname: Annotated[
+        str,
+        Field(
+            min_length=3,
+            max_length=24,
+            pattern=r'^[A-Za-z0-9_]+$'
+        )
+    ]
 
 
 class UserLoginSchema(BaseModel):

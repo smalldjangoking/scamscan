@@ -5,7 +5,7 @@ from fastapi import APIRouter, status, HTTPException, Security, Request, Respons
 from database_settings import SessionDep
 from schemas import UserRegistrationSchema, UserLoginSchema, PasswordRestore, EmailRequest
 from services import add_user, nickname_check, get_user_by_email, verify_password, access_token_valid, create_refresh_token, \
-    create_access_token, ALGORITHM, JWT_SECRET_KEY, create_token_verify, hash_password
+    create_access_token, ALGORITHM, create_token_verify, hash_password
 from fastapi.security import OAuth2PasswordBearer
 from smtp.smtp import send_confirm_email, send_reset_password
 from models import Email_tokens
@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 from models import Users
-
+from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
@@ -61,8 +61,8 @@ async def user_login(userbase: UserLoginSchema, session: SessionDep, response: R
         old_token = await session.scalar(select(Email_tokens).where(Email_tokens.user_id == user.id))
 
         if old_token:
-            session.delete(old_token)
-            session.commit()
+            await session.delete(old_token)
+            await session.commit()
 
         token = await create_token_verify(user.id, purpose='email', session=session)
         await asyncio.create_task(send_confirm_email(user.email, user.nickname, token))
@@ -116,9 +116,10 @@ async def web_refresh_token_validator(request: Request, response: Response):
     except jwt.PyJWTError:
         response.delete_cookie("refresh_token")
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token")
+    
 
 @router.patch('/email/verify/{token}', status_code=status.HTTP_200_OK)
-async def verify_email(token: str, session: SessionDep) -> None:    
+async def verify_email(token: str, session: SessionDep):    
     token_db = await session.execute(
         select(Email_tokens)
         .where(Email_tokens.token == token)
@@ -127,9 +128,18 @@ async def verify_email(token: str, session: SessionDep) -> None:
     result = token_db.scalar_one_or_none()
 
     if not result:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Token doesnt exists. Please log in to request a new confirmation email.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail="Token doesnt exists. Please log in to request a new confirmation email")
     
-
+    if result.user.is_email_verified:
+        return JSONResponse(
+            status_code=status.HTTP_208_ALREADY_REPORTED,
+            content={
+                'status': 'ok',
+                'detail': 'You have already confirmed your email address'
+            }
+        )
+    
     exp = result.expires_at
     if exp.tzinfo is None:  # костыль для sqlite
         exp = exp.replace(tzinfo=timezone.utc)
@@ -145,6 +155,8 @@ async def verify_email(token: str, session: SessionDep) -> None:
     result.user.is_email_verified = True
     await session.delete(result)
     await session.commit()
+
+    return {'status': 'ok', 'detail': 'email address was confirmed'}
     
 
 @router.patch('/password/verify/{token}', status_code=status.HTTP_200_OK)

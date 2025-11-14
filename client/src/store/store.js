@@ -1,12 +1,25 @@
 import { makeAutoObservable } from "mobx";
 import AuthService from "../services/authService";
+import userService from "../services/userService";
 
 export default class Store {
   isLoading = false;
   errors = new Set();
+  successAlerts = ''
+  accessToken = localStorage.getItem("access_token") || null;
 
   constructor() {
     makeAutoObservable(this);
+  }
+
+  setAccessToken(token) {
+    localStorage.setItem("access_token", token);
+    this.accessToken = token;
+  }
+
+  removeAccessToken() {
+    localStorage.removeItem("access_token");
+    this.accessToken = null;
   }
 
   setIsLoading(val) {
@@ -17,16 +30,21 @@ export default class Store {
     this.errors.add(String(msg));
   }
 
+  setSuccessAlerts(msg) {
+    this.successAlerts = msg
+  }
+
   clearErorrs() {
     this.errors.clear();
   }
 
   errorValid(e) {
+    this.clearErorrs();
     const res = e?.response;
     const detail = res?.data?.detail;
 
     if (Array.isArray(detail)) {
-      detail.forEach(item => this.addError(item?.msg || item?.message || JSON.stringify(item)));
+      detail.forEach(item => this.addError(item?.loc[1] + ': ' + item?.msg || item?.message || JSON.stringify(item)));
     } else if (typeof detail === "string") {
       this.addError(detail);
     } else if (detail && typeof detail === "object") {
@@ -38,15 +56,31 @@ export default class Store {
     }
   }
 
+  async me() {
+    this.setIsLoading(true)
+    try {
+      return await userService.me();
+    }
+    catch (e) {
+      this.errorValid(e)
+      console.log(e)
+    } finally {
+      this.setIsLoading(false)
+    }
+  }
+
   async login(email, password) {
     this.setIsLoading(true);
     this.clearErorrs();
     try {
       const response = await AuthService.login(email, password);
-      localStorage.setItem("access_token", response.data.access_token);
+      this.setAccessToken(response.data.access_token);
     } catch (e) {
-      console.log(e)
-      this.errorValid(e)
+      if (e?.response?.status === 403) {
+        this.setSuccessAlerts(e?.response?.detail)
+      } else {
+        this.errorValid(e)
+      }
     } finally {
       this.setIsLoading(false);
     }
@@ -64,6 +98,7 @@ export default class Store {
       return true;
     } catch (e) {
       this.errorValid(e)
+      console.log(e)
     } finally {
       this.setIsLoading(false);
     }
@@ -75,9 +110,8 @@ export default class Store {
       const res = await AuthService.passwordTokenReq(email);
 
       if (res.data.status === "ok") {
-        this.setVerifyText("Reset link sent!");
+        this.setSuccessAlerts("Reset link sent!");
       }
-      return true;
     } catch (e) {
       this.errorValid(e)
     } finally {
@@ -88,8 +122,17 @@ export default class Store {
   async tokenCheck(option, token) {
     this.setIsLoading(true);
     try {
-      await AuthService.tokenConfirm(option, token);
+      const res = await AuthService.tokenConfirm(option, token);
+      console.log(res)
+
+      if (option === 'email') {
+        if (res.status === 200) {
+          this.setSuccessAlerts(res.data.detail)
+        }
+      }
+
     } catch (e) {
+      console.log(e)
       this.errorValid(e)
     } finally {
       this.setIsLoading(false);

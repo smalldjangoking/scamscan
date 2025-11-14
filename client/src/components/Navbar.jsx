@@ -1,14 +1,16 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Shield, ArrowRight, User } from "lucide-react"
 import { ThemeToggle } from "./ui/ThemeToggle.jsx";
 import { Button } from "./ui/Button.jsx";
 import Authentication from "./Authentication.jsx";
+import { Context } from "../main";
+import { observer } from "mobx-react-lite";
 
 function Navbar() {
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const [authVariant, setAuthVariant] = useState('register');
     const toggleAuth = () => setIsAuthOpen(prev => !prev);
-    const [accessToken, setAccessToken] = useState(localStorage.getItem("access_token"))
+    const { store } = useContext(Context);
 
     const openAuth = (variant) => {
         setAuthVariant(variant);
@@ -19,7 +21,6 @@ function Navbar() {
     return (
         <>
             <Authentication isOpen={isAuthOpen} onClose={toggleAuth} authVar={authVariant} />
-
             <header
                 className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -44,7 +45,7 @@ function Navbar() {
                     </nav>
                     <div className="flex items-center gap-3">
                         <ThemeToggle />
-                        {!accessToken ? (
+                        {!store.accessToken ? (
                             <>
                                 <Button onClick={() => openAuth('login')} variant="ghost" size="sm">Sign In</Button>
                                 <Button onClick={() => openAuth('register')} size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
@@ -60,7 +61,6 @@ function Navbar() {
                                     </Button>
                             </>
                         )}
-
                     </div>
                 </div>
             </header>
@@ -68,4 +68,4 @@ function Navbar() {
     )
 }
 
-export default Navbar;
+export default observer(Navbar);

@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { User, Phone, AtSign, Calendar, Pencil, Check, X, KeyRound, ShieldAlert, FileWarning } from "lucide-react";
+import React, { useState, useEffect, useContext } from "react";
+import { User, Phone, AtSign, Calendar, Pencil, Check, X, KeyRound, FileWarning } from "lucide-react";
 import { Button } from "../components/ui/Button.jsx";
 import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
+import { Context } from "../main";
+import { observer } from "mobx-react-lite";
+
 
 function Profile() {
+    const { store } = useContext(Context)
+
     const [user, setUser] = useState(null);
     const [userUpdate, setUserDataUpdate] = useState(null);
     const [editField, setEditField] = useState(null);
@@ -16,72 +21,18 @@ function Profile() {
     const successToast = (data) => toast.success(data);
     const failedToast = (errorReason) => toast.error(`${errorReason}`);
     const navigate = useNavigate();
-    
-
-
-    const handleLogout = async () => {
-        try {
-            const response = await fetch("api/auth/logout", {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": accessToken ? `Bearer ${accessToken}` : ""
-                }
-            });
-
-            const response_status = await response.json();
-
-            if (response_status.status === "ok") {
-                localStorage.removeItem('access_token');
-                window.location.href = "/";
-            }
-
-        } catch (error) {
-            console.log(error);
-        }
-    };
 
     const fetchUser = async () => {
-        try {
-            const response = await fetch("api/user/me", {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": accessToken ? `Bearer ${accessToken}` : ""
-                }
-            });
-            if (response.status == 401) {
-                localStorage.removeItem('access_token');
-                handleLogout()
-                return;
-            }
-
-
-            const userData = await response.json();
-
-            const newAccessToken = response.headers.get("X-New-Access-Token");
-            if (newAccessToken) {
-                localStorage.setItem('access_token', newAccessToken);
-            }
-
-            setUser(userData);
-        } catch (error) {
-            console.log(error);
-        }
-    };
+        const res = await store.me();
+        setUser(res?.data)
+    }
 
     useEffect(() => {
         if (userUpdate) {
             patchUserData();
         }
 
-
         fetchUser();
-
-
-
     }, [userUpdate]);
 
     if (!user) return null;
@@ -91,7 +42,7 @@ function Profile() {
         { key: "name", label: "Name", icon: <User className="h-4 w-4" /> },
         { key: "surname", label: "Surname", icon: <User className="h-4 w-4" /> },
         { key: "phone", label: "Phone", icon: <Phone className="h-4 w-4" /> },
-        { key: "nickname", label: "Nickname", icon: <User className="h-4 w-4" />},
+        { key: "nickname", label: "Nickname", icon: <User className="h-4 w-4" /> },
         { key: "created_at", label: "Created At", icon: <Calendar className="h-4 w-4" />, readonly: true }
     ];
 
@@ -113,7 +64,7 @@ function Profile() {
         cancelEdit();
     }
 
-    const patchUserData = async() => {
+    const patchUserData = async () => {
         if (!userUpdate) return;
 
         try {
@@ -145,7 +96,7 @@ function Profile() {
     }
 
 
-    const submitPasswordChange = async() => {
+    const submitPasswordChange = async () => {
         if (pwdDraft.new_password !== pwdDraft.confirm_password) return;
 
         const response = await fetch("/user/change-password", {
@@ -182,17 +133,17 @@ function Profile() {
                 {/* Header */}
                 <div className="max-w-6xl mx-auto mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
                     <div>
-                        
+
                         <h1 className="text-4xl md:text-6xl tracking-tight mb-4">
-                            Hey, <span className="text-primary">{user.nickname.charAt(0).toUpperCase() + user.nickname.slice(1) }</span>
+                            Hey, <span className="text-primary">{user.nickname.charAt(0).toUpperCase() + user.nickname.slice(1)}</span>
                         </h1>
                         <p className="text-muted-foreground max-w-xl">
                             Manage personal information, security and activity.
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Button onClick={handleLogout} size="sm" className="w-[70px]" variant="destructive">
-                        Quit
+                        <Button  size="sm" className="w-[70px]" variant="destructive">
+                            Quit
                         </Button>
                     </div>
                 </div>
@@ -238,7 +189,7 @@ function Profile() {
                                         <div className="flex items-center gap-2 justify-end">
                                             {editField === f.key ? (
                                                 <>
-                                                
+
                                                     <Button
                                                         size="icon"
                                                         variant="secondary"
@@ -246,7 +197,7 @@ function Profile() {
                                                         onClick={saveField}
                                                         disabled={f.readonly || (fieldDraft === user[f.key])}
                                                     >
-                                                         <Check className="h-4 w-4" />
+                                                        <Check className="h-4 w-4" />
                                                     </Button>
                                                     <Button size="icon" variant="ghost" className="h-8 w-8" onClick={cancelEdit}>
                                                         <X className="h-4 w-4" />
@@ -353,7 +304,7 @@ function Profile() {
                             ) : (
                                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                     <KeyRound className="h-4 w-4" />
-                                        <span>Keep your account secure. Use a strong password.</span>
+                                    <span>Keep your account secure. Use a strong password.</span>
                                 </div>
                             )}
                         </div>
@@ -364,8 +315,8 @@ function Profile() {
                         <div className="bg-card/80 backdrop-blur-sm border border-border rounded-2xl shadow-sm p-6 min-h-[340px] flex flex-col">
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl font-semibold">Your Reports</h2>
-                                <Button 
-                                    size="sm" variant="outline" 
+                                <Button
+                                    size="sm" variant="outline"
                                     onClick={() => navigate('/reports', { state: { showUserReports: true } })}>
                                     <FileWarning className="h-4 w-4 mr-2" />
                                     My Reports
@@ -421,4 +372,4 @@ function Profile() {
     );
 }
 
-export default Profile;
+export default observer(Profile);
