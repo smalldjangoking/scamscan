@@ -1,10 +1,16 @@
-import React, { useState, useEffect, useContext } from "react";
-import { User, Phone, AtSign, Calendar, Pencil, Check, X, KeyRound, FileWarning } from "lucide-react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
+import {
+    User, Phone, AtSign, Calendar, Pencil,
+    Check, X, KeyRound, FileWarning, Wrench
+} from "lucide-react";
+import LoadingSpinner from "../components/ui/Loading"
 import { Button } from "../components/ui/Button.jsx";
 import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
+import { useReports } from "../utils/hook.js"
+import Pagination from "../components/ui/Paginator.jsx";
 
 
 function Profile() {
@@ -21,6 +27,35 @@ function Profile() {
     const successToast = (data) => toast.success(data);
     const failedToast = (errorReason) => toast.error(`${errorReason}`);
     const navigate = useNavigate();
+    const [page, setPage] = useState(1)
+    const pageSize = 4
+
+
+    const user_id = useMemo(() => {
+        if (!accessToken) return null;
+        try {
+            const payload = jwtDecode(accessToken);
+            return payload?.sub ?? null;
+        } catch (e) {
+            console.error("Failed to decode token", e);
+            return null;
+        }
+    }, [accessToken]);
+
+
+    const { data, isLoading, isError, isFetching } = useReports({
+        page,
+        pageSize,
+        userOnly: true,
+        user_id
+    })
+
+
+    useEffect(() => {
+        if (data?.reports?.length > 0) {
+            console.log(data.reports)
+        }
+    }, [data])
 
     const fetchUser = async () => {
         const res = await store.me();
@@ -142,7 +177,7 @@ function Profile() {
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Button  size="sm" className="w-[70px]" variant="destructive">
+                        <Button size="sm" className="w-[70px]" variant="destructive">
                             Quit
                         </Button>
                     </div>
@@ -323,39 +358,56 @@ function Profile() {
                                 </Button>
                             </div>
 
-                            {mockReports.length === 0 ? (
-                                <div className="flex flex-1 items-center justify-center">
-                                    <div className="text-center">
-                                        <div
-                                            className="mx-auto mb-4 h-14 w-14 rounded-full border border-dashed border-muted flex items-center justify-center">
-                                            <FileWarning className="h-7 w-7 text-muted-foreground" />
-                                        </div>
-                                        <p className="text-muted-foreground">
-                                            You have no reports yet. Start contributing by submitting the first one.
-                                        </p>
+                            {isLoading ? (
+                                <>
+                                    <div className="col-span-full flex justify-center items-center py-20">
+                                        <LoadingSpinner />
                                     </div>
-                                </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    {mockReports.map(r => (
-                                        <div
-                                            key={r.id}
-                                            className="p-4 rounded-lg border border-border bg-accent/40 hover:bg-accent/60 transition-colors">
-                                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                                                <div>
-                                                    <h3 className="font-medium">{r.title}</h3>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        {new Date(r.created_at).toLocaleString()}
-                                                    </p>
+                                </>
+                            )
+                                : (
+                                    data?.reports?.length === 0 ? (
+                                        <div className="flex flex-1 items-center justify-center">
+                                            <div className="text-center">
+                                                <div
+                                                    className="mx-auto mb-4 h-14 w-14 rounded-full border border-dashed border-muted flex items-center justify-center">
+                                                    <FileWarning className="h-7 w-7 text-muted-foreground" />
                                                 </div>
-                                                <div className="text-xs uppercase tracking-wide font-medium px-3 py-1 rounded-md bg-primary text-primary-foreground">
-                                                    {r.status}
-                                                </div>
+                                                <p className="text-muted-foreground">
+                                                    You have no reports yet. Start contributing by submitting the first one.
+                                                </p>
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
-                            )}
+                                    ) : (
+                                        <div className="space-y-4">
+                                            {data.reports.map(r => (
+                                                <div
+                                                    key={r.id}
+                                                    className="p-4 rounded-lg border border-border bg-accent/40 hover:bg-accent/60 transition-colors">
+                                                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                                                        <div>
+                                                            <h3 className="font-medium">{r.report_title}</h3>
+                                                            <p className="text-xs text-muted-foreground">
+                                                                {new Date(r.created_at).toLocaleString()}
+                                                            </p>
+                                                        </div>
+                                                        <Button variant="ghost">
+                                                            <Wrench />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ))}
+
+                                            <Pagination
+                                                page={page}
+                                                totalPages={data?.totalPages}
+                                                isFetching={isLoading}
+                                                onPageChange={setPage}
+                                            />
+                                        </div>
+                                    )
+                                )}
+
                         </div>
 
                         {/* Last Activity (placeholder) */}

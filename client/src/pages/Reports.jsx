@@ -1,37 +1,47 @@
-import {Button} from "../components/ui/Button"
+import { Button } from "../components/ui/Button"
 import BurgerFilterMenu from "../components/reports/dropdown"
 import ReportCard from '../components/reports/ReportCard'
-import {useReports} from "../utils/hook.js"
-import React, {useState, useEffect} from "react"
+import { useReports } from "../utils/hook.js"
+import React, { useState, useEffect, useMemo } from "react"
 import LoadingSpinner from "../components/ui/Loading"
-import {useLocation} from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Input from '../components/ui/Input'
-import {Menu, ListFilter, FileWarning} from "lucide-react"
+import { Menu, ListFilter, FileWarning } from "lucide-react"
 import debounce from 'lodash.debounce';
 import Pagination from "../components/ui/Paginator.jsx";
+import { jwtDecode } from "jwt-decode";
 
 export default function Reports() {
     const location = useLocation();
     const token = localStorage.getItem('access_token')
+
+    const user_id = useMemo(() => {
+        if (!token) return null;
+        try {
+            const payload = jwtDecode(token);
+            return payload?.sub ?? null;
+        } catch (e) {
+            console.error("Failed to decode token", e);
+            return null;
+        }
+    }, [token]);
 
     const [search, setSearch] = useState('')
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [filterQuery, setFilterQuery] = useState({})
     const [page, setPage] = useState(1)
     const pageSize = 10
-    const [browse, setBrowse] = useState({
-        'show': location.state?.showUserReports
-            ? 'user' : 'all', 'token': token
-    })
+    const [userOnly, setUserOnly] = useState(false)
     const debounceSearch = debounce((val) => setDebouncedSearch(val), 1000);
 
 
-    const {data, isLoading, isError, isFetching} = useReports({
+    const { data, isLoading, isError, isFetching } = useReports({
         debouncedSearch,
         page,
         pageSize,
-        browse,
+        userOnly,
         filterQuery,
+        user_id
     })
 
     const reportOptions = [
@@ -46,9 +56,9 @@ export default function Reports() {
     ];
 
     const sortBy = [
-        {id: "oldest", label: "Oldest first"},
-        {id: "commented", label: "Most commented"},
-        {id: "viewed", label: "Most Viewed"},
+        { id: "oldest", label: "Oldest first" },
+        { id: "commented", label: "Most commented" },
+        { id: "viewed", label: "Most Viewed" },
     ];
 
 
@@ -61,7 +71,7 @@ export default function Reports() {
     return (
         <section className="relative">
             <div
-                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"/>
+                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
             <div className="relative container mx-auto py-10 px-2 md:py-20">
                 <h2 className="text-4xl font-bold">Reports Explorer</h2>
                 <p className="text-muted-foreground max-w-2xl text-lg">
@@ -73,20 +83,20 @@ export default function Reports() {
                     <div className="flex flex gap-2 justify-between">
                         <div className="flex flex-wrap gap-2">
                             <Button
-                                disabled={browse.show === 'all'}
+                                disabled={!userOnly}
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => setBrowse((old) => ({...old, show: 'all'}))}
+                                onClick={() => setUserOnly((old) => !old)}
                             >
                                 Browse
                             </Button>
 
                             {token && (
                                 <Button
-                                    disabled={browse.show === 'user'}
+                                    disabled={userOnly}
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => setBrowse((old) => ({...old, show: 'user'}))}
+                                    onClick={() => setUserOnly((old) => !old)}
                                 >
                                     My Reports
                                 </Button>
@@ -99,7 +109,7 @@ export default function Reports() {
                                     <span className="text-muted-foreground max-w-2xl text-sm">Filltred by:</span>
                                     {Object.entries(filterQuery).map(([key, value]) => (
                                         <Button onClick={() => setFilterQuery((rest) => {
-                                            const {[key]: _, ...newRest} = rest
+                                            const { [key]: _, ...newRest } = rest
                                             return newRest
                                         })} size="sm" variant="destructive" key={key}>{value}</Button>
                                     ))}
@@ -108,13 +118,13 @@ export default function Reports() {
                         </div>
                     </div>
 
-                    <hr className="my-2"/>
+                    <hr className="my-2" />
                     <div className="mb-5 flex items-center gap-2">
                         <BurgerFilterMenu icon={Menu} iter={reportOptions} obj_name={'category'}
-                                          callback={setFilterQuery} position={'left'}/>
-                        <Input placeholder="Filter..." callBack={setSearch}/>
+                            callback={setFilterQuery} position={'left'} />
+                        <Input placeholder="Filter..." callBack={setSearch} />
                         <BurgerFilterMenu icon={ListFilter} iter={sortBy} obj_name={'orderby'}
-                                          callback={setFilterQuery} position={'right'}/>
+                            callback={setFilterQuery} position={'right'} />
                     </div>
                 </div>
 

@@ -20,6 +20,7 @@
     "@tiptap/starter-kit": "^3.4.4",
     "axios": "^1.13.2",
     "dompurify": "^3.2.7",
+    "jwt-decode": "^4.0.0",
     "lodash.debounce": "^4.0.8",
     "mobx": "^6.15.0",
     "mobx-react-lite": "^4.1.1",

@@ -1,13 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
+import reportService from "../services/reportService"
 
-export function useReports({ browse = {}, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = '' }) {
-    let token = ''
-    if (browse?.show == 'user' && browse?.token) {
-        token = browse.token
-    }
-
+export function useReports({ user_id, userOnly = false, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = '' }) {
     return useQuery({
-        queryKey: ['reports', { debouncedSearch, page, pageSize, browse, filterQuery }],
+        queryKey: ['reports', { debouncedSearch, page, pageSize, userOnly, filterQuery, user_id }],
         queryFn: async () => {
             const params = new URLSearchParams({
                 page: page.toString(),
@@ -19,14 +15,11 @@ export function useReports({ browse = {}, page = 1, pageSize = 10, filterQuery =
                 params.append(key, value)
             })
 
-
-            const res = await fetch(`/api/reports/all?${params}`, {
-                headers: {
-                    ...(token ? { Authorization: `Bearer ${token}` } : {})
-                }
-            })
-            if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
-            return res.json()
+            const res = await reportService.getReports({
+                user_id: userOnly ? user_id : null,
+                params,
+            });
+            return res.data
         },
         keepPreviousData: true,
     })
@@ -93,22 +86,22 @@ export function useAddrReports({ page = 1, pageSize = 10, address_id = '' }) {
 }
 
 export function useSingleReport(id) {
-  return useQuery({
-    queryKey: ['report', id],
-    enabled: !!id,
-    keepPreviousData: true,
-    queryFn: async () => {
-      const res = await fetch(`/api/reports/id/${id}`);
+    return useQuery({
+        queryKey: ['report', id],
+        enabled: !!id,
+        keepPreviousData: true,
+        queryFn: async () => {
+            const res = await fetch(`/api/reports/id/${id}`);
 
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("❌ useSingleReport bad response:", res.status, text);
-        throw new Error(`Request failed with status ${res.status}`);
-      }
+            if (!res.ok) {
+                const text = await res.text();
+                console.error("❌ useSingleReport bad response:", res.status, text);
+                throw new Error(`Request failed with status ${res.status}`);
+            }
 
-      const data = await res.json();
-      console.log("✅ useSingleReport data:", data);
-      return data;
-    },
-  });
+            const data = await res.json();
+            console.log("✅ useSingleReport data:", data);
+            return data;
+        },
+    });
 }

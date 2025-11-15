@@ -72,8 +72,7 @@ async def create_report(schema: ReportSchema,
 
 
 @router.get("/all", status_code=status.HTTP_200_OK)
-async def get_all_reports(session: SessionDep, request: Request, response: Response,
-                          token: str | None = Depends(oauth2_scheme_optional),
+async def get_all_reports(session: SessionDep,
                           q: str = Query(
                               default=None,
                               alias="search",
@@ -101,15 +100,76 @@ async def get_all_reports(session: SessionDep, request: Request, response: Respo
                           )
                           ):
     """Retrieve all reports by user or all from the database with optional queries and pagination"""
-    user_id = None
-    if token: user_id = access_token_valid(token)
-
     query = select(Reports).options(selectinload(Reports.address))
 
     if category:
         query = query.where(Addresses.subject == category)
-    if user_id:
-        query = query.where(Reports.user_id == user_id)
+    if q:
+        query = query.where(
+            or_(
+                Reports.report_title.ilike(f"{q}%"),
+                Addresses.crypto_address.ilike(f"%{q}%"),
+                Addresses.website_url.ilike(f"%{q}%")
+            )
+        )
+    if orderby:
+        if orderby == "newest":  # default
+            query = query.order_by(Reports.id.desc())
+        if orderby == "oldest":
+            query = query.order_by(Reports.id)
+
+    count_query = select(func.count()).select_from(query.subquery())
+    total_count = (await session.execute(count_query)).scalar()
+    total_pages = ceil(total_count / page_size) if total_count else 1
+
+    query = query.offset((page - 1) * page_size).limit(page_size)
+
+    result = await session.execute(query)
+    reports = result.scalars().all()
+
+
+    return ReportsListAPISchema(
+        reports=[ReportAPISchema.model_validate(report) for report in reports],
+        totalPages=total_pages
+    )
+
+
+@router.get("/users/{user_id}", status_code=status.HTTP_200_OK)
+async def ger_user_reports(session: SessionDep,
+                          user_id: int = Path(..., ge=1, description="ID of users reports"),
+                          q: str = Query(
+                              default=None,
+                              alias="search",
+                              min_length=1,
+                              max_length=150,
+                              description="Search value for filtering results. Crypto address, website or title are accepted"
+                          ),
+                          page: int = Query(
+                              default=1,
+                              ge=1,
+                              description="Current page number for pagination"
+                          ),
+                          page_size: int = Query(
+                              default=10,
+                              ge=1,
+                              description="Number of reports per page"
+                          ),
+                          category: str = Query(
+                              default=None,
+                              description="Category of the report"
+                          ),
+                          orderby: str = Query(
+                              default='newest',
+                              description="Sort order of the reports"
+                          )
+                          ):
+    """Retrieve reports by user ID from the database with optional queries and pagination"""
+
+    query = select(Reports).where(Reports.user_id == user_id).options(selectinload(Reports.address))
+
+    if category:
+        query = query.where(Addresses.subject == category)
+
     if q:
         query = query.where(
             or_(
