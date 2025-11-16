@@ -11,6 +11,8 @@ import { Context } from "../main";
 import { observer } from "mobx-react-lite";
 import { useReports } from "../utils/hook.js"
 import Pagination from "../components/ui/Paginator.jsx";
+import UserService from "../services/userService.js";
+import { jwtDecode } from "jwt-decode";
 
 
 function Profile() {
@@ -49,13 +51,6 @@ function Profile() {
         userOnly: true,
         user_id
     })
-
-
-    useEffect(() => {
-        if (data?.reports?.length > 0) {
-            console.log(data.reports)
-        }
-    }, [data])
 
     const fetchUser = async () => {
         const res = await store.me();
@@ -99,66 +94,49 @@ function Profile() {
         cancelEdit();
     }
 
-    const patchUserData = async () => {
+    const updateUserInfo = async () => {
         if (!userUpdate) return;
 
         try {
-            const response = await fetch("/user/update-user-info", {
-                method: "PATCH",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": accessToken ? `Bearer ${accessToken}` : ""
-                },
-                body: JSON.stringify(userUpdate)
-            });
-
-            const data = await response.json();
-
+            const response = updateUserInfo(userUpdate)
+            
             if (response.status === 200 && data.status === "ok") {
                 successToast(data.message);
                 setUserDataUpdate(null);
-
-            }
-
-            if (response.status === 400) {
-                failedToast(data.detail)
             }
 
         } catch (error) {
-            console.error("Error updating user data:", error);
+            const msg =
+                error?.response?.data?.detail ||
+                error?.response?.data?.message ||
+                "Something went wrong";
+
+            failedToast(msg);
         }
     }
 
 
     const submitPasswordChange = async () => {
-        if (pwdDraft.new_password !== pwdDraft.confirm_password) return;
+        if (pwdDraft.new_password !== pwdDraft.confirm_password) {
+            failedToast("Passwords do not match");
+            return;
+        }
 
-        const response = await fetch("/user/change-password", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': accessToken ? `Bearer ${accessToken}` : ""
-            },
-            body: JSON.stringify(pwdDraft),
-            credentials: 'include',
-        })
-
-        const data = await response.json()
-
-        if (response.status === 200) {
+        try {
+            const { data } = await UserService.changePassword(pwdDraft.new_password);
             successToast(data.message);
+            setPwdDraft({ old_password: "", new_password: "", confirm_password: "" });
+            setPasswordOpen(false);
+
+        } catch (error) {
+            const msg =
+                error?.response?.data?.detail ||
+                error?.response?.data?.message ||
+                "Something went wrong";
+
+            failedToast(msg);
         }
-
-        if (response.status === 400) {
-            failedToast(data.detail)
-        }
-
-
-        setPwdDraft({ old_password: "", new_password: "", confirm_password: "" })
-        setPasswordOpen(false)
-
-    }
+    };
 
     return (
         <section className="relative">
@@ -274,17 +252,6 @@ function Profile() {
                                 <div className="space-y-4 animate-fade-in">
                                     <div>
                                         <label className="block text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">
-                                            Current Password
-                                        </label>
-                                        <input
-                                            type="password"
-                                            className="w-full bg-input-background dark:bg-input/30 border border-input rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
-                                            value={pwdDraft.old_password}
-                                            onChange={e => setPwdDraft({ ...pwdDraft, old_password: e.target.value })}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">
                                             New Password
                                         </label>
                                         <input
@@ -311,7 +278,6 @@ function Profile() {
                                             className="flex-1"
                                             onClick={submitPasswordChange}
                                             disabled={
-                                                !pwdDraft.old_password ||
                                                 !pwdDraft.new_password ||
                                                 pwdDraft.new_password !== pwdDraft.confirm_password
                                             }
@@ -323,7 +289,7 @@ function Profile() {
                                             size="sm"
                                             variant="outline"
                                             onClick={() => {
-                                                setPwdDraft({ old_password: "", new_password: "", confirm_password: "" });
+                                                setPwdDraft({ new_password: "", confirm_password: "" });
                                                 setPasswordOpen(false);
                                             }}
                                         >
@@ -352,9 +318,9 @@ function Profile() {
                                 <h2 className="text-2xl font-semibold">Your Reports</h2>
                                 <Button
                                     size="sm" variant="outline"
-                                    onClick={() => navigate('/reports', { state: { showUserReports: true } })}>
+                                    onClick={() => navigate('/report')}>
                                     <FileWarning className="h-4 w-4 mr-2" />
-                                    My Reports
+                                    Create a Report
                                 </Button>
                             </div>
 
@@ -407,15 +373,6 @@ function Profile() {
                                         </div>
                                     )
                                 )}
-
-                        </div>
-
-                        {/* Last Activity (placeholder) */}
-                        <div className="bg-card/80 backdrop-blur-sm border border-border rounded-2xl shadow-sm p-6">
-                            <h2 className="text-xl font-semibold mb-4">Search History</h2>
-                            <p className="text-sm text-muted-foreground">
-                                (Optional section) You can display login history, verification events or changes here.
-                            </p>
                         </div>
                     </div>
                 </div>

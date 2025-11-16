@@ -35,7 +35,6 @@ class RefreshTokenSchema(BaseModel):
 
 
 class ChangePasswordSchema(BaseModel):
-    old_password: str
     new_password: str
 
 

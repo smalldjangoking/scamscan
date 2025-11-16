@@ -17,21 +17,32 @@ $api.interceptors.request.use((config) => {
 
 $api.interceptors.response.use(
     (response) => response,
-    async (error)  => {
-    const originalRequest = error.config
-    const status = error.response?.status
+    async (error) => {
+        const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !error.config._retry) {
-        originalRequest._retry = true
-        
-        const res = await $api.post('/auth/refresh');
-        if (res.data.access_token) {
-            localStorage.setItem('access_token', res.data.access_token);
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+
+            try {
+                const res = await $api.post("/auth/refresh");
+
+                if (res.data?.access_token) {
+                    localStorage.setItem("access_token", res.data.access_token);
+
+                    originalRequest.headers = {
+                        ...originalRequest.headers,
+                        Authorization: `Bearer ${res.data.access_token}`,
+                    };
+
+                    return $api(originalRequest);
+                }
+            } catch (refreshError) {
+                return Promise.reject(refreshError);
+            }
         }
-        return $api(originalRequest)
+        return Promise.reject(error);
     }
-    }
-)
+);
 
 
 export default $api

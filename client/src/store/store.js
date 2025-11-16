@@ -1,6 +1,6 @@
 import { makeAutoObservable } from "mobx";
 import AuthService from "../services/authService";
-import userService from "../services/userService";
+import UserService from "../services/userService";
 
 export default class Store {
   isLoading = false;
@@ -59,7 +59,7 @@ export default class Store {
   async me() {
     this.setIsLoading(true)
     try {
-      return await userService.me();
+      return await UserService.me();
     }
     catch (e) {
       this.errorValid(e)
@@ -73,9 +73,10 @@ export default class Store {
     this.setIsLoading(true);
     this.clearErorrs();
     try {
-      const response = await AuthService.login(email, password);
-      this.setAccessToken(response.data.access_token);
+      const res = await AuthService.login(email, password);
+      console.log(res)
     } catch (e) {
+      console.log('works', e)
       if (e?.response?.status === 403) {
         this.setSuccessAlerts(e?.response?.detail)
       } else {
@@ -95,10 +96,11 @@ export default class Store {
         password2,
         nickname
       );
+
+      console.log('hello')
       return true;
     } catch (e) {
       this.errorValid(e)
-      console.log(e)
     } finally {
       this.setIsLoading(false);
     }

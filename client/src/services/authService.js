@@ -1,6 +1,7 @@
 import $api from '../http/auth'
 
 export default class AuthService {
+    
     static async login(email, password) {
         return $api.post('/auth/login', {email, password})
     }

@@ -21,7 +21,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 @router.post('/create', status_code=status.HTTP_201_CREATED)
 async def user_create(user: UserRegistrationSchema, session: SessionDep):
-    """Registration endpoint."""
+    """Registration"""
     if user.password != user.password2:
         raise HTTPException(status_code=400, detail="Passwords do not match")
 
@@ -42,7 +42,8 @@ async def user_create(user: UserRegistrationSchema, session: SessionDep):
 
 @router.post('/login')
 async def user_login(userbase: UserLoginSchema, session: SessionDep, response: Response):
-    """Login endpoint.
+    """
+    Login
     format: email, password
     """
 

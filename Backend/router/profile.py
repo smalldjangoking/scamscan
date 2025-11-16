@@ -29,22 +29,24 @@ async def read_user_me(session: SessionDep, user_id: str = Depends(access_token_
     raise HTTPException(status_code=401, detail="Bad credentials")
 
 
-@router.post('/change-password')
-async def change_password(passwordSchema: ChangePasswordSchema, session: SessionDep, user_id: str = Depends(access_token_valid)):
-    data = await session.get(Users, user_id)
+@router.post('/update/password')
+async def change_password(passwordSchema: ChangePasswordSchema, 
+                          session: SessionDep, 
+                          user_id: str = Depends(access_token_valid)):
+    user = await session.get(Users, user_id)
 
-    if verify_password(passwordSchema.old_password, data.hashed_password):
-        data.hashed_password = hash_password(passwordSchema.new_password)
-        await session.commit()
-        return {'message': 'Password changed successfully'}
+    user.hashed_password = hash_password(passwordSchema.new_password)
+    
+    await session.commit()
 
-    else:
-        raise HTTPException(status_code=400, detail="Old password is incorrect")
+    return {'message': 'Password changed successfully'}
 
     
 
-@router.patch('/update-user-info')
-async def update_user_info(userInfoSchema: UpdateUserInfoSchema, session: SessionDep, user_id: str = Depends(access_token_valid)):
+@router.patch('/update/info')
+async def update_user_info(userInfoSchema: UpdateUserInfoSchema, 
+                           session: SessionDep, 
+                           user_id: str = Depends(access_token_valid)):
     data = await session.get(Users, user_id)
 
     if userInfoSchema.phone:
@@ -64,11 +66,9 @@ async def update_user_info(userInfoSchema: UpdateUserInfoSchema, session: Sessio
     try:
         for key, value in userInfoSchema.model_dump(exclude_unset=True).items():
             setattr(data, key, value)
-            
-            await session.commit()
-            return {'status': 'ok', 'message': f'Your {key.title()} updated successfully'}
+
+        await session.commit()
+        return {'status': 'ok', 'message': 'User information was updated successfully'}
 
     except Exception as e:
-        return {'status': 'error'}
-
-    raise HTTPException(status_code=400, detail="Bad request")
+        raise HTTPException(status_code=400, detail="Bad request")
