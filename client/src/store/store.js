@@ -74,9 +74,8 @@ export default class Store {
     this.clearErorrs();
     try {
       const res = await AuthService.login(email, password);
-      console.log(res)
+      this.setAccessToken(res.data.access_token)
     } catch (e) {
-      console.log('works', e)
       if (e?.response?.status === 403) {
         this.setSuccessAlerts(e?.response?.detail)
       } else {
@@ -90,14 +89,13 @@ export default class Store {
   async registration(email, password, password2, nickname) {
     this.setIsLoading(true);
     try {
-      const response = await AuthService.registration(
+      await AuthService.registration(
         email,
         password,
         password2,
         nickname
       );
 
-      console.log('hello')
       return true;
     } catch (e) {
       this.errorValid(e)

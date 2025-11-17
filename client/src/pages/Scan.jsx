@@ -5,8 +5,6 @@ import SearchAddress from "../components/ui/SearchAddress.jsx";
 
 
 export default function Scan() {
-
-
     return (
         <section className="relative h-screen">
             <div

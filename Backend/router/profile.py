@@ -47,14 +47,8 @@ async def change_password(passwordSchema: ChangePasswordSchema,
 async def update_user_info(userInfoSchema: UpdateUserInfoSchema, 
                            session: SessionDep, 
                            user_id: str = Depends(access_token_valid)):
+    
     data = await session.get(Users, user_id)
-
-    if userInfoSchema.phone:
-        result = await session.execute(select(Users).where(Users.phone == userInfoSchema.phone))
-        phone_user = result.scalar_one_or_none()
-
-        if phone_user:
-            raise HTTPException(status_code=400, detail="Phone is already in use")
 
     if userInfoSchema.nickname:
         result = await session.execute(select(Users).where(Users.nickname == userInfoSchema.nickname))

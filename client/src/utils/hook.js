@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import reportService from "../services/reportService"
+import UserService from "../services/userService.js";
 
 export function useReports({ user_id, userOnly = false, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = '' }) {
     return useQuery({
@@ -105,3 +106,56 @@ export function useSingleReport(id) {
         },
     });
 }
+
+export function useUserUpdate({ setUser, successToast, failedToast }) {
+    return useMutation({
+        mutationFn: async (userUpdateFields) => {
+            const { data } = await UserService.updateUserInfo(userUpdateFields);
+            return data;
+        },
+
+        onSuccess: (data, variables) => {
+            successToast(data.message);
+
+            setUser(prev => ({
+                ...prev,
+                ...variables,
+            }));
+        },
+
+        onError: (error) => {
+            const msg =
+                error?.response?.data?.detail ||
+                error?.response?.data?.message ||
+                "Something went wrong";
+
+            failedToast(msg);
+        }
+    });
+}
+
+export function useUserPasswordChange({ setPwdDraft, setPasswordOpen, successToast, failedToast }) {
+    return useMutation({
+        mutationFn: async (password) => {
+            const { data } = await UserService.changePassword(password);
+            return data;
+        },
+
+        onSuccess: (data, variables) => {
+            successToast(data.message);
+            setPwdDraft({ old_password: "", new_password: "", confirm_password: "" });
+            setPasswordOpen(false);
+        },
+
+        onError: (error) => {
+            const msg =
+                error?.response?.data?.detail ||
+                error?.response?.data?.message ||
+                "Something went wrong";
+
+            failedToast(msg);
+        }
+    });
+}
+
+

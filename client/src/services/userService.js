@@ -11,6 +11,6 @@ export default class UserService {
     }
 
     static async updateUserInfo(data) {
-        return $api.patch('/update/info', {...data})
+        return $api.patch('user/update/info', {...data})
     }
 }

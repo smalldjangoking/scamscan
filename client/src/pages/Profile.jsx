@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useMemo } from "react";
 import {
-    User, Phone, AtSign, Calendar, Pencil,
+    User, AtSign, Calendar, Pencil,
     Check, X, KeyRound, FileWarning, Wrench
 } from "lucide-react";
 import LoadingSpinner from "../components/ui/Loading"
@@ -9,23 +9,21 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
-import { useReports } from "../utils/hook.js"
+import { useReports, useUserUpdate, useUserPasswordChange } from "../utils/hook.js"
 import Pagination from "../components/ui/Paginator.jsx";
-import UserService from "../services/userService.js";
 import { jwtDecode } from "jwt-decode";
+
+
 
 
 function Profile() {
     const { store } = useContext(Context)
-
     const [user, setUser] = useState(null);
     const [userUpdate, setUserDataUpdate] = useState(null);
     const [editField, setEditField] = useState(null);
     const [fieldDraft, setFieldDraft] = useState("");
     const [passwordOpen, setPasswordOpen] = useState(false);
     const [pwdDraft, setPwdDraft] = useState({ old_password: "", new_password: "", confirm_password: "" });
-    const accessToken = localStorage.getItem('access_token');
-    const mockReports = []; // Replace with real data fetching
     const successToast = (data) => toast.success(data);
     const failedToast = (errorReason) => toast.error(`${errorReason}`);
     const navigate = useNavigate();
@@ -34,36 +32,56 @@ function Profile() {
 
 
     const user_id = useMemo(() => {
-        if (!accessToken) return null;
+        if (!store.accessToken) return null;
         try {
-            const payload = jwtDecode(accessToken);
+            const payload = jwtDecode(store.accessToken);
             return payload?.sub ?? null;
         } catch (e) {
             console.error("Failed to decode token", e);
             return null;
         }
-    }, [accessToken]);
+    }, [store.accessToken]);
 
 
-    const { data, isLoading, isError, isFetching } = useReports({
+    const { data, isLoading } = useReports({
         page,
         pageSize,
         userOnly: true,
         user_id
     })
 
+    const { mutate: updateUserDataFunc, isPending: isLoadingUserUpdate } = useUserUpdate(
+        {
+            setUser,
+            successToast,
+            failedToast,
+        }
+    );
+
+    const { mutate: updateUserPasswordFunc, isPending: isLoadingUserPasUpdate } = useUserPasswordChange(
+        {
+            setPasswordOpen,
+            setPwdDraft,
+            successToast,
+            failedToast,
+        }
+    );
+
     const fetchUser = async () => {
         const res = await store.me();
         setUser(res?.data)
     }
 
+
+    useEffect(() => {
+        fetchUser();
+    }, [])
+
     useEffect(() => {
         if (userUpdate) {
-            patchUserData();
+            updateUserDataFunc(userUpdate);
         }
-
-        fetchUser();
-    }, [userUpdate]);
+    }, [userUpdate])
 
     if (!user) return null;
 
@@ -71,7 +89,6 @@ function Profile() {
         { key: "email", label: "Email", icon: <AtSign className="h-4 w-4" />, readonly: true },
         { key: "name", label: "Name", icon: <User className="h-4 w-4" /> },
         { key: "surname", label: "Surname", icon: <User className="h-4 w-4" /> },
-        { key: "phone", label: "Phone", icon: <Phone className="h-4 w-4" /> },
         { key: "nickname", label: "Nickname", icon: <User className="h-4 w-4" /> },
         { key: "created_at", label: "Created At", icon: <Calendar className="h-4 w-4" />, readonly: true }
     ];
@@ -93,50 +110,6 @@ function Profile() {
         setUserDataUpdate(prev => ({ ...prev, [editField]: fieldDraft }));
         cancelEdit();
     }
-
-    const updateUserInfo = async () => {
-        if (!userUpdate) return;
-
-        try {
-            const response = updateUserInfo(userUpdate)
-            
-            if (response.status === 200 && data.status === "ok") {
-                successToast(data.message);
-                setUserDataUpdate(null);
-            }
-
-        } catch (error) {
-            const msg =
-                error?.response?.data?.detail ||
-                error?.response?.data?.message ||
-                "Something went wrong";
-
-            failedToast(msg);
-        }
-    }
-
-
-    const submitPasswordChange = async () => {
-        if (pwdDraft.new_password !== pwdDraft.confirm_password) {
-            failedToast("Passwords do not match");
-            return;
-        }
-
-        try {
-            const { data } = await UserService.changePassword(pwdDraft.new_password);
-            successToast(data.message);
-            setPwdDraft({ old_password: "", new_password: "", confirm_password: "" });
-            setPasswordOpen(false);
-
-        } catch (error) {
-            const msg =
-                error?.response?.data?.detail ||
-                error?.response?.data?.message ||
-                "Something went wrong";
-
-            failedToast(msg);
-        }
-    };
 
     return (
         <section className="relative">
@@ -169,7 +142,7 @@ function Profile() {
                         {/* User Info Card */}
                         <div className="bg-card/80 backdrop-blur-sm border border-border rounded-2xl shadow-sm p-6">
                             <h2 className="text-2xl font-semibold mb-6">Account Information</h2>
-                            <div className="divide-y divide-border">
+                            <div className="relative divide-y divide-border">
                                 {fields.map(f => (
                                     <div key={f.key} className="py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                         <div className="flex items-center gap-3 min-w-0">
@@ -202,7 +175,6 @@ function Profile() {
                                         <div className="flex items-center gap-2 justify-end">
                                             {editField === f.key ? (
                                                 <>
-
                                                     <Button
                                                         size="icon"
                                                         variant="secondary"
@@ -232,6 +204,11 @@ function Profile() {
                                     </div>
                                 ))}
                             </div>
+                            {isLoadingUserUpdate && (
+                                <div className="absolute bg-secondary/60 inset-0 w-full h-full flex items-center justify-center z-50">
+                                    <LoadingSpinner />
+                                </div>
+                            )}
                         </div>
 
                         {/* Password Change */}
@@ -249,7 +226,7 @@ function Profile() {
                             </div>
 
                             {passwordOpen ? (
-                                <div className="space-y-4 animate-fade-in">
+                                <div className="relative space-y-4 animate-fade-in">
                                     <div>
                                         <label className="block text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">
                                             New Password
@@ -276,7 +253,7 @@ function Profile() {
                                         <Button
                                             size="sm"
                                             className="flex-1"
-                                            onClick={submitPasswordChange}
+                                            onClick={() => updateUserPasswordFunc(pwdDraft.new_password)}
                                             disabled={
                                                 !pwdDraft.new_password ||
                                                 pwdDraft.new_password !== pwdDraft.confirm_password
@@ -301,6 +278,13 @@ function Profile() {
                                         pwdDraft.new_password !== pwdDraft.confirm_password && (
                                             <p className="text-xs text-destructive mt-1">Passwords do not match.</p>
                                         )}
+
+
+                                    {isLoadingUserPasUpdate && (
+                                        <div className="absolute bg-secondary/60 inset-0 w-full h-full flex items-center justify-center z-50">
+                                            <LoadingSpinner />
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
