@@ -17,4 +17,8 @@ export default class AuthService {
     static async passwordTokenReq(email) {
         return $api.post('auth/password/token/create', {email})
     }
+
+    static async logout() {
+        return $api.post('/auth/logout')
+    }
 }

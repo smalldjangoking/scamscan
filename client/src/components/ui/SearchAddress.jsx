@@ -5,11 +5,15 @@ import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {Tooltip} from "react-tooltip";
 import {isValidUrl, removeHttp} from "../../utils/helpers.js";
+import { useLocation } from "react-router-dom";
+
 
 function SearchAddress({onValue=''}) {
+    const { state } = useLocation();
     const navigate = useNavigate();
     const [search, setSearch] = useState('');
     const [searchError, setSearchError] = useState(null);
+    const searchFromMain = state?.search || null
 
     const handleSubmitSearch = () => {
         if (!search) return setSearchError('search query is required');
@@ -30,6 +34,13 @@ function SearchAddress({onValue=''}) {
             setSearch(onValue)
         }
     }, [onValue])
+
+    useEffect(() => {
+        if (searchFromMain) {
+            setSearch(searchFromMain);
+            handleSubmitSearch();
+        }
+    }, [searchFromMain, search])
 
     return (
         <div className={`${onValue ? 'md:opacity-50 md:hover:opacity-100 md:transition md:duration-300 md:ease-in-out' : ''} bg-card/80 backdrop-blur-sm border border-border rounded-2xl shadow-sm p-6`}>

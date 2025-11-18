@@ -56,19 +56,6 @@ export default class Store {
     }
   }
 
-  async me() {
-    this.setIsLoading(true)
-    try {
-      return await UserService.me();
-    }
-    catch (e) {
-      this.errorValid(e)
-      console.log(e)
-    } finally {
-      this.setIsLoading(false)
-    }
-  }
-
   async login(email, password) {
     this.setIsLoading(true);
     this.clearErorrs();
@@ -119,6 +106,30 @@ export default class Store {
     }
   }
 
+  async logout() {
+      try {
+        const res = await AuthService.logout();
+
+        if (res.status === 200) {
+          this.removeAccessToken();
+        }
+      } catch (e) {
+        this.errorValid(e)
+      } }
+
+  async me() {
+    this.setIsLoading(true)
+    try {
+      return await UserService.me();
+    }
+    catch (e) {
+      this.errorValid(e)
+      console.log(e)
+    } finally {
+      this.setIsLoading(false)
+    }
+  }
+
   async tokenCheck(option, token) {
     this.setIsLoading(true);
     try {
@@ -132,7 +143,6 @@ export default class Store {
       }
 
     } catch (e) {
-      console.log(e)
       this.errorValid(e)
     } finally {
       this.setIsLoading(false);

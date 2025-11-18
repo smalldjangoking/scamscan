@@ -63,7 +63,7 @@ function Home() {
                         <div className="mb-5 w-full md:w-1/2 md:mx-auto ">
                             <Input value={search} callBack={setSearch} placeholder={"Enter website URL or crypto address to scan..."} icon={Search} />
                             <div className="mt-3">
-                                <Button>Scan</Button>
+                                <Button onClick={() => navigate('/scan', { state: { search } })}>Scan</Button>
                             </div>
 
                         </div>

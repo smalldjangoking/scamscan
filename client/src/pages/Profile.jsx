@@ -16,6 +16,7 @@ import { jwtDecode } from "jwt-decode";
 
 
 
+
 function Profile() {
     const { store } = useContext(Context)
     const [user, setUser] = useState(null);
@@ -29,6 +30,7 @@ function Profile() {
     const navigate = useNavigate();
     const [page, setPage] = useState(1)
     const pageSize = 4
+    const accessToken = store.accessToken
 
 
     const user_id = useMemo(() => {
@@ -40,7 +42,7 @@ function Profile() {
             console.error("Failed to decode token", e);
             return null;
         }
-    }, [store.accessToken]);
+    }, [accessToken]);
 
 
     const { data, isLoading } = useReports({
@@ -74,8 +76,12 @@ function Profile() {
 
 
     useEffect(() => {
+        if (!accessToken) {
+            navigate('/')
+        }
+
         fetchUser();
-    }, [])
+    }, [accessToken])
 
     useEffect(() => {
         if (userUpdate) {
@@ -128,7 +134,7 @@ function Profile() {
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Button size="sm" className="w-[70px]" variant="destructive">
+                        <Button onClick={() => store.logout()} size="sm" className="w-[70px]" variant="destructive">
                             Quit
                         </Button>
                     </div>
