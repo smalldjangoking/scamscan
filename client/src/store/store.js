@@ -10,6 +10,12 @@ export default class Store {
 
   constructor() {
     makeAutoObservable(this);
+
+    window.addEventListener("storage", (event) => {
+      if (event.key === "access_token") {
+        this.accessToken = event.newValue;
+      }
+    });
   }
 
   setAccessToken(token) {
@@ -107,15 +113,16 @@ export default class Store {
   }
 
   async logout() {
-      try {
-        const res = await AuthService.logout();
+    try {
+      const res = await AuthService.logout();
 
-        if (res.status === 200) {
-          this.removeAccessToken();
-        }
-      } catch (e) {
-        this.errorValid(e)
-      } }
+      if (res.status === 200) {
+        this.removeAccessToken();
+      }
+    } catch (e) {
+      this.errorValid(e)
+    }
+  }
 
   async me() {
     this.setIsLoading(true)

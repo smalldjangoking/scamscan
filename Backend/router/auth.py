@@ -191,7 +191,7 @@ async def password_change(
 
 
 @router.patch('/password/change/{token}')
-async def password_change(
+async def password_change_confirm(
     payload: PasswordRestore,
     session: SessionDep,
     token: str = Path(..., description="Reset token from email"),
@@ -221,8 +221,8 @@ async def password_change(
     
     if payload.password:
         result.user.hashed_password = hash_password(payload.password)
-        session.delete(result)
-        session.commit()
+        await session.delete(result)
+        await session.commit()
         return {'status': 'ok', 'detail': 'Password is successfully changed'}
     return {'status': 'ok'}
 
