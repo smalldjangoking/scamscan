@@ -33,3 +33,19 @@ export function isValidUrl(str) {
 export function removeHttp(url) {
   return url.replace(/^https?:\/\//, '');
 }
+
+
+export function normalizeError(error) {
+    const detail = error?.response?.data?.detail;
+
+    if (Array.isArray(detail)) {
+        return detail.map(e => e.msg || "Unknown error");
+    }
+
+    return [
+        error?.response?.data?.message ||
+        error?.response?.data?.detail ||
+        error?.message ||
+        "Unknown error"
+    ];
+}

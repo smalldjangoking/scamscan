@@ -3,7 +3,7 @@ import BurgerFilterMenu from "../components/reports/dropdown"
 import ReportCard from '../components/reports/ReportCard'
 import { useReports } from "../utils/hook.js"
 import React, { useState, useEffect, useMemo } from "react"
-import LoadingSpinner from "../components/ui/Loading"
+import LoadingSpinner from "../components/ui/Loading.jsx"
 import { useLocation } from "react-router-dom";
 import Input from '../components/ui/Input'
 import { Menu, ListFilter, FileWarning } from "lucide-react"

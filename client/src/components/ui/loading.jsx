@@ -6,11 +6,11 @@ const LoadingSpinner = () => {
     <div role="status" aria-label="loading" className="flex flex-col items-center justify-center py-10">
       {/* Иконка Lucide с анимацией */}
       <Loader2 
-        className="w-35 h-35 animate-spin text-[color:var(--secondary-foreground]" 
+        className="max-w-[35px] max-h-[35px]  w-full h-full animate-spin text-[color:var(--secondary-foreground]" 
       />
 
       {/* Текст для скринридеров */}
-      <span className="sr-only">Loading...</span>
+      <span className="sr-only">Loading proccess animation</span>
     </div>
   );
 };

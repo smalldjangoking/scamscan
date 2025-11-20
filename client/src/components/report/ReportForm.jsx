@@ -90,7 +90,7 @@ function ReportForm() {
     const [tooltipContent, setTooltipContent] = useState("ToolTip");
 
 
-    const { mutate: sendReportfunc, data:reportAnswer, isError, isSuccess, isPending } = useReportCreate()
+    const { mutate: sendReportfunc, data:reportAnswer, error, isError, isSuccess, isPending } = useReportCreate()
 
     useEffect(() => {
         if (selectedReportSubject === "crypto") {
@@ -297,6 +297,7 @@ function ReportForm() {
                 isSuccess={isSuccess}
                 isError={isError}
                 reportAnswer={reportAnswer}
+                error={error}
             />
         </div>
     );

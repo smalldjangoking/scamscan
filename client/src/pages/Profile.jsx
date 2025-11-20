@@ -3,7 +3,7 @@ import {
     User, AtSign, Calendar, Pencil,
     Check, X, KeyRound, FileWarning, Wrench
 } from "lucide-react";
-import LoadingSpinner from "../components/ui/Loading"
+import LoadingSpinner from "../components/ui/Loading.jsx"
 import { Button } from "../components/ui/Button.jsx";
 import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
