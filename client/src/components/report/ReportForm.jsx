@@ -90,7 +90,7 @@ function ReportForm() {
     const [tooltipContent, setTooltipContent] = useState("ToolTip");
 
 
-    const { mutate: sendReportfunc, isError, isSuccess, isPending } = useReportCreate()
+    const { mutate: sendReportfunc, data:reportAnswer, isError, isSuccess, isPending } = useReportCreate()
 
     useEffect(() => {
         if (selectedReportSubject === "crypto") {
@@ -148,7 +148,7 @@ function ReportForm() {
 
 
     return (
-        <form className="relative rounded-2xl border border-border bg-card/80 p-6 shadow-sm backdrop-blur-sm">
+        <div className="relative rounded-2xl border border-border bg-card/80 p-6 shadow-sm backdrop-blur-sm">
 
             <h3 className="flex items-center gap-3 text-lg tracking-wider">
                 Report Subject
@@ -296,8 +296,9 @@ function ReportForm() {
                 isPending={isPending}
                 isSuccess={isSuccess}
                 isError={isError}
+                reportAnswer={reportAnswer}
             />
-        </form>
+        </div>
     );
 }
 

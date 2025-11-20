@@ -64,7 +64,7 @@ async def create_report(schema: ReportSchema,
         session.add(report)
         await session.commit()
 
-        return {"message": "Report created successfully", "report_id": report.id}
+        return {"message": "Report created successfully", "report_id": report.id, "slug": slug}
 
     except Exception as e:
         await session.rollback()
