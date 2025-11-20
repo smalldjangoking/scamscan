@@ -13,9 +13,10 @@ import { Button } from "../ui/Button";
 import Tiptap from './TipTapEditor';
 import { Tooltip } from 'react-tooltip';
 import CryptoDropDownMenu from "./CryptoDropDownMenu";
-import {ReportStatus} from './ReportStatus.jsx'
+import { ReportStatus } from './ReportStatus.jsx'
 
 function ReportForm() {
+    const [payloadRetry, setPayloadRetry] = useState(null);
     const schema = Yup.object().shape({
 
         subject: Yup.string()
@@ -90,7 +91,7 @@ function ReportForm() {
     const [tooltipContent, setTooltipContent] = useState("ToolTip");
 
 
-    const { mutate: sendReportfunc, data:reportAnswer, error, isError, isSuccess, isPending } = useReportCreate()
+    const { mutate: sendReportfunc, data: reportAnswer, error, isError, isSuccess, isPending } = useReportCreate()
 
     useEffect(() => {
         if (selectedReportSubject === "crypto") {
@@ -126,7 +127,7 @@ function ReportForm() {
             payload = { ...payload, website_url };
         }
 
-
+        setPayloadRetry(payload)
         sendReportfunc(payload);
     }
 
@@ -179,7 +180,7 @@ function ReportForm() {
 
             {/* Description */}
             <div className={`transition-all duration-300 ease-in-out overflow-hidden ${selectedReportSubject ? 'opacity-100 transform translate-y-0'
-                    : 'max-h-0 opacity-0 transform -translate-y-2'
+                : 'max-h-0 opacity-0 transform -translate-y-2'
                 }`}>
                 <div className="block mt-5">
                     <Input aria-invalid={!!errors.report_title} {...register("report_title")} label="Title" placeholder='Enter a clear and descriptive title for your scam report' />
@@ -298,6 +299,11 @@ function ReportForm() {
                 isError={isError}
                 reportAnswer={reportAnswer}
                 error={error}
+                onRetry={
+                    payloadRetry
+                        ? () => sendReportfunc(payloadRetry)
+                        : null
+                }
             />
         </div>
     );

@@ -5,7 +5,7 @@ import { Check, TriangleAlert } from 'lucide-react';
 import { useEffect, useState } from 'react'
 
 
-export function ReportStatus({ reportAnswer, isPending, isSuccess, isError, error }) {
+export function ReportStatus({ reportAnswer, isPending, isSuccess, isError, error, onRetry}) {
     const navigate = useNavigate();
     const dunno = "¯\\_(ツ)_/¯";
     const [errorMsg, setErrorMsg] = useState("");
@@ -39,8 +39,8 @@ export function ReportStatus({ reportAnswer, isPending, isSuccess, isError, erro
                         <Check className="text-green-500" />
                         <p className="text-muted-foreground text-sm">Your Report sent successfully sent!</p>
                         <div className="flex flex-row gap-2">
-                            <Button size="sm">Open Report</Button>
-                            <Button variant="ghost" size="sm">Create new Report</Button>
+                            <Button onClick={() => navigate('/report/show/' + reportAnswer.report_id + '/' + reportAnswer.slug)} size="sm">Open Report</Button>
+                            <Button onClick={() => navigate(0)} variant="ghost" size="sm">Create new Report</Button>
                         </div>
                     </div>
                 )}
@@ -50,7 +50,7 @@ export function ReportStatus({ reportAnswer, isPending, isSuccess, isError, erro
                         <p className="text-red-600 text-xl font-semibold text-center tracking-wide">{dunno}</p>
                         <p className="text-red-500 font-bold text-sm">{errorMsg || '"Something went wrong"'}</p>
                         <div className="flex flex-row gap-2">
-                            <Button size="sm">Try send it again</Button>
+                            <Button onClick={onRetry} size="sm">Try send it again</Button>
                         </div>
                     </div>
                 )}
