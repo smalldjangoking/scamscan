@@ -1,6 +1,3 @@
-// src/components/ReportStatus.jsx
-import Lottie from "lottie-react";
-import checkmarkAnim from "../../assets/animation.json";
 import { Button } from "../ui/Button";
 import { useNavigate } from "react-router-dom";
 

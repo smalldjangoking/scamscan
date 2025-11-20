@@ -50,8 +50,8 @@ function Report() {
                                             <p className="text-muted-foreground text-sm">Full security features unlocked</p>
                                         </div>
 
-                                        <fieldset class="border border-green-400 p-4 rounded">
-                                            <legend class="px-2 flex flex-row gap-2 items-center">
+                                        <fieldset className="border border-green-400 p-4 rounded">
+                                            <legend className="px-2 flex flex-row gap-2 items-center">
                                                 <SquareDashedTopSolid className="text-primary" />
                                                 <span className="text-sm font-medium">Get a green border</span>
                                             </legend>
