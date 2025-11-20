@@ -2,19 +2,26 @@ import { Button } from "../ui/Button";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../ui/Loading"
 import { Check, TriangleAlert } from 'lucide-react';
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 
 export function ReportStatus({ reportAnswer, isPending, isSuccess, isError, error }) {
     const navigate = useNavigate();
     const dunno = "¯\\_(ツ)_/¯";
+    const [errorMsg, setErrorMsg] = useState("");
 
     useEffect(() => {
-        console.log(error)
-    }, [error])
+        const msg =
+            error?.response?.data?.detail ||
+            error?.response?.data?.message ||
+            error?.response?.data?.msg ||
+            "Something went wrong1";
+
+        setErrorMsg(msg);
+    }, [error]);
+
 
     if (!isPending && !isSuccess && !isError) return null;
-
 
 
     return (
@@ -41,6 +48,7 @@ export function ReportStatus({ reportAnswer, isPending, isSuccess, isError, erro
                 {isError && (
                     <div className="flex flex-col justify-center items-center gap-5">
                         <p className="text-red-600 text-xl font-semibold text-center tracking-wide">{dunno}</p>
+                        <p className="text-red-500 font-bold text-sm">{errorMsg || '"Something went wrong"'}</p>
                         <div className="flex flex-row gap-2">
                             <Button size="sm">Try send it again</Button>
                         </div>

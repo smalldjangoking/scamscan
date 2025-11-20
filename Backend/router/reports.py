@@ -38,7 +38,6 @@ async def create_report(schema: ReportSchema,
 
         address = response.scalar_one_or_none()
 
-
         address_data = {
             "website_url": schema.website_url,
             "crypto_address": schema.crypto_address,
