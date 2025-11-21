@@ -98,7 +98,7 @@ export default observer(function ReportDetail() {
 
                                 {/* Inside */}
                                 <div className="flex flex-col gap-1">
-                                    <span className="text-muted-foreground text-sm">Title</span>
+                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Title</span>
                                     <h2 className="text-lg font-semibold">{reportData.report.report_title}</h2>
                                 </div>
                                 <div className="inline-flex flex-col w-fit max-w-full gap-2">
@@ -168,7 +168,7 @@ export default observer(function ReportDetail() {
 
 
                                 <div className="flex flex-col gap-2">
-                                    <span className="text-muted-foreground text-sm">Description</span>
+                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Description</span>
                                     <TiptapViewer html={reportData?.report.report_description} />
                                 </div>
 

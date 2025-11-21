@@ -1,6 +1,7 @@
 import { makeAutoObservable } from "mobx";
 import AuthService from "../services/authService";
 import UserService from "../services/userService";
+import { jwtDecode } from "jwt-decode";
 
 export default class Store {
   isLoading = false;
@@ -17,6 +18,19 @@ export default class Store {
       }
     });
   }
+
+  get userId() {
+    if (!this.accessToken) return null;
+
+    try {
+      const payload = jwtDecode(this.accessToken);
+      return payload?.sub ?? null;
+    } catch (e) {
+      console.error("Failed to decode token", e);
+      return null;
+    }
+  }
+
 
   setAccessToken(token) {
     localStorage.setItem("access_token", token);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useMemo } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
     User, AtSign, Calendar, Pencil,
     Check, X, KeyRound, FileWarning, Wrench
@@ -11,7 +11,6 @@ import { Context } from "../main";
 import { observer } from "mobx-react-lite";
 import { useReports, useUserUpdate, useUserPasswordChange } from "../utils/hook.js"
 import Pagination from "../components/ui/Paginator.jsx";
-import { jwtDecode } from "jwt-decode";
 
 
 
@@ -31,18 +30,7 @@ function Profile() {
     const [page, setPage] = useState(1)
     const pageSize = 4
     const accessToken = store.accessToken
-
-
-    const user_id = useMemo(() => {
-        if (!store.accessToken) return null;
-        try {
-            const payload = jwtDecode(store.accessToken);
-            return payload?.sub ?? null;
-        } catch (e) {
-            console.error("Failed to decode token", e);
-            return null;
-        }
-    }, [accessToken]);
+    const user_id = store.userId
 
 
     const { data, isLoading } = useReports({
