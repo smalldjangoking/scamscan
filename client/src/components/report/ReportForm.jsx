@@ -89,6 +89,8 @@ function ReportForm() {
     const selectedReportSubject = watch("subject");
     const screenshots = watch("screenshots");
     const [tooltipContent, setTooltipContent] = useState("ToolTip");
+    const all = watch(handleSubmit)
+    console.log(watch());
 
 
     const { mutate: sendReportfunc, data: reportAnswer, error, isError, isSuccess, isPending } = useReportCreate()

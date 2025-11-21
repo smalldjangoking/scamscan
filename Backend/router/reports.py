@@ -15,6 +15,20 @@ from services import access_token_valid
 router = APIRouter(prefix="/api/reports", tags=["reports"])
 oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
 
+ALLOWED_TAGS = [
+    "p", "br",
+    "strong", "em", "u", "s",
+    "h1", "h2", "h3",
+    "ul", "ol", "li",
+    "blockquote",
+    "code", "pre",
+    "a", "hr",
+]
+
+ALLOWED_ATTRIBUTES = {
+    "a": ["href", "target", "rel"],
+}
+
 
 @router.post("/create", status_code=status.HTTP_200_OK)
 async def create_report(schema: ReportSchema,
@@ -55,7 +69,13 @@ async def create_report(schema: ReportSchema,
             await session.flush()
 
         report = Reports(**report_data, address_id=address.id, slug=slug)
-        report.report_description = bleach.clean(report.report_description, tags=["b", "i", "p"], strip=True)
+        
+        report.report_description = bleach.clean(
+            report.report_description,
+            tags=ALLOWED_TAGS,
+            attributes=ALLOWED_ATTRIBUTES,
+            strip=True)
+        #raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(report.report_description))
 
         if user_id:
             report.user_id = int(user_id)
