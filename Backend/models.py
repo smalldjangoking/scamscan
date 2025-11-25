@@ -80,9 +80,16 @@ class Comments(Base):
 
     comment: Mapped[str] = mapped_column(String(250), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    parent_comment_id: Mapped[int | None] = mapped_column(ForeignKey("comments.id", ondelete="CASCADE"), nullable=True)
 
     report: Mapped["Reports"] = relationship(back_populates="comments")
     user: Mapped["Users"] = relationship(back_populates="comments")
+    
+    children: Mapped[list["Comments"]] = relationship(
+        "Comments",
+        foreign_keys=[parent_comment_id],
+        cascade="all, delete-orphan",
+    )
 
 
 class Email_tokens(Base):

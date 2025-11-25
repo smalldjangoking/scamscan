@@ -1,6 +1,7 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import reportService from "../services/reportService"
 import UserService from "../services/userService.js";
+import commentService from "../services/commentService.js"
 
 export function useReports({ user_id, userOnly = false, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = '' }) {
     return useQuery({
@@ -47,10 +48,10 @@ export function useAddress({ value, subject }) {
     })
 }
 
-export function useComments({ report_id, comment_page }) {
+export function useComments({ report_id, page }) {
 
     return useQuery({
-        queryKey: ['comments', { report_id, comment_page }],
+        queryKey: ['comments', { report_id, page }],
         queryFn: async () => {
             const params = new URLSearchParams({
                 page: comment_page.toString(),
@@ -165,6 +166,39 @@ export function useReportCreate() {
             return data;
         }
     });
+}
+
+
+
+export function useCommentCreate({ setValue }) {
+    return useMutation({
+        mutationFn: async ({ reportId, comment, mainCommentId }) => {
+            const { data } = await commentService.createComment(reportId, comment, mainCommentId);
+            console.log(data)
+            return data;
+        },
+        onSuccess: () => {
+            setValue("comment", "");
+        }
+    });
+}
+
+
+export function useInfinityComments(reportId) {
+    return useInfiniteQuery({
+        queryKey: ["report_comments", reportId],
+        queryFn: async ({ pageParam = 1 }) => {
+            const {data} = await commentService.getComments(reportId, pageParam);
+            return data
+        },
+        getNextPageParam: (lastPage, pages) => {
+            const currentPage = pages.length;
+            const totalPages = lastPage.total_pages;
+
+            return currentPage < totalPages ? currentPage + 1 : undefined;
+        },
+        enabled: !!reportId
+    })
 }
 
 

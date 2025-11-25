@@ -24,7 +24,7 @@ export default class Store {
 
     try {
       const payload = jwtDecode(this.accessToken);
-      return payload?.sub ?? null;
+      return Number(payload?.sub) ?? null;
     } catch (e) {
       console.error("Failed to decode token", e);
       return null;

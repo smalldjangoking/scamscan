@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { TiptapViewer } from "../components/TiptapOut.jsx";
 import { useState } from "react";
 import { BackButton } from '../components/ui/GoBack.jsx'
@@ -27,20 +27,19 @@ import { useSingleReport } from "../utils/hook.js"
 export default observer(function ReportDetail() {
     const { store } = useContext(Context)
     const [copied, setCopied] = useState(false);
-    const navigate = useNavigate();
     const { id, slug } = useParams();
-
     const { data: reportData, isLoading: reportIsLoading, isError: reportIsError } = useSingleReport(id);
 
+
     return (
-        <section className="relative min-h-screen">
+        <section className="relative min-h-screen" >
             <div
                 className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
             <div className="relative container mx-auto py-10 px-2 md:py-20">
                 <div className="flex justify-between items-center mb-5">
                     <BackButton />
 
-                    {store.accessToken && (
+                    {reportData?.user && store.userId === reportData.report.user_id && (
                         <div className="flex items-center ml-auto">
                             <Button variant='ghost'>
                                 <Edit />
@@ -58,8 +57,7 @@ export default observer(function ReportDetail() {
                     reportIsLoading ? (
                         <div className="col-span-full flex justify-center items-center py-20 flex flex-col">
                             <LoadingSpinner />
-
-                            Loading Report...
+                            <p className="text-sm text-muted-foreground">Loading Report...</p>
                         </div>
                     ) : reportIsError ? (
                         <div>Error</div>

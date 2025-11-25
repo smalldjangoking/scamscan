@@ -138,24 +138,45 @@ class SingleReportSchema(BaseModel):
     report: SingleReport
     user: PublicUserAPISchema | None = None
 
+class CommentUser(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    nickname: str
+
 class CommentSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
+    id: int
     user_id: int
     comment: str
     created_at: datetime
+    children: list['CommentReply'] | None = None
+    user: CommentUser
+
+class CommentReply(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    user_id: int
+    comment: str
+    created_at: datetime
+    user: CommentUser
+
 
 class CommentsSchema(BaseModel):
     comments: list[CommentSchema]
     comments_total: int
     total_pages: int
 
+class CommentValid(BaseModel):
+    parent_comment_id: int | None = None
+    comment: str
+
 class PasswordRestore(BaseModel):
     password: str | None = None
 
 class EmailRequest(BaseModel):
     email: EmailStr
-
 
 
 

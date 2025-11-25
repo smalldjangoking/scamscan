@@ -1,7 +1,7 @@
 ﻿import * as React from "react";
-import {Slot} from "@radix-ui/react-slot";
-import {cva} from "class-variance-authority";
-import {cn} from "./utils";
+import { Slot } from "@radix-ui/react-slot";
+import { cva } from "class-variance-authority";
+import { cn } from "./utils";
 
 const inputVariants = cva(
     "flex min-w-0 rounded-md border text-base transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed",
@@ -12,6 +12,7 @@ const inputVariants = cva(
             },
             size: {
                 default: "min-h-0 h-10",
+                multi: "min-h-0 h-10",
             },
         },
         defaultVariants: {
@@ -22,18 +23,24 @@ const inputVariants = cva(
 );
 
 function Input({
-                   className,
-                   variant,
-                   size,
-                   asChild = false,
-                   type,
-                   label,
-                   placeholder,
-                   callBack,
-                   icon: Icon,
-                   ...props
-               }) {
-    const Comp = asChild ? Slot : "input";
+    className,
+    variant,
+    size,
+    asChild = false,
+    type,
+    label,
+    placeholder,
+    callBack,
+    icon: Icon,
+    multiline = false,
+    ...props
+}) {
+
+    const Comp = asChild
+        ? Slot
+        : multiline
+            ? "textarea"
+            : "input";
 
     return (
         <div className="flex flex-col gap-1 w-full">
@@ -73,5 +80,5 @@ function Input({
 }
 
 
-export {Input, inputVariants};
+export { Input, inputVariants };
 export default Input;
