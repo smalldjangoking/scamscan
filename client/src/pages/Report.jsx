@@ -39,7 +39,7 @@ function Report() {
                             {/* Content */}
                             <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-2">
                                 {/* Registered User Card */}
-                                <div className="group relative cursor-pointer" onClick={() => { console.log('lox') }}>
+                                <div className="group relative cursor-pointer" onClick={() => setIsAuthOpen(true)}>
                                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/20 to-accent/20 opacity-50 blur-xl transition-opacity group-hover:opacity-75"></div>
                                     <div className="relative rounded-2xl border border-border bg-card/90 p-8 shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-xl">
                                         <div className="mb-6 text-center">

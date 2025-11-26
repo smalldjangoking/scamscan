@@ -89,7 +89,7 @@ export default function ScanDetail() {
                         <div className="flex flex-col items-center justify-center py-20 text-center">
                             <FileWarning className="h-10 w-10 text-muted-foreground mb-3" />
                             <p className="text-muted-foreground">
-                                Address not found or failed to load.
+                                Address not found.
                             </p>
                         </div>
                     ) : (

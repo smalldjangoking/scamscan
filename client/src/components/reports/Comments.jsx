@@ -40,7 +40,7 @@ export default function Comments({ reportId }) {
                 loader={<div className="flex justify-center py-4"><LoadingSpinner /></div>}
             >
                 {comments.map((c) => (
-                    <CommentCard key={c.id} items={c} reportId={c.id} />
+                    <CommentCard key={c.id} items={c} reportId={reportId} />
                 ))}
             </InfiniteScroll>
         </div>

@@ -23,12 +23,18 @@ import { Button } from "../components/ui/Button.jsx";
 import LoadingSpinner from "../components/ui/Loading.jsx";
 import { Tooltip } from "react-tooltip";
 import { useSingleReport } from "../utils/hook.js"
+import ShareButtons from "../components/report/Share.jsx"
+
 
 export default observer(function ReportDetail() {
     const { store } = useContext(Context)
     const [copied, setCopied] = useState(false);
     const { id, slug } = useParams();
     const { data: reportData, isLoading: reportIsLoading, isError: reportIsError } = useSingleReport(id);
+    const [shareOpen, setShareOpen] = useState(false)
+
+
+
 
 
     return (
@@ -66,6 +72,12 @@ export default observer(function ReportDetail() {
                             <div
                                 className="flex flex-col gap-2 border rounded-xl bg-card/80 backdrop-blur-sm pt-5 pl-5 pr-5 pb-2 shadow-sm">
                                 <div className="flex justify-between items-center border-b pb-4">
+                                    {shareOpen && (
+                                        <ShareButtons
+                                            title={`Report: ${reportData?.report.crypto_name} | Scamscan.io`}
+                                            onClose={() => setShareOpen(false)}
+                                        />
+                                    )}
                                     <div className="flex items-center">
                                         {reportData.user ? (
                                             <div className="flex items-center gap-2">
@@ -179,16 +191,17 @@ export default observer(function ReportDetail() {
                                             data-tooltip-content="Amount of Views"
 
                                         />
-                                        <span className="font-medium text-muted-foreground">0</span>
+                                        <span className="font-medium text-muted-foreground">{reportData?.report.views}</span>
                                     </div>
 
                                     {/* Share Button */}
                                     <Button
                                         variant="outline"
                                         className="flex items-center gap-2 text-muted-foreground"
+                                        onClick={() => setShareOpen(true)}
                                     >
                                         <Share2 className="h-4 w-4" />
-                                        <span>Share</span>
+                                        Share
                                     </Button>
                                 </div>
                             </div>
@@ -201,7 +214,7 @@ export default observer(function ReportDetail() {
                                     <FileWarning className="h-7 w-7 text-muted-foreground" />
                                 </div>
                                 <p className="text-muted-foreground">
-                                    123
+                                    Failed to load!
                                 </p>
                             </div>
                         </div>

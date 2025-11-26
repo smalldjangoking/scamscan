@@ -4,7 +4,7 @@ from sqlalchemy.orm import selectinload, joinedload
 from database_settings import SessionDep
 from schemas import ReportSchema, ReportsListAPISchema, ReportAPISchema, \
     SingleReportSchema, AddressAPISchema, SingleReport, PublicUserAPISchema, CommentsSchema, CommentSchema
-from sqlalchemy import select, func, or_
+from sqlalchemy import select, func, or_, update
 from models import Reports, Addresses, Comments
 from fastapi.security import OAuth2PasswordBearer
 import bleach
@@ -229,12 +229,14 @@ async def get_report(session: SessionDep,
         .where(Reports.id == report_id)
         .options(joinedload(Reports.address), joinedload(Reports.user)))
     
-    
     result = await session.execute(query)
     report_data = result.scalar_one_or_none()
 
     if not report_data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
+    
+    await session.execute(update(Reports).where(Reports.id == report_id).values(views=Reports.views + 1))
+    await session.commit()
 
     return SingleReportSchema(
         address=AddressAPISchema.model_validate(report_data.address),

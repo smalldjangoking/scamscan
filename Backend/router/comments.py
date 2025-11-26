@@ -35,8 +35,10 @@ async def get_report_comments(session: SessionDep,
             selectinload(Comments.user),
             selectinload(Comments.children).selectinload(Comments.user),  # Дети + их user
         )
-        )
-    print(query)
+        .order_by(
+            Comments.id.desc(),
+        ))
+
     count_query = select(func.count()).select_from(query.subquery())
 
     total_count = (await session.execute(count_query)).scalar_one()

@@ -1,7 +1,8 @@
-import { useMutation, useQuery, useInfiniteQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import reportService from "../services/reportService"
 import UserService from "../services/userService.js";
 import commentService from "../services/commentService.js"
+
 
 export function useReports({ user_id, userOnly = false, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = '' }) {
     return useQuery({
@@ -171,15 +172,27 @@ export function useReportCreate() {
 
 
 export function useCommentCreate({ setValue }) {
+    const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async ({ reportId, comment, mainCommentId }) => {
-            const { data } = await commentService.createComment(reportId, comment, mainCommentId);
-            console.log(data)
-            return data;
+            console.log(reportId)
+            const { data } = await commentService.createComment(
+                reportId,
+                comment,
+                mainCommentId
+            );
+            return data
         },
-        onSuccess: () => {
+
+        onSuccess: (newComment, { reportId, mainCommentId }) => {
             setValue("comment", "");
-        }
+
+            queryClient.invalidateQueries({
+                queryKey: ["report_comments", reportId],
+            });
+
+        },
     });
 }
 
@@ -188,7 +201,7 @@ export function useInfinityComments(reportId) {
     return useInfiniteQuery({
         queryKey: ["report_comments", reportId],
         queryFn: async ({ pageParam = 1 }) => {
-            const {data} = await commentService.getComments(reportId, pageParam);
+            const { data } = await commentService.getComments(reportId, pageParam);
             return data
         },
         getNextPageParam: (lastPage, pages) => {

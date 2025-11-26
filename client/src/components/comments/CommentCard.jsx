@@ -19,7 +19,7 @@ export default observer(function CommentCard({ items, reportId, isReply = false 
             <div
                 className={`
                     rounded-lg border w-full
-                    ${isReply ? "bg-card mt-2" : "bg-card mt-3 shadow-sm"}
+                    ${isReply ? "relative bg-card mt-2" : "bg-card mt-3 shadow-sm"}
                 `}
             >
                 <div className={isReply ? "px-3 py-2 sm:px-4 sm:py-2.5" : "px-5 py-3"}>

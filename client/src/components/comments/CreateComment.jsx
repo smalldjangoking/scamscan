@@ -15,13 +15,14 @@ export default observer(function CreateComment({ reportId, mainForm=false, label
     const schema = Yup.object().shape({
         comment: Yup.string()
             .max(1000, 'Max 1000 chars')
+            .min(10, 'Min 10 chars')
             .required("This field is required"),
     })
 
 
     const { register, setValue, getValues, formState: { errors, isValid } } = useForm({
         resolver: yupResolver(schema),
-        mode: "onChange",
+        mode: "onBlur",
         defaultValues: {
             comment: "",
         }
@@ -41,7 +42,7 @@ export default observer(function CreateComment({ reportId, mainForm=false, label
     return (
         <>
             {store.accessToken ? (
-                <div className={`${mainForm ? 'w-full rounded-lg border p-4 bg-card/50 backdrop-blur-sm' : ''}`}>
+                <div className={`${mainForm ? 'relative w-full rounded-lg border p-4 bg-card/50 backdrop-blur-sm' : ''}`}>
                     <div className="flex items-stretch gap-3">
                         <div className="flex flex-col justify-center flex-1">
                             <Input {...register("comment")} size="multi" multiline={true} label={labelForm ? "Add comment" : ""} placeholder="Write your comment..." />
