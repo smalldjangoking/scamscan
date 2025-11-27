@@ -11,10 +11,9 @@ export function TiptapViewer({ html }) {
       StarterKit.configure({
         heading: { levels: [2] },
       }),
-      // если есть кастомные расширения — добавь сюда
     ],
     content: html || "",
-    editable: false,      // <--- делает редактор read-only
+    editable: false,
   });
 
   if (!editor) return null;

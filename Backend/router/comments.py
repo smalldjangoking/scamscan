@@ -13,7 +13,7 @@ from sqlalchemy.orm import selectinload
 router = APIRouter(prefix="/api/report/comments", tags=["comments"])
 
 
-@router.get('/{report_id}/all', status_code=status.HTTP_200_OK)
+@router.get('/{report_id}/all', status_code=status.HTTP_200_OK, include_in_schema=False)
 async def get_report_comments(session: SessionDep,
                               report_id: int = Path(...,),
                               page: int = Query(ge=0, description="Page number for pagination"),
@@ -55,7 +55,7 @@ async def get_report_comments(session: SessionDep,
         total_pages=total_pages
     )
 
-@router.post('/{report_id}/create', status_code=status.HTTP_201_CREATED)
+@router.post('/{report_id}/create', status_code=status.HTTP_201_CREATED, include_in_schema=False)
 async def create_report_comment(session: SessionDep,
                                 comment: CommentValid,
                                 report_id: int = Path(...),

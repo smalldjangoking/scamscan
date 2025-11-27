@@ -5,6 +5,7 @@ import {
   ShieldUser,
   Loader2,
   TriangleAlert,
+  Shield,
 } from "lucide-react";
 import { Button } from "./ui/Button.jsx";
 import React, { useEffect, useRef, useState, useContext } from "react";
@@ -63,7 +64,7 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
         className="fixed top-0 left-0 md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-40"
         ref={AuthenticationSectionRef}
       >
-        <div className="flex flex-col justify-center w-screen h-screen md:max-w-[500px] md:h-fit bg-card/80 backdrop-blur-sm border border-border rounded-2xl shadow-sm p-6">
+        <div className="flex flex-col w-screen h-screen md:justify-center md:max-w-[500px] md:h-fit bg-card/80 backdrop-blur-sm border border-border rounded-2xl shadow-sm p-6">
           {store.errors.size > 0 && (
             Array.from(store.errors).map((item, index) => (
               <div
@@ -252,12 +253,12 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
                 />
               </div>
               <div className="relative flex gap-2 mt-5 justify-between">
-                <div className="flex gap-1 justify-center">
+                <div className="flex gap-1 justify-center items-center">
                   <input type="checkbox" placeholder="Password" className="" />
-                  <span className="">Remember me</span>
+                  <span className="text-sm">Remember me</span>
                 </div>
 
-                <Button variant='link' onClick={() => setAuthVariant('reset_password')}>
+                <Button variant='link' className="text-sm" onClick={() => setAuthVariant('reset_password')}>
                   Forgot password?
                 </Button>
               </div>
@@ -350,6 +351,18 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
               </Button>
             </>
           )}
+
+          <div className="flex flex-col items-center gap-3 mt-20 w-full px-10">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary text-primary-foreground p-2 rounded-lg">
+                <Shield className="h-6 w-6" />
+              </div>
+              <div>
+                <span className="text-lg font-semibold">scamscan.io</span>
+                <div className="text-xs text-muted-foreground">report & observe</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>,

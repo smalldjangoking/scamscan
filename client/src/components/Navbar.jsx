@@ -1,17 +1,21 @@
 import React, { useState, useContext } from 'react'
-import { Shield, ArrowRight, User } from "lucide-react"
+import { Shield, ArrowRight, User, Menu } from "lucide-react"
 import { ThemeToggle } from "./ui/ThemeToggle.jsx";
 import { Button } from "./ui/Button.jsx";
 import Authentication from "./Authentication.jsx";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
+import BurgerMenu from "./navbar/BurgerMenu"
+import { useNavigate } from 'react-router-dom';
 
 function Navbar() {
     const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const [isBurgerOpen, setIsBurgerOpen] = useState(false)
     const [authVariant, setAuthVariant] = useState('register');
     const toggleAuth = () => setIsAuthOpen(prev => !prev);
+    const toggleBurger = () => setIsBurgerOpen(prev => !prev);
     const { store } = useContext(Context);
-
+    const navigate = useNavigate();
     const openAuth = (variant) => {
         setAuthVariant(variant);
         toggleAuth();
@@ -21,8 +25,11 @@ function Navbar() {
     return (
         <>
             <Authentication isOpen={isAuthOpen} onClose={toggleAuth} authVar={authVariant} />
+
+            <BurgerMenu isOpen={isBurgerOpen} onClose={toggleBurger} openAuth={toggleAuth} />
+
             <header
-                className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 <div className="container mx-auto px-4 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="bg-primary text-primary-foreground p-2 rounded-lg">
@@ -34,16 +41,20 @@ function Navbar() {
                         </div>
                     </div>
                     <nav className="hidden md:flex items-center gap-8">
-                        <a href="/"
-                            className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Explore</a>
-                        <a href="/scan"
-                           className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Scan</a>
-                        <a href="/report"
-                            className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Report</a>
-                        <a href="/reports"
-                            className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">All Reports</a>
+                        {[{ address: "/", label: "Explore" },
+                        { address: "/scan", label: "Scan" },
+                        { address: "/report", label: "Report" },
+                        { address: "/reports", label: "All Reports" }
+                        ].map((item) => (
+                            <a
+                                key={item.address}
+                                onClick={() => navigate(item.address)}
+                                className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium cursor-pointer">{item.label}
+                            </a>
+                        ))}
                     </nav>
-                    <div className="flex items-center gap-3">
+                    {/*Desktop*/}
+                    <div className="items-center gap-3 hidden md:flex">
                         <ThemeToggle />
                         {!store.accessToken ? (
                             <>
@@ -55,12 +66,19 @@ function Navbar() {
                             </>
                         ) : (
                             <>
-                                    <Button onClick={() => window.location.href = '/profile' } size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                                        <span className="font-medium tracking-wide">Profile</span>
-                                        <User className="ml-1 h-6 w-6" />
-                                    </Button>
+                                <Button onClick={() => window.location.href = '/profile'} size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                                    <span className="font-medium tracking-wide">Profile</span>
+                                    <User className="ml-1 h-6 w-6" />
+                                </Button>
                             </>
                         )}
+                    </div>
+
+                    {/*Mobile*/}
+                    <div className="items-center gap-3 flex md:hidden">
+                        <Button onClick={() => setIsBurgerOpen(true)} variant="outline">
+                            <Menu />
+                        </Button>
                     </div>
                 </div>
             </header>

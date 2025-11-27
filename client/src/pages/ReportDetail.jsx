@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { useParams } from "react-router-dom";
-import { TiptapViewer } from "../components/TiptapOut.jsx";
+import { TiptapViewer } from "../components/reports/TiptapOut.jsx";
 import { useState } from "react";
 import { BackButton } from '../components/ui/GoBack.jsx'
 import { Context } from "../main.jsx";
