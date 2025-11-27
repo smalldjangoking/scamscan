@@ -1,11 +1,11 @@
 import { Button } from "../ui/Button"
-import { Menu } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 
 export default function BurgerFilterMenu({ icon: Icon, iter = [], callback, obj_name, position }) {
   const [filterMenu, setFilterMenu] = useState(false);
   const menuRef = useRef(null);
 
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {

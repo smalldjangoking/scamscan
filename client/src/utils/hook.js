@@ -2,6 +2,7 @@ import { useMutation, useQuery, useInfiniteQuery, useQueryClient } from '@tansta
 import reportService from "../services/reportService"
 import UserService from "../services/userService.js";
 import commentService from "../services/commentService.js"
+import CoinGecko from "../services/CoinGecko.js"
 
 
 export function useReports({ user_id, userOnly = false, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = '' }) {
@@ -103,7 +104,6 @@ export function useSingleReport(id) {
             }
 
             const data = await res.json();
-            console.log("✅ useSingleReport data:", data);
             return data;
         },
     });
@@ -176,7 +176,6 @@ export function useCommentCreate({ setValue }) {
 
     return useMutation({
         mutationFn: async ({ reportId, comment, mainCommentId }) => {
-            console.log(reportId)
             const { data } = await commentService.createComment(
                 reportId,
                 comment,
@@ -211,6 +210,48 @@ export function useInfinityComments(reportId) {
             return currentPage < totalPages ? currentPage + 1 : undefined;
         },
         enabled: !!reportId
+    })
+}
+
+
+export function useInfinityCryptoList({ queryWord = '', enabled = false }) {
+    const perPage = 100
+
+    
+    return useInfiniteQuery({
+        queryKey: ["InfinityCryptoList"],
+        queryFn: async ({ pageParam = 1 }) => {
+            const { data } = await CoinGecko.cryptoList(pageParam, queryWord, perPage)
+            if (Array.isArray(data)) {
+                return data;
+            }
+
+            if (data && Array.isArray(data.coins)) {
+                return data.coins;
+            }
+
+            return [];
+        },
+        enabled,
+        getNextPageParam: (lastPage, allPages) => {
+            // 🔹 Если есть фильтр (поиск) — только одна "страница"
+            if (queryWord) {
+                return undefined;
+            }
+
+            // 🔹 Для coins/markets lastPage — это массив
+            if (!Array.isArray(lastPage)) {
+                return undefined;
+            }
+
+            // 🔹 Если вернули меньше чем PER_PAGE — дальше данных нет
+            if (lastPage.length < perPage) {
+                return undefined;
+            }
+
+            // 🔹 Иначе просто следующая страница = кол-во уже загруженных
+            return allPages.length + 1;
+        },
     })
 }
 

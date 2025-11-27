@@ -145,7 +145,6 @@ export default class Store {
     }
     catch (e) {
       this.errorValid(e)
-      console.log(e)
     } finally {
       this.setIsLoading(false)
     }
@@ -155,7 +154,6 @@ export default class Store {
     this.setIsLoading(true);
     try {
       const res = await AuthService.tokenConfirm(option, token);
-      console.log(res)
 
       if (option === 'email') {
         if (res.status === 200) {

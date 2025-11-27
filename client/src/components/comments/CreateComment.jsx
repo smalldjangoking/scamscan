@@ -22,7 +22,7 @@ export default observer(function CreateComment({ reportId, mainForm=false, label
 
     const { register, setValue, getValues, formState: { errors, isValid } } = useForm({
         resolver: yupResolver(schema),
-        mode: "onBlur",
+        mode: "onChange",
         defaultValues: {
             comment: "",
         }
