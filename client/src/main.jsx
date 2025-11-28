@@ -14,6 +14,9 @@ import Confirm from "./pages/confirm.jsx";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import ReportDetail from "./pages/ReportDetail.jsx";
 import Store from './store/store'
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService"
+import CookiePolicy from "./pages/CookiePolicy"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,6 +44,9 @@ const router = createBrowserRouter([
             { path: 'report', index: false, element:  <Report /> },
             { path: 'report/show/:id/:slug', index: true, element: (<ReportDetail />) },
             { path: 'confirm/:option/:token', index: false, element: (<Confirm />) },
+            { path: 'legal/privacy-policy', index: false, element: (<PrivacyPolicy />) },
+            { path: 'legal/terms-of-service', index: false, element: (<TermsOfService />) },
+            { path: 'legal/cookie-policy', index: false, element: (<CookiePolicy />) },
         ],
     },
 ]);

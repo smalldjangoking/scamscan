@@ -66,7 +66,7 @@ function Navbar() {
                             </>
                         ) : (
                             <>
-                                <Button onClick={() => window.location.href = '/profile'} size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                                <Button onClick={() => navigate('/profile')} size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
                                     <span className="font-medium tracking-wide">Profile</span>
                                     <User className="ml-1 h-6 w-6" />
                                 </Button>
