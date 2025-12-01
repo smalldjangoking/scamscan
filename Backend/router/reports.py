@@ -11,6 +11,7 @@ import bleach
 from math import ceil
 from slugify import slugify
 from services import access_token_valid
+from limiter import limiter
 
 router = APIRouter(prefix="/api/reports", tags=["reports"])
 oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
@@ -31,8 +32,10 @@ ALLOWED_ATTRIBUTES = {
 
 
 @router.post("/create", status_code=status.HTTP_200_OK)
+@limiter.limit("1/5minutes")
 async def create_report(schema: ReportSchema,
                         session: SessionDep,
+                        request: Request,
                         token: str | None = Depends(oauth2_scheme_optional)):
     """Create a new report in the database."""
     user_id = None

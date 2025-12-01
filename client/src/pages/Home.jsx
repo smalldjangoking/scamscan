@@ -70,13 +70,13 @@ function Home() {
 
                         {/* Action Buttons */}
                         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-                            <Button onClick={() => window.location.href = '/report'} size="lg"
+                            <Button onClick={() => navigate("/report")} size="lg"
                                 className="px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90">
                                 <AlertTriangle className="mr-2 h-5 w-5" />
                                 Report a Scammer
                                 <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
-                            <Button onClick={() => window.location.href = '/reports'} size="lg" variant="outline" className="px-8 py-4">
+                            <Button onClick={() => navigate('/reports')} size="lg" variant="outline" className="px-8 py-4">
                                 <BookText className="mr-2 h-5 w-5" />
                                 Browse Reports
                             </Button>

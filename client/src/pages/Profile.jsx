@@ -13,9 +13,6 @@ import { useReports, useUserUpdate, useUserPasswordChange } from "../utils/hook.
 import Pagination from "../components/ui/Paginator.jsx";
 
 
-
-
-
 function Profile() {
     const { store } = useContext(Context)
     const [user, setUser] = useState(null);
@@ -77,7 +74,24 @@ function Profile() {
         }
     }, [userUpdate])
 
-    if (!user) return null;
+    if (!user) {
+        return (
+            <section className="relative">
+                {store.isLoading && (
+                    <>
+                        <section className="relative">
+                            <Toaster />
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+                            <div className="container mx-auto px-4 py-20 md:py-28 relative"></div>
+                            <div className="absolute inset-0 w-full h-full flex items-center justify-center z-50">
+                                <LoadingSpinner />
+                            </div>
+                        </section>
+                    </>
+                )}
+            </section>
+        );
+    }
 
     const fields = [
         { key: "email", label: "Email", icon: <AtSign className="h-4 w-4" />, readonly: true },

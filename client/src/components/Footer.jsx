@@ -41,7 +41,7 @@ function Footer() {
                                 { address: "/report", label: "Report" },
                                 { address: "/reports", label: "All Reports" }
                                 ].map((item) => (
-                                    <li onClick={() => navigate(item.address)} id={item.address} className="cursor-pointer">
+                                    <li key={item.address} onClick={() => navigate(item.address)} id={item.address} className="cursor-pointer">
                                         <p className="hover:text-foreground transition-colors">{item.label}</p>
                                     </li>
                                 ))}
@@ -56,7 +56,7 @@ function Footer() {
                                 { address: "/legal/cookie-policy", label: "Cookie Policy" },
                                 { address: "/", label: "GDPR Compliance" }
                                 ].map((item) => (
-                                    <li onClick={() => navigate(item.address)} id={item.address} className="cursor-pointer">
+                                    <li key={item.address} onClick={() => navigate(item.address)} id={item.address} className="cursor-pointer">
                                         <p className="hover:text-foreground transition-colors">{item.label}</p>
                                     </li>
                                 ))}

@@ -14,13 +14,15 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 from models import Users
 from fastapi.responses import JSONResponse
+from limiter import limiter
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 
 @router.post('/create', status_code=status.HTTP_201_CREATED)
-async def user_create(user: UserRegistrationSchema, session: SessionDep):
+@limiter.limit("1/5minutes")
+async def user_create(request: Request, user: UserRegistrationSchema, session: SessionDep):
     """Registration"""
     if user.password != user.password2:
         raise HTTPException(status_code=400, detail="Passwords do not match")
@@ -163,7 +165,7 @@ async def verify_email(token: str, session: SessionDep):
 @router.patch('/password/verify/{token}', status_code=status.HTTP_200_OK)
 async def password_change(
     session: SessionDep,
-    token: str
+    token: str = Path(..., description="Token from email to confirm your rights to the account")
     ) -> dict:
     token_db = await session.execute(
         select(Email_tokens)
@@ -194,8 +196,10 @@ async def password_change(
 async def password_change_confirm(
     payload: PasswordRestore,
     session: SessionDep,
-    token: str = Path(..., description="Reset token from email"),
+    token: str = Path(..., description="Token from email to confirm your rights to the account"),
     ) -> dict:
+    """Change Password by Token from email"""
+
     token_db = await session.execute(
         select(Email_tokens)
         .where(Email_tokens.token == token)

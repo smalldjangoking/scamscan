@@ -1,9 +1,15 @@
 from fastapi import FastAPI
 from router import auth, profile, reports, scan, comments
 from fastapi.middleware.cors import CORSMiddleware
-
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from limiter import limiter
+from slowapi.middleware import SlowAPIMiddleware
 
 app = FastAPI()
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 
 app.add_middleware(
@@ -16,7 +22,7 @@ app.add_middleware(
 
 @app.get("/")
 async def read_root():
-    return {"Hello": "World"}
+    return {"Backend": "See all endpoints by just writing /docs"}
 
 app.include_router(auth.router)
 app.include_router(profile.router)

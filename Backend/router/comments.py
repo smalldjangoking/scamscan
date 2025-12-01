@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query, status, Path, Depends
+from fastapi import APIRouter, HTTPException, Query, status, Path, Depends, Request
 
 from database_settings import SessionDep
 from schemas import CommentsSchema, CommentSchema
@@ -9,6 +9,7 @@ from math import ceil
 from models import Comments
 from services import access_token_valid
 from sqlalchemy.orm import selectinload
+from limiter import limiter
 
 router = APIRouter(prefix="/api/report/comments", tags=["comments"])
 
@@ -56,7 +57,9 @@ async def get_report_comments(session: SessionDep,
     )
 
 @router.post('/{report_id}/create', status_code=status.HTTP_201_CREATED, include_in_schema=False)
+@limiter.limit("1/5minutes")
 async def create_report_comment(session: SessionDep,
+                                request: Request,
                                 comment: CommentValid,
                                 report_id: int = Path(...),
                                 user_id: str = Depends(access_token_valid),

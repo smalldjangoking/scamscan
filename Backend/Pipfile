@@ -19,6 +19,7 @@ httpx = "*"
 aiosmtplib = "*"
 jinja2 = "*"
 python-slugify = "*"
+slowapi = "*"
 
 [dev-packages]
 

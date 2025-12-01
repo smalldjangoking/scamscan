@@ -3,6 +3,7 @@ import reportService from "../services/reportService"
 import UserService from "../services/userService.js";
 import commentService from "../services/commentService.js"
 import CoinGecko from "../services/CoinGecko.js"
+import AuthService from "../services/authService.js"
 
 
 export function useReports({ user_id, userOnly = false, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = '' }) {
@@ -217,7 +218,7 @@ export function useInfinityComments(reportId) {
 export function useInfinityCryptoList({ queryWord = '', enabled = false }) {
     const perPage = 100
 
-    
+
     return useInfiniteQuery({
         queryKey: ["InfinityCryptoList"],
         queryFn: async ({ pageParam = 1 }) => {
@@ -234,25 +235,37 @@ export function useInfinityCryptoList({ queryWord = '', enabled = false }) {
         },
         enabled,
         getNextPageParam: (lastPage, allPages) => {
-            // 🔹 Если есть фильтр (поиск) — только одна "страница"
+
             if (queryWord) {
                 return undefined;
             }
-
-            // 🔹 Для coins/markets lastPage — это массив
             if (!Array.isArray(lastPage)) {
                 return undefined;
             }
-
-            // 🔹 Если вернули меньше чем PER_PAGE — дальше данных нет
             if (lastPage.length < perPage) {
                 return undefined;
             }
-
-            // 🔹 Иначе просто следующая страница = кол-во уже загруженных
             return allPages.length + 1;
         },
     })
 }
 
 
+export function useTokenCheck() {
+    return useMutation({
+        mutationFn: async ({ option, token }) => {
+            const res = await AuthService.tokenConfirm(option, token)
+            return res
+        },
+    })
+}
+
+
+export function useChangePassword() {
+    return useMutation({
+        mutationFn: async ({ token, password }) => {
+            const res = await AuthService.changePassword(token, password);
+            return res;
+        },
+    });
+}

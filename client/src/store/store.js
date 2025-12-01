@@ -149,22 +149,4 @@ export default class Store {
       this.setIsLoading(false)
     }
   }
-
-  async tokenCheck(option, token) {
-    this.setIsLoading(true);
-    try {
-      const res = await AuthService.tokenConfirm(option, token);
-
-      if (option === 'email') {
-        if (res.status === 200) {
-          this.setSuccessAlerts(res.data.detail)
-        }
-      }
-
-    } catch (e) {
-      this.errorValid(e)
-    } finally {
-      this.setIsLoading(false);
-    }
-  }
 }
