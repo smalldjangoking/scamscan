@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import {
     User, AtSign, Calendar, Pencil,
-    Check, X, KeyRound, FileWarning, Wrench
+    Check, X, KeyRound, FileWarning, Trash2, DoorOpen, UserRoundX 
 } from "lucide-react";
 import LoadingSpinner from "../components/ui/Loading.jsx"
 import { Button } from "../components/ui/Button.jsx";
@@ -9,7 +9,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
-import { useReports, useUserUpdate, useUserPasswordChange } from "../utils/hook.js"
+import { useReports, useUserUpdate, useUserPasswordChange, deleteReport, deleteAccount  } from "../utils/hook.js"
 import Pagination from "../components/ui/Paginator.jsx";
 
 
@@ -45,6 +45,19 @@ function Profile() {
         }
     );
 
+    const { mutate: deleteReportFunc } = deleteReport(
+        {
+            successToast,
+            failedToast,
+        }
+    );
+
+    const { mutate: deleteAccountFunc, isSuccess: isSuccessDeleted } = deleteAccount(
+        {
+            failedToast,
+        }
+    );
+
     const { mutate: updateUserPasswordFunc, isPending: isLoadingUserPasUpdate } = useUserPasswordChange(
         {
             setPasswordOpen,
@@ -73,6 +86,26 @@ function Profile() {
             updateUserDataFunc(userUpdate);
         }
     }, [userUpdate])
+
+    useEffect(() => {
+        if (isSuccessDeleted) {
+            store.logout();
+        }
+    }, [isSuccessDeleted])
+
+    const reportDeleteHandler = (reportId, reportName) => {
+        const ok = window.confirm(`Are you sure to delete Report: ${reportName}?`);
+        if (!ok) return;
+
+        deleteReportFunc({ reportId });
+    };
+
+    const userDeleteHandler = () => {
+        const ok = window.confirm("Are you sure you want to delete your account and all data?");
+        if (!ok) return;
+
+        deleteAccountFunc();
+    };
 
     if (!user) {
         return (
@@ -136,8 +169,11 @@ function Profile() {
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Button onClick={() => store.logout()} size="sm" className="w-[70px]" variant="destructive">
-                            Quit
+                        <Button onClick={userDeleteHandler} size="sm" variant="destructive">
+                            <UserRoundX /> Delete Account
+                        </Button>
+                        <Button onClick={() => store.logout()} size="sm" variant="ghost">
+                            <DoorOpen /> Logout
                         </Button>
                     </div>
                 </div>
@@ -343,14 +379,14 @@ function Profile() {
                                                     key={r.id}
                                                     className="p-4 rounded-lg border border-border bg-accent/40 hover:bg-accent/60 transition-colors">
                                                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                                                        <div>
+                                                        <div onClick={() => navigate('/report/show/' + r.id + '/' + r.slug)} className="cursor-pointer">
                                                             <h3 className="font-medium">{r.report_title}</h3>
                                                             <p className="text-xs text-muted-foreground">
                                                                 {new Date(r.created_at).toLocaleString()}
                                                             </p>
                                                         </div>
-                                                        <Button variant="ghost">
-                                                            <Wrench />
+                                                        <Button onClick={() => reportDeleteHandler(r.id, r.report_title)} variant="ghost">
+                                                            <Trash2 />
                                                         </Button>
                                                     </div>
                                                 </div>

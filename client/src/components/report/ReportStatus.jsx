@@ -15,7 +15,8 @@ export function ReportStatus({ reportAnswer, isPending, isSuccess, isError, erro
             error?.response?.data?.detail ||
             error?.response?.data?.message ||
             error?.response?.data?.msg ||
-            "Something went wrong1";
+            error?.response?.data?.error ||
+            "Something went wrong!";
 
         setErrorMsg(msg);
     }, [error]);

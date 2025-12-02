@@ -10,5 +10,9 @@ export default class reportService {
     static createReport(payload) {
         return $api.post('/reports/create', payload)
     }
+
+    static deleteReport(reportId) {
+        return $api.delete(`/reports/delete/${reportId}`)
+    }
 }
 

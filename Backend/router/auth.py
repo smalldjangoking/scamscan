@@ -21,7 +21,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 
 @router.post('/create', status_code=status.HTTP_201_CREATED)
-@limiter.limit("1/5minutes")
+@limiter.limit("10/hour")
 async def user_create(request: Request, user: UserRegistrationSchema, session: SessionDep):
     """Registration"""
     if user.password != user.password2:

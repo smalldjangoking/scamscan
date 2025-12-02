@@ -280,3 +280,24 @@ async def get_report_comments(session: SessionDep,
         total_pages=total_pages
     )
 
+
+@router.delete('/delete/{report_id}')
+async def delete_report(session: SessionDep,
+                        report_id: int = Path(..., description="Provide Report_Id for deleting specific Report"),
+                        user_id: int = Depends(access_token_valid)
+                        ):
+    """Deletes specific Report From DB"""
+
+    report = await session.get(Reports, report_id)
+
+    if not report:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report was not found")
+    
+    if report.user_id != user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(report.user_id))
+    
+
+    await session.delete(report)
+    await session.commit()
+
+    return {"status": "ok", "detail": "Report Was Deleted!"}

@@ -269,3 +269,35 @@ export function useChangePassword() {
         },
     });
 }
+
+export function deleteReport({successToast, failedToast}) {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ reportId }) => {
+            const res = await reportService.deleteReport(reportId)
+            return res
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["reports"],
+            });
+            successToast('Report Was Deleted!')
+        },
+        onError: () => {
+            failedToast('An error! Report Was not deleted!')
+        }
+    })
+}
+
+export function deleteAccount({failedToast}) {
+    return useMutation({
+        mutationFn: async () => {
+            const res = await UserService.deleteUser()
+            return res
+        },
+        onError: () => {
+            failedToast("An Error! Account wasn't deleted!")
+        }
+    })
+}

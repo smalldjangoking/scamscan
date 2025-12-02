@@ -28,15 +28,15 @@ class Users(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
     last_login: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     
-    reports: Mapped[list["Reports"]] = relationship(back_populates="user")
-    comments: Mapped[list["Comments"]] = relationship(back_populates="user")
+    reports: Mapped[list["Reports"]] = relationship(back_populates="user", passive_deletes=True)
+    comments: Mapped[list["Comments"]] = relationship(back_populates="user", passive_deletes=True)
 
 
 class Reports(Base):
     __tablename__ = "reports"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True)
     report_title: Mapped[str] = mapped_column(String(50), nullable=False)
     report_description: Mapped[str] = mapped_column(String(2000), nullable=False)
     screenshots: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
@@ -50,7 +50,7 @@ class Reports(Base):
 
     address: Mapped["Addresses"] = relationship(back_populates="reports")
     user: Mapped["Users"] = relationship(back_populates="reports")
-    comments: Mapped[list["Comments"]] = relationship(back_populates="report")
+    comments: Mapped[list["Comments"]] = relationship(back_populates="report", passive_deletes=True)
 
 
 class Addresses(Base):
@@ -67,16 +67,15 @@ class Addresses(Base):
     dislikes: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    reports: Mapped[list["Reports"]] = relationship(back_populates="address", cascade="all, delete-orphan",
-                                                    passive_deletes=True)
+    reports: Mapped[list["Reports"]] = relationship(back_populates="address", passive_deletes=True)
 
 
 class Comments(Base):
     __tablename__ = "comments"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    report_id: Mapped[int] = mapped_column(ForeignKey("reports.id"))
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    report_id: Mapped[int] = mapped_column(ForeignKey("reports.id", ondelete="CASCADE"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     comment: Mapped[str] = mapped_column(String(250), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -88,7 +87,7 @@ class Comments(Base):
     children: Mapped[list["Comments"]] = relationship(
         "Comments",
         foreign_keys=[parent_comment_id],
-        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
 
 
@@ -96,7 +95,7 @@ class Email_tokens(Base):
     __tablename__ = "email_tokens"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     purpose: Mapped[str] = mapped_column(String(100), nullable=False)
     token: Mapped[str] = mapped_column(String(250), nullable=False, unique=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

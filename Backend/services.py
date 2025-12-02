@@ -83,12 +83,12 @@ def create_access_token(data: dict, expires_in: int = ACCESS_TOKEN_EXPIRE_MINUTE
     return token
 
 
-def access_token_valid(token: str = Depends(oauth2_scheme)):
+def access_token_valid(token: str = Depends(oauth2_scheme)) -> int:
     """validate access token for auth"""
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
-        return user_id
+        return int(user_id)
 
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Access token expired")

@@ -34,7 +34,7 @@ async def get_report_comments(session: SessionDep,
             )
         .options(
             selectinload(Comments.user),
-            selectinload(Comments.children).selectinload(Comments.user),  # Дети + их user
+            selectinload(Comments.children).selectinload(Comments.user),
         )
         .order_by(
             Comments.id.desc(),
@@ -48,7 +48,10 @@ async def get_report_comments(session: SessionDep,
 
     result = await session.execute(query)
     comments = result.scalars().all()
-    total_pages = ceil(total_count / page_size) if total_count else 1
+    total_pages = ceil(total_count / page_size) if total_count else 0
+
+    if not comments:
+        return {'comments': [], 'total_pages': total_pages, 'comments_total': total_count}
 
     return CommentsSchema(
         comments=[CommentSchema.model_validate(comment) for comment in comments],
@@ -57,13 +60,14 @@ async def get_report_comments(session: SessionDep,
     )
 
 @router.post('/{report_id}/create', status_code=status.HTTP_201_CREATED, include_in_schema=False)
-@limiter.limit("1/5minutes")
+@limiter.limit("3/min")
 async def create_report_comment(session: SessionDep,
                                 request: Request,
                                 comment: CommentValid,
                                 report_id: int = Path(...),
-                                user_id: str = Depends(access_token_valid),
+                                user_id: int = Depends(access_token_valid),
                                 ):
+    """creates a comment to report"""
     new_comment = Comments(
         report_id=report_id,
         user_id=user_id,

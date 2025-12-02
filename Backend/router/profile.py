@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/user", tags=["user"])
 
 
 @router.post("/me")
-async def read_user_me(session: SessionDep, user_id: str = Depends(access_token_valid)):
+async def read_user_me(session: SessionDep, user_id: int = Depends(access_token_valid)):
     data = await session.get(Users, user_id)
 
     if data:
@@ -32,7 +32,7 @@ async def read_user_me(session: SessionDep, user_id: str = Depends(access_token_
 @router.post('/update/password')
 async def change_password(passwordSchema: ChangePasswordSchema, 
                           session: SessionDep, 
-                          user_id: str = Depends(access_token_valid)):
+                          user_id: int = Depends(access_token_valid)):
     user = await session.get(Users, user_id)
 
     user.hashed_password = hash_password(passwordSchema.new_password)
@@ -46,7 +46,7 @@ async def change_password(passwordSchema: ChangePasswordSchema,
 @router.patch('/update/info')
 async def update_user_info(userInfoSchema: UpdateUserInfoSchema, 
                            session: SessionDep, 
-                           user_id: str = Depends(access_token_valid)):
+                           user_id: int = Depends(access_token_valid)):
     
     data = await session.get(Users, user_id)
 
@@ -66,3 +66,17 @@ async def update_user_info(userInfoSchema: UpdateUserInfoSchema,
 
     except Exception as e:
         raise HTTPException(status_code=400, detail="Bad request")
+    
+
+
+@router.delete('/delete/me')
+async def delete_user(session: SessionDep,
+                      user_id: int = Depends(access_token_valid)):
+    """Deletes user and all his data"""
+
+    user = await session.get(Users, user_id)
+
+    await session.delete(user)
+    await session.commit()
+
+    return {'status': 'ok', 'detail': 'User and all his data were deleted'}
