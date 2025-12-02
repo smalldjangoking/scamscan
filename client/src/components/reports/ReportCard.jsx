@@ -1,67 +1,147 @@
-import {Globe, CalendarDays, MessageCircle, Eye, User} from 'lucide-react';
-import {Button} from '../ui/Button';
-import DOMPurify from 'dompurify'
-import {truncate} from '../../utils/helpers.js';
-import { useNavigate } from 'react-router-dom';
+import { Globe, CalendarDays, HatGlasses, Eye, User } from "lucide-react";
+import { Button } from "../ui/Button";
+import DOMPurify from "dompurify";
+import { useNavigate } from "react-router-dom";
 
-const ReportCard = ({   
-                        id,
-                        crypto_name,
-                        crypto_logo_url,
-                        report_title,
-                        report_description,
-                        user_id,
-                        crypto_address,
-                        website_url,
-                        created_at,
-                        slug
-                    }) => {
-    const shortDescription = report_description.length > 100
-        ? report_description.slice(0, 150) + "..."
-        : report_description;
-
+const ReportCard = ({
+    id,
+    crypto_name,
+    crypto_logo_url,
+    report_title,
+    report_description,
+    user_id,
+    crypto_address,
+    website_url,
+    created_at,
+    slug,
+    views,
+}) => {
     const navigate = useNavigate();
+    console.log(user_id)
 
-    const date = new Date(created_at);
-    const formatted = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-
-    const safeHTML = DOMPurify.sanitize(shortDescription, {
-        USE_PROFILES: {html: true}
+    const rawDescription = report_description || "";
+    const cleanDescription = DOMPurify.sanitize(rawDescription, {
+        ALLOWED_TAGS: [],
+        ALLOWED_ATTR: [],
     });
 
+    const maxDescriptionLength = 255;
+    const shortDescription =
+        cleanDescription.length > maxDescriptionLength
+            ? cleanDescription.slice(0, maxDescriptionLength) + "..."
+            : cleanDescription;
+
+    const date = new Date(created_at);
+    const formatted = `${date
+        .getDate()
+        .toString()
+        .padStart(2, "0")}.${(date.getMonth() + 1)
+            .toString()
+            .padStart(2, "0")}.${date.getFullYear()} ${date
+                .getHours()
+                .toString()
+                .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+
+    const handleOpenDetails = () => {
+        navigate(`/report/show/${id}/${slug}`);
+    };
+
+    const handleScanNavigate = () => {
+        navigate(
+            `/scan/${crypto_name ? "crypto" : "website"}/${crypto_address || website_url}`,
+        );
+    };
+
+    const isCrypto = Boolean(crypto_address);
+    const isWebsite = Boolean(website_url);
+
     return (
-        <li className={`flex flex-col min-w-[250px] min-h-[250px] rounded border p-5 shadow-md transform transition duration-300 md:hover:scale-101 hover:shadow-lg ${user_id ? 'border-green-500' : 'border'}`}>
-            {crypto_address || website_url ? (
-                <div className="text-red-700 flex items-center gap-2 rounded-xl justify-between">
-                    <Button onClick={() => navigate(`/scan/${crypto_name ? 'crypto' : 'website'}/${crypto_address || website_url}`)} className="max-w-[200px] truncate" size="sm" variant="ghost">{
-                    truncate({
-                        crypto: crypto_address,
-                        web: website_url
-                    })}
+        <li
+            className={`flex flex-col min-w-[250px] min-h-[250px] rounded border p-5 shadow-md transform transition duration-300 md:hover:scale-101 hover:shadow-lg ${user_id ? "border-green-500" : "border"
+                }`}
+        >
+            <div className="flex justify-between">
+                <div className="mb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                            {user_id ? (
+                                <>
+                                    <User className="h-4 w-4" /> Registered user
+                                </>
+                            ) : (
+                                <>
+                                    <HatGlasses className="h-4 w-4" /> Guest report
+                                </>
+                            )}
+                        </span>
+                    </div>
+                </div>
+
+                {(crypto_name || isWebsite) && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        {crypto_name ? (
+                            <div className="flex items-center gap-2">
+                                <div className="flex h-7 w-7 items-center justify-center rounded-full border">
+                                    <img
+                                        src={crypto_logo_url}
+                                        alt={crypto_name}
+                                        className="h-5 w-5 object-contain"
+                                    />
+                                </div>
+                                <span className="uppercase tracking-wide">{crypto_name}</span>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <div className="flex h-7 w-7 items-center justify-center rounded-full border">
+                                    <Globe className="h-4 w-4" />
+                                </div>
+                                <span className="uppercase tracking-wide">Website report</span>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {(crypto_address || website_url) && (
+                <div className="mb-3 flex items-center justify-between gap-2">
+                    <Button
+                        onClick={handleScanNavigate}
+                        className="flex max-w-[200px] items-center gap-1 text-xs"
+                        size="sm"
+                        variant="ghost"
+                    >
+                        {crypto_address ? (crypto_address) : (website_url)}
                     </Button>
-                    <Button variant="ghost" size="sm">{crypto_name ? (
-                        <img src={crypto_logo_url} alt={crypto_name} className="h-6 w-6"/>) : (
-                        <Globe className="h-6 w-6"/>)}</Button>
                 </div>
-            ) : null}
+            )}
 
-            <div onClick={() => navigate(`/report/show/${id}/${slug}`)} className="mt-5 max-w-full overflow-hidden cursor-pointer">
-                <h3 className="flex text-2xl tracking-wider font-medium">{report_title}</h3>
-                <div className="text-sm text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{__html: safeHTML}}/>
+            <div
+                onClick={handleOpenDetails}
+                className="mt-4 flex-1 max-w-full cursor-pointer overflow-hidden"
+            >
+                <h3 className="mb-2 text-xl font-semibold tracking-wide">
+                    {report_title}
+                </h3>
+                <p
+                    className="text-sm text-muted-foreground leading-relaxed min-h-[90px] max-w-[40ch] break-words"
+                >
+                    {shortDescription}
+                </p>
             </div>
 
-
-            <div className="flex justify-between mt-auto">
-                <div className="flex gap-1 mt-auto">
-
-                    <Button variant="ghost"><MessageCircle/> 0</Button>
-                    <Button variant="ghost"><Eye/> 0</Button>
+            <div className="mt-4 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Eye className="h-4 w-4" />
+                    <span>{views ?? 0}</span>
                 </div>
 
-                <Button className="mt-auto" variant="ghost"><CalendarDays/>{formatted}</Button>
-
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <CalendarDays className="h-4 w-4" />
+                    <span>{formatted}</span>
+                </div>
             </div>
-        </li>);
+        </li>
+    );
 };
 
 export default ReportCard;

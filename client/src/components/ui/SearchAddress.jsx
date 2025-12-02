@@ -58,7 +58,6 @@ function SearchAddress({onValue=''}) {
             ) : null}
             <div className="flex justify-start items-center gap-4 mt-4">
                 <Button onClick={handleSubmitSearch} disabled={search === onValue}>Search</Button>
-                <Button variant='ghost'>Scan with <Bot size={20}/></Button>
             </div>
             <Tooltip
                 anchorSelect=".scan-help"

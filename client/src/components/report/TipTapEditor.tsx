@@ -92,6 +92,8 @@ const Tiptap: React.FC<TiptapProps> = ({ content, onChange, onBlur, error }) => 
     const currentCount = editor.getText().length;
     const isOverLimit = currentCount > MAX_CHARACTERS;
 
+    const ALLOWED_ATTRIBUTES = []
+
     return (
         <div
             className={cn(

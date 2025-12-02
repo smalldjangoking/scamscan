@@ -84,6 +84,7 @@ class ReportAPISchema(BaseModel):
 
     id: int
     report_title: str
+    user_id: int | None = None
     report_description: str
     address: AddressAPISchema | None = None
     slug: str
@@ -99,15 +100,18 @@ class AddressReportSchema(BaseModel):
 
     id: int
     report_title: str
+    user_id: int
     report_description: str
     address_id: int | None = None
     slug: str
     created_at: datetime
     views: int
+    comments_count: int | None = None
 
 class AddressListReportSchema(BaseModel):
     reports: list[AddressReportSchema]
     totalPages: int
+    total_reports: int
 
 
 class SubjectEnum(str, Enum):

@@ -2,6 +2,7 @@ from math import ceil
 
 from fastapi import APIRouter, Query, HTTPException
 from sqlalchemy import select, func
+from sqlalchemy.orm import joinedload
 from starlette import status
 from database_settings import SessionDep
 from models import Addresses, Reports
@@ -54,7 +55,7 @@ async def get_reports(session: SessionDep,
                       )
                       ):
     """Returns Reports by address_id"""
-
+    
     base_query = select(Reports).where(Reports.address_id == address_id)
 
     count_query = select(func.count()).select_from(base_query.subquery())
@@ -68,5 +69,6 @@ async def get_reports(session: SessionDep,
 
     return AddressListReportSchema(
         reports=[AddressReportSchema.model_validate(report) for report in reports],
-        totalPages=total_pages
+        totalPages=total_pages,
+        total_reports=total_count
     )

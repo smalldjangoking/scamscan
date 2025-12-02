@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 fastapi = "0.118.0"
 uvicorn = "*"
-aiosqlite = "*"
 sqlalchemy = "*"
 pydantic = {extras = ["email"], version = "*"}
 passlib = "1.7.4"
@@ -20,6 +19,7 @@ aiosmtplib = "*"
 jinja2 = "*"
 python-slugify = "*"
 slowapi = "*"
+asyncpg = "*"
 
 [dev-packages]
 

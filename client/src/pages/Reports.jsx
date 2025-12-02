@@ -2,30 +2,18 @@ import { Button } from "../components/ui/Button"
 import BurgerFilterMenu from "../components/reports/dropdown"
 import ReportCard from '../components/reports/ReportCard'
 import { useReports } from "../utils/hook.js"
-import React, { useState, useEffect, useMemo } from "react"
+import React, { useState, useEffect } from "react"
 import LoadingSpinner from "../components/ui/Loading.jsx"
-import { useLocation } from "react-router-dom";
 import Input from '../components/ui/Input'
 import { Menu, ListFilter, FileWarning } from "lucide-react"
 import debounce from 'lodash.debounce';
 import Pagination from "../components/ui/Paginator.jsx";
-import { jwtDecode } from "jwt-decode";
+import { Context } from "../main";
+import { observer } from "mobx-react-lite";
+import { useContext } from "react"
 
 export default function Reports() {
-    const location = useLocation();
-    const token = localStorage.getItem('access_token')
-
-    const user_id = useMemo(() => {
-        if (!token) return null;
-        try {
-            const payload = jwtDecode(token);
-            return payload?.sub ?? null;
-        } catch (e) {
-            console.error("Failed to decode token", e);
-            return null;
-        }
-    }, [token]);
-
+    const { store } = useContext(Context)
     const [search, setSearch] = useState('')
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [filterQuery, setFilterQuery] = useState({})
@@ -33,6 +21,8 @@ export default function Reports() {
     const pageSize = 10
     const [userOnly, setUserOnly] = useState(false)
     const debounceSearch = debounce((val) => setDebouncedSearch(val), 1000);
+    const userId = store.userId
+    
 
 
     const { data, isLoading, isError, isFetching } = useReports({
@@ -41,7 +31,7 @@ export default function Reports() {
         pageSize,
         userOnly,
         filterQuery,
-        user_id
+        userId
     })
 
     const reportOptions = [
@@ -91,7 +81,7 @@ export default function Reports() {
                                 Browse
                             </Button>
 
-                            {token && (
+                            {store.accessToken && (
                                 <Button
                                     disabled={userOnly}
                                     variant="ghost"

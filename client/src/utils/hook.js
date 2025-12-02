@@ -4,6 +4,7 @@ import UserService from "../services/userService.js";
 import commentService from "../services/commentService.js"
 import CoinGecko from "../services/CoinGecko.js"
 import AuthService from "../services/authService.js"
+import axios from "axios"
 
 
 export function useReports({ user_id, userOnly = false, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = '' }) {
@@ -32,22 +33,20 @@ export function useReports({ user_id, userOnly = false, page = 1, pageSize = 10,
 
 
 export function useAddress({ value, subject }) {
-
     return useQuery({
         queryKey: ['addresses', { value, subject }],
         queryFn: async () => {
-            const params = new URLSearchParams({
-                value: value.toString(),
-                subject: subject.toString(),
+            const {data} = await axios.get("/api/scan/address", {
+                params: {
+                    value: value.toString(),
+                    subject: subject.toString()
+                }
             })
-
-            const res = await fetch(`/api/scan/address?${params}`)
-
-            if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
-
-            return res.json()
+            console.log(data)
+            return data
         },
         keepPreviousData: true,
+        enabled: !!value && !!subject,
     })
 }
 
@@ -76,14 +75,14 @@ export function useAddrReports({ page = 1, pageSize = 10, address_id = '' }) {
     return useQuery({
         queryKey: ['reports', { page, pageSize, address_id }],
         queryFn: async () => {
-            const params = new URLSearchParams({
-                page: page.toString(),
-                page_size: pageSize.toString(),
+            const { data } = await axios.get(`/api/scan/${address_id}/reports`, {
+                params: {
+                    page: page.toString(),
+                    page_size: pageSize.toString(),
+                }
             })
-
-            const res = await fetch(`/api/scan/${address_id}/reports?${params}`)
-            if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
-            return res.json()
+            console.log(data)
+            return data
         },
         keepPreviousData: true,
         enabled: !!address_id,
@@ -270,7 +269,7 @@ export function useChangePassword() {
     });
 }
 
-export function deleteReport({successToast, failedToast}) {
+export function deleteReport({ successToast, failedToast }) {
     const queryClient = useQueryClient();
 
     return useMutation({
@@ -290,7 +289,7 @@ export function deleteReport({successToast, failedToast}) {
     })
 }
 
-export function deleteAccount({failedToast}) {
+export function deleteAccount({ failedToast }) {
     return useMutation({
         mutationFn: async () => {
             const res = await UserService.deleteUser()

@@ -1,3 +1,4 @@
+import axios from 'axios'
 import $api from '../http/auth'
 
 export default class AuthService {
@@ -19,7 +20,7 @@ export default class AuthService {
     }
 
     static async logout() {
-        return $api.post('/auth/logout')
+        return axios.post('api/auth/logout')
     }
 
     static async changePassword(token, password) {

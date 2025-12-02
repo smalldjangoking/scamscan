@@ -15,6 +15,7 @@ from sqlalchemy.orm import joinedload
 from models import Users
 from fastapi.responses import JSONResponse
 from limiter import limiter
+from services import REFRESH_TOKEN_EXPIRE_DAYS
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
@@ -79,7 +80,8 @@ async def user_login(userbase: UserLoginSchema, session: SessionDep, response: R
         value=refresh_token, 
         httponly=True,
         secure=False,
-        samesite="lax" 
+        samesite="lax",
+        max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
     )
     
     return {
@@ -143,11 +145,7 @@ async def verify_email(token: str, session: SessionDep):
             }
         )
     
-    exp = result.expires_at
-    if exp.tzinfo is None:  # костыль для sqlite
-        exp = exp.replace(tzinfo=timezone.utc)
-
-    if exp < datetime.now(timezone.utc):
+    if result.expires_at < datetime.now(timezone.utc):
         await session.delete(result)
         await session.commit()
         raise HTTPException(status_code=status.HTTP_410_GONE, detail="Token is expired. Please log in to request a new confirmation email.")
@@ -177,11 +175,8 @@ async def password_change(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail="Token doesnt exists. Please create a new token through password restore form")
 
-    exp = result.expires_at
-    if exp.tzinfo is None:  # костыль для sqlite
-        exp = exp.replace(tzinfo=timezone.utc)
 
-    if exp < datetime.now(timezone.utc):
+    if result.expires_at < datetime.now(timezone.utc):
         await session.delete(result)
         await session.commit()
         raise HTTPException(status_code=status.HTTP_410_GONE, detail="Token doesnt exists. Please create a new token through password restore form")

@@ -1,5 +1,5 @@
 import axios from "axios"
-import store from '../store/store'
+import store from "../store/store"
 
 const $api = axios.create({
     withCredentials: true,
@@ -39,7 +39,8 @@ $api.interceptors.response.use(
                 }
             } catch (refreshError) {
                 if (refreshError.response?.status !== 500) {
-                    localStorage.removeItem('access_token')
+                    store.removeAccessToken()
+                    store.addError('Your session has expired. Please sign in again')
                 }
                 return Promise.reject(refreshError);
             }

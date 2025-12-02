@@ -22,23 +22,18 @@ ALLOWED_TAGS = [
     "h1", "h2", "h3",
     "ul", "ol", "li",
     "blockquote",
-    "code", "pre",
-    "a", "hr",
+    "code", "pre", "hr",
 ]
 
-ALLOWED_ATTRIBUTES = {
-    "a": ["href", "target", "rel"],
-}
-
-
 @router.post("/create", status_code=status.HTTP_200_OK)
-@limiter.limit("1/5minutes")
+@limiter.limit("55555/5minutes")
 async def create_report(schema: ReportSchema,
                         session: SessionDep,
                         request: Request,
                         token: str | None = Depends(oauth2_scheme_optional)):
     """Create a new report in the database."""
     user_id = None
+    ALLOWED_ATTRIBUTES = []
 
     if token:
         user_id = access_token_valid(token)
@@ -126,6 +121,7 @@ async def get_all_reports(session: SessionDep,
 
     if category:
         query = query.where(Addresses.subject == category)
+
     if q:
         query = query.where(
             or_(
@@ -134,6 +130,7 @@ async def get_all_reports(session: SessionDep,
                 Addresses.website_url.ilike(f"%{q}%")
             )
         )
+
     if orderby:
         if orderby == "newest":  # default
             query = query.order_by(Reports.id.desc())
@@ -152,7 +149,7 @@ async def get_all_reports(session: SessionDep,
 
     return ReportsListAPISchema(
         reports=[ReportAPISchema.model_validate(report) for report in reports],
-        totalPages=total_pages
+        totalPages=total_pages,
     )
 
 

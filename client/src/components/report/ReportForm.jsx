@@ -284,7 +284,7 @@ function ReportForm() {
                         className="checkbox-custom"
                         {...register("check_box.accepted")}
                     />
-                    <p>I agree with all rules and things</p>
+                    <p>I agree to all terms and conditions.</p>
                 </div>
             </div>
 
