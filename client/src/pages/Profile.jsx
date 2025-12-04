@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import {
     User, AtSign, Calendar, Pencil,
-    Check, X, KeyRound, FileWarning, Trash2, DoorOpen, UserRoundX 
+    Check, X, KeyRound, FileWarning, Trash2, DoorOpen, UserRoundX
 } from "lucide-react";
 import LoadingSpinner from "../components/ui/Loading.jsx"
 import { Button } from "../components/ui/Button.jsx";
@@ -9,8 +9,9 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
-import { useReports, useUserUpdate, useUserPasswordChange, deleteReport, deleteAccount  } from "../utils/hook.js"
+import { useReports, useUserUpdate, useUserPasswordChange, deleteReport, deleteAccount } from "../utils/hook.js"
 import Pagination from "../components/ui/Paginator.jsx";
+import SeoHead from "../components/Seo.jsx"
 
 
 function Profile() {
@@ -154,6 +155,14 @@ function Profile() {
 
     return (
         <section className="relative">
+            <SeoHead
+                title="Your profile"
+                description="Manage your ScamScan account and settings."
+                canonicalUrl="https://scamscan.io/profile"
+                robots="noindex,nofollow"
+                ogType="profile"
+            />
+
             <Toaster />
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
             <div className="container mx-auto px-4 py-20 md:py-28 relative">

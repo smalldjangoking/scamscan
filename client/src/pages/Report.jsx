@@ -1,25 +1,46 @@
-﻿import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect, useContext } from "react";
 import { Button } from "../components/ui/Button";
 import ReportForm from "../components/report/ReportForm"
 import { SquareDashedTopSolid, Cog, Captions, ShieldUser, UserX, Shield, MessageCircle, TrendingUp, History, AlertTriangle, Users, Eye } from 'lucide-react';
 import Authentication from "../components/Authentication.jsx";
+import { Context } from "../main";
+import { observer } from "mobx-react-lite";
+import SeoHead from "../components/Seo.jsx"
 
 function Report() {
+    const { store } = useContext(Context);
     const [step, setStep] = useState(1);
-    const accessToken = localStorage.getItem("access_token");
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const toggleAuth = () => setIsAuthOpen(prev => !prev);
 
     useEffect(() => {
-        if (accessToken) {
+        if (store.accessToken) {
             setStep(2);
         }
-    }, [accessToken]);
+    }, [store.accessToken]);
 
     return (
         <>
             <section className="relative">
                 <Authentication isOpen={isAuthOpen} onClose={toggleAuth} authVar='register' />
+                <SeoHead
+                    title="Submit a Cryptocurrency Scam Report | ScamScan"
+                    description="Report a fraudulent cryptocurrency wallet or suspicious website anonymously or as a registered user. Help the community stay safe."
+                    canonicalUrl="https://scamscan.io/report"
+                    robots="noindex,nofollow"
+                    ogType="website"
+                    ogImage="https://scamscan.io/static/logo.svg"
+                    twitterCard="summary_large_image"
+                    twitterImage="https://scamscan.io/static/logo.svg"
+                    keywords={[
+                        "submit crypto scam report",
+                        "report suspicious wallet",
+                        "fraud report form",
+                        "report scam website",
+                        "crypto scam submission",
+                    ]}
+                />
+
 
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
                 <div className="relative container mx-auto px-4 py-20 md:py-28 min-h-screen">
@@ -161,4 +182,4 @@ function Report() {
     )
 }
 
-export default Report;
+export default observer(Report);

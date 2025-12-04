@@ -43,6 +43,15 @@ class UpdateUserInfoSchema(BaseModel):
     surname: str | None = None
     nickname: str | None = None
 
+class UserVote(BaseModel):
+    value: int
+
+    @model_validator(mode="after")
+    def vote_number_of_two(cls, data):
+        if data.value not in [-1, 1]:
+            raise ValueError("Vote must be only in two positions")
+        return data
+
 class ReportSchema(BaseModel):
     subject: str
     report_title: str
@@ -99,8 +108,7 @@ class AddressReportSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    report_title: str
-    user_id: int
+    report_title: str 
     report_description: str
     address_id: int | None = None
     slug: str

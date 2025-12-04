@@ -9,6 +9,7 @@ import Authentication from "../components/Authentication";
 import { useChangePassword, useTokenCheck } from "../utils/hook"
 import LoadingSpinner from "../components/ui/Loading"
 import { Input } from "../components/ui/Input"
+import SeoHead from "../components/Seo";
 
 export default observer(function Confirm() {
   const navigate = useNavigate()
@@ -42,6 +43,30 @@ export default observer(function Confirm() {
         onClose={toggleAuth}
         authVar={authVariant}
       />
+
+      <SeoHead
+        title={
+          option === "email"
+            ? "Email Confirmation | ScamScan"
+            : option === "password"
+              ? "Reset Your Password | ScamScan"
+              : "Account Confirmation | ScamScan"
+        }
+        description={
+          option === "email"
+            ? "Confirm your email to activate your ScamScan account."
+            : option === "password"
+              ? "Set a new password for your ScamScan account."
+              : "ScamScan account confirmation page."
+        }
+        canonicalUrl={`https://scamscan.io/confirm/${option}/${token}`}
+        robots="noindex,nofollow"
+        ogType="website"
+        ogImage="https://scamscan.io/static/logo.svg"
+        twitterCard="summary_large_image"
+        twitterImage="https://scamscan.io/static/logo.svg"
+      />
+
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
       <div className="relative container mx-auto px-4 py-20 md:py-28 min-h-screen">
 

@@ -1,8 +1,19 @@
 import { Check } from "lucide-react";
+import SeoHead from "../components/Seo"
 
 function CookiePolicy() {
     return (
         <section className="relative">
+            <SeoHead
+                title="Cookie Policy — ScamScan.io"
+                description="Learn how ScamScan.io uses only strictly necessary cookies for authentication and security. No tracking, analytics, or advertising cookies used."
+                canonicalUrl="https://scamscan.io/cookies"
+                robots="index,follow"
+                ogType="website"
+                ogImage="https://scamscan.io/static/logo.svg"
+                twitterCard="summary_large_image"
+                twitterImage="https://scamscan.io/static/logo.svg"
+            />
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
             <div className="container mx-auto px-4 py-20 md:py-28 relative">
                 <div className="mx-auto mb-12 max-w-6xl">
@@ -58,7 +69,7 @@ function CookiePolicy() {
                                         <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                                         <span>
                                             <span className="font-medium text-foreground">Authentication Cookie
-                                            (Refresh Token)</span> – used to keep you logged in securely and refresh
+                                                (Refresh Token)</span> – used to keep you logged in securely and refresh
                                             your session. Stored as an HTTP-only, Secure cookie.
                                         </span>
                                     </li>
@@ -68,7 +79,7 @@ function CookiePolicy() {
                                         <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                                         <span>
                                             <span className="font-medium text-foreground">Cloudflare Security
-                                            Cookies</span> – automatically placed to protect against DDoS attacks,
+                                                Cookies</span> – automatically placed to protect against DDoS attacks,
                                             bots, abuse, and malicious traffic.
                                         </span>
                                     </li>

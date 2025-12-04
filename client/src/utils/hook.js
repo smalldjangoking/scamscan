@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import reportService from "../services/reportService"
-import UserService from "../services/userService.js";
-import commentService from "../services/commentService.js"
-import CoinGecko from "../services/CoinGecko.js"
-import AuthService from "../services/authService.js"
+import UserService from "../services/userService";
+import commentService from "../services/commentService"
+import CoinGecko from "../services/CoinGecko"
+import AddressService from "../services/addressService"
+import AuthService from "../services/authService"
 import axios from "axios"
 
 
@@ -36,13 +37,12 @@ export function useAddress({ value, subject }) {
     return useQuery({
         queryKey: ['addresses', { value, subject }],
         queryFn: async () => {
-            const {data} = await axios.get("/api/scan/address", {
+            const { data } = await axios.get("/api/scan/address", {
                 params: {
                     value: value.toString(),
                     subject: subject.toString()
                 }
             })
-            console.log(data)
             return data
         },
         keepPreviousData: true,
@@ -81,7 +81,6 @@ export function useAddrReports({ page = 1, pageSize = 10, address_id = '' }) {
                     page_size: pageSize.toString(),
                 }
             })
-            console.log(data)
             return data
         },
         keepPreviousData: true,
@@ -299,4 +298,32 @@ export function deleteAccount({ failedToast }) {
             failedToast("An Error! Account wasn't deleted!")
         }
     })
+}
+
+
+export function likeDislikeMutation() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ addressId, value }) => {
+            const res = await AddressService.createLikesDislikes(addressId, value)
+            return res
+        },
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries({
+                queryKey: ['address', 'likeDislike', variables.addressId],
+            });
+        }
+    })
+}
+
+export function useLikeDislike(addressId) {
+    return useQuery({
+        queryKey: ['address', 'likeDislike', addressId],
+        enabled: !!addressId,
+        keepPreviousData: true,
+        queryFn: async () => {
+            const { data } = await AddressService.getLikesDislikes(addressId)
+            return data
+        },
+    });
 }

@@ -2,11 +2,36 @@ import { Button } from "../components/ui/Button.jsx";
 import { TriangleAlert, Bot } from "lucide-react";
 import SearchAddress from "../components/ui/SearchAddress.jsx";
 import { useNavigate } from "react-router-dom";
+import SeoHead from "../components/Seo.jsx"
 
 export default function Scan() {
-    const navigate = useNavigate()
+  const navigate = useNavigate()
   return (
     <section className="relative">
+      {/* Meta */}
+      <SeoHead
+        title="Scan crypto addresses and websites"
+        description="Instantly scan crypto wallet addresses and suspicious websites on ScamScan.io to see if the community has reported them as scams or high-risk."
+        canonicalUrl="https://scamscan.io/scan"
+        robots="index,follow"
+        ogType="website"
+        ogImage="https://scamscan.io/static/logo.svg"
+        twitterCard="summary_large_image"
+        twitterImage="https://scamscan.io/static/logo.svg"
+        keywords={[
+          "scan crypto address",
+          "check crypto wallet for scam",
+          "is this wallet safe",
+          "crypto scam checker tool",
+          "scan scam website",
+          "check suspicious crypto link",
+          "crypto address reputation",
+          "wallet risk checker",
+          "blockchain scam lookup",
+          "ScamScan scanner",
+        ]}
+      />
+
       {/* мягкий градиентный фон */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
 

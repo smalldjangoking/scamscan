@@ -1,6 +1,19 @@
+import SeoHead from "../components/Seo"
+
 function PrivacyPolicy() {
     return (
         <section className="relative">
+            <SeoHead
+                title="Privacy Policy | ScamScan.io"
+                description="Learn how ScamScan.io collects, uses, and protects your personal information in accordance with GDPR, CCPA, and other global data privacy laws."
+                canonicalUrl="https://scamscan.io/privacy"
+                robots="index,follow"
+                ogType="article"
+                ogImage="https://scamscan.io/static/logo.svg"
+                twitterCard="summary_large_image"
+                twitterImage="https://scamscan.io/static/logo.svg"
+            />
+
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
             <div className="container mx-auto px-4 py-20 md:py-28 relative">
                 <div className="mx-auto mb-12 max-w-6xl">

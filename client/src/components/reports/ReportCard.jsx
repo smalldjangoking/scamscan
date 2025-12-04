@@ -17,7 +17,6 @@ const ReportCard = ({
     views,
 }) => {
     const navigate = useNavigate();
-    console.log(user_id)
 
     const rawDescription = report_description || "";
     const cleanDescription = DOMPurify.sanitize(rawDescription, {

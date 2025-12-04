@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from sqlalchemy import DateTime, func, String, Boolean, JSON, Integer
+from sqlalchemy import DateTime, func, String, Boolean, JSON, Integer, CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 from database_settings import engine
@@ -62,12 +62,25 @@ class Addresses(Base):
     crypto_address: Mapped[str | None] = mapped_column(String, nullable=True, index=True, unique=True)
     crypto_name: Mapped[str | None] = mapped_column(String, nullable=True, unique=True)
     crypto_logo_url: Mapped[str | None] = mapped_column(String, nullable=True)
-
-    likes: Mapped[int] = mapped_column(Integer, default=0)
-    dislikes: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     reports: Mapped[list["Reports"]] = relationship(back_populates="address", passive_deletes=True)
+
+
+class Address_votes(Base):
+    __tablename__ = "address_votes"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    address_id: Mapped[int] = mapped_column(ForeignKey("addresses.id", ondelete="CASCADE"), nullable=False)
+    value: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    addresses: Mapped["Addresses"] = relationship(passive_deletes=True)
+
+    __table_args__ = (
+        CheckConstraint("value IN (-1, 1)", name="ck_address_votes_value"),
+        UniqueConstraint("user_id", "address_id", name="uq_user_address_vote")
+    )
 
 
 class Comments(Base):

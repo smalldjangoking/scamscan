@@ -5,11 +5,13 @@ import { useAddress, useAddrReports } from "../utils/hook.js";
 import SearchAddress from "../components/ui/SearchAddress.jsx";
 import LoadingSpinner from "../components/ui/Loading.jsx";
 import { Button } from "../components/ui/Button.jsx";
-import LikeDislike from "../components/scan/LikesDislike.jsx";
+import LikeDislike from "../components/scan/LikeDislike.jsx";
 import ReportCard from "../components/reports/ReportCard.jsx";
 import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
 import Pagination from "../components/ui/Paginator.jsx";
+import SeoHead from "../components/Seo.jsx"
+import { useLocation } from "react-router-dom";
 
 import {
   FileWarning,
@@ -18,11 +20,11 @@ import {
   Clock8,
   Copy,
   ExternalLink,
-  ShieldAlert,
 } from "lucide-react";
 
 export default function ScanDetail() {
   const { web_url, crypto_address } = useParams();
+  const location = useLocation()
 
   const queryValue = web_url || crypto_address;
   const querySubject = web_url ? "website" : "crypto";
@@ -86,10 +88,51 @@ export default function ScanDetail() {
       .catch(() => { });
   };
 
-  const website = addressData?.address?.website_url;
-
   return (
     <section className="relative min-h-screen">
+      {/* Meta */}
+
+      <SeoHead
+        title={
+          crypto_address
+            ? `Scam reports for ${crypto_address} | Crypto address lookup`
+            : `Scam reports for ${web_url} | Website scam scanner`
+        }
+        description={
+          crypto_address
+            ? `Scan reports, community ratings and fraud history for crypto wallet address ${crypto_address}. Check if this blockchain address is risky or has scam activity.`
+            : `Investigate ${web_url} for scam reports, fraud detection, and reputation signals. See what the community says about this domain.`
+        }
+        canonicalUrl={`https://scamscan.io${location.pathname}`}
+        robots="index,follow"
+        ogType="article"
+        ogImage="https://scamscan.io/static/logo.svg"
+        twitterCard="summary_large_image"
+        twitterImage="https://scamscan.io/static/logo.svg"
+        keywords={[
+          "crypto scam report",
+          "blockchain fraud detection",
+          "crypto address lookup",
+          "scam website reports",
+          "crypto risk scanner",
+          "wallet investigation tool",
+          ...(crypto_address
+            ? [
+              `${crypto_address} scam`,
+              `${crypto_address} wallet report`,
+              `check ${crypto_address} reputation`,
+            ]
+            : []),
+          ...(web_url
+            ? [
+              `${web_url} scam`,
+              `${web_url} fraud review`,
+              `${web_url} domain reputation`,
+            ]
+            : []),
+        ]}
+      />
+
       {/* background gradient */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
 
@@ -109,7 +152,7 @@ export default function ScanDetail() {
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <FileWarning className="h-10 w-10 text-muted-foreground mb-3" />
               <p className="text-muted-foreground">
-                Address not found or unreachable.
+                Address not found.
               </p>
             </div>
           ) : (
@@ -158,7 +201,7 @@ export default function ScanDetail() {
                         {copied ? "Copied" : "Copy value"}
                       </Button>
 
-                      {!crypto_address && website && (
+                      {!crypto_address && web_url && (
                         <Button
                           variant="outline"
                           className="h-8 px-3 text-xs"
@@ -168,7 +211,7 @@ export default function ScanDetail() {
                             href={
                               website.startsWith("http")
                                 ? website
-                                : `https://${website}`
+                                : `https://${web_url}`
                             }
                             target="_blank"
                             rel="noopener noreferrer"
@@ -198,7 +241,7 @@ export default function ScanDetail() {
                 {/* Useful Links + LikeDislike + WHOIS */}
                 <div className="grid gap-4 lg:gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
                   <div className="space-y-4">
-                    {website && (
+                    {web_url && (
                       <div className="flex flex-col border rounded-xl bg-background/60 p-4 gap-3">
                         <p className="text-sm font-medium">
                           Security tools &amp; OSINT
@@ -209,7 +252,7 @@ export default function ScanDetail() {
                         <div className="flex flex-wrap justify-start gap-2">
                           <Button variant="ghost" asChild>
                             <a
-                              href={`https://www.virustotal.com/gui/home/search/${website}`}
+                              href={`https://www.virustotal.com/gui/home/search/${web_url}`}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
@@ -222,7 +265,7 @@ export default function ScanDetail() {
                           </Button>
                           <Button variant="ghost" asChild>
                             <a
-                              href={`https://web.archive.org/web/*/${website}`}
+                              href={`https://web.archive.org/web/*/${web_url}`}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
@@ -235,7 +278,7 @@ export default function ScanDetail() {
                           </Button>
                           <Button variant="ghost" asChild>
                             <a
-                              href={`https://whois.com/whois/${website}`}
+                              href={`https://whois.com/whois/${web_url}`}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
@@ -250,7 +293,7 @@ export default function ScanDetail() {
                       </div>
                     )}
 
-                      <LikeDislike />
+                    <LikeDislike addressId={addressId}/>
                   </div>
 
                   {/* WHOIS block only for websites (заглушка) */}

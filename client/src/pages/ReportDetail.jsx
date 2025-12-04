@@ -6,6 +6,7 @@ import { BackButton } from '../components/ui/GoBack.jsx'
 import { Context } from "../main.jsx";
 import { observer } from "mobx-react-lite";
 import Comments from "../components/reports/Comments.jsx"
+import SeoHead from "../components/Seo.jsx";
 
 import {
     HatGlasses,
@@ -34,11 +35,54 @@ export default observer(function ReportDetail() {
     const [shareOpen, setShareOpen] = useState(false)
 
 
-
-
-
     return (
         <section className="relative min-h-screen" >
+
+            <SeoHead
+                title={
+                    reportIsLoading
+                        ? `Scam report: ${slug}`
+                        : reportData?.address?.crypto_address
+                            ? `Scam reports for ${reportData.address.crypto_address}`
+                            : `Scam reports for ${reportData.address.website_url}`
+                }
+                description={
+                    reportIsLoading
+                        ? `Scam report detail for ${slug}. Review fraud history and community feedback.`
+                        : reportData?.address?.crypto_address
+                            ? `Scan reports, community ratings and fraud history for crypto wallet address ${reportData.address.crypto_address}. Check if this blockchain address is risky or has scam activity.`
+                            : `Investigate ${reportData.address.website_url} for scam reports, fraud detection, and reputation signals. See what the community says about this domain.`
+                }
+                canonicalUrl={`https://scamscan.io/report/${slug}`}
+                ogType="article"
+                ogImage={reportData?.address?.crypto_logo_url || "https://scamscan.io/static/logo.svg"}
+                twitterImage={reportData?.address?.crypto_logo_url || "https://scamscan.io/static/logo.svg"}
+                keywords={[
+                    "crypto scam report",
+                    "blockchain fraud detection",
+                    "crypto address lookup",
+                    "scam website reports",
+                    "crypto risk scanner",
+                    "wallet investigation tool",
+                    ...(reportData?.address?.crypto_address
+                        ? [
+                            `${reportData.address.crypto_address} scam`,
+                            `${reportData.address.crypto_address} wallet report`,
+                            `check ${reportData.address.crypto_address} reputation`,
+                        ]
+                        : []),
+                    ...(reportData?.address?.website_url
+                        ? [
+                            `${reportData.address.website_url} scam`,
+                            `${reportData.address.website_url} fraud review`,
+                            `${reportData.address.website_url} domain reputation`,
+                        ]
+                        : slug
+                            ? [`${slug} scam report`]
+                            : []),
+                ]}
+            />
+
             <div
                 className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
             <div className="relative container mx-auto py-10 px-2 md:py-20">

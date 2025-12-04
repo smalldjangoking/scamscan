@@ -2,8 +2,9 @@ import { Button } from "../components/ui/Button.jsx"
 import { AlertTriangle, Badge, BookText, Star } from "lucide-react"
 import { Input } from "../components/ui/Input.jsx"
 import { ArrowRight, Search } from "lucide-react"
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import SeoHead  from "../components/Seo.jsx"
 
 
 function Home() {
@@ -14,6 +15,29 @@ function Home() {
     return (
         <>
             <section className="relative">
+                <SeoHead
+                    title="Search and Report crypto scams"
+                    description="ScamScan.io is a community-driven database of reports on suspicious crypto addresses, scam websites, and fraudulent blockchain projects."
+                    canonicalUrl="https://scamscan.io/"
+                    robots="index,follow"
+                    ogType="website"
+                    ogImage="https://scamscan.io/static/logo.svg"
+                    twitterCard="summary_large_image"
+                    twitterImage="https://scamscan.io/static/logo.svg"
+                    keywords={[
+                        "crypto scam checker",
+                        "cryptocurrency scam reports",
+                        "wallet address scanner",
+                        "blockchain fraud detection",
+                        "crypto address lookup",
+                        "scam website database",
+                        "crypto investigation tool",
+                        "scam address report",
+                        "crypto fraud alerts",
+                        "crypto safety checker",
+                    ]}
+                />
+
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
                 <div className="container mx-auto px-4 py-24 md:py-32 relative">
                     <div className="max-w-5xl mx-auto text-center">

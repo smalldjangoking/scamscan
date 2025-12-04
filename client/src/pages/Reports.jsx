@@ -9,8 +9,8 @@ import { Menu, ListFilter, FileWarning } from "lucide-react"
 import debounce from 'lodash.debounce';
 import Pagination from "../components/ui/Paginator.jsx";
 import { Context } from "../main";
-import { observer } from "mobx-react-lite";
 import { useContext } from "react"
+import SeoHead from "../components/Seo.jsx"
 
 export default function Reports() {
     const { store } = useContext(Context)
@@ -22,7 +22,7 @@ export default function Reports() {
     const [userOnly, setUserOnly] = useState(false)
     const debounceSearch = debounce((val) => setDebouncedSearch(val), 1000);
     const userId = store.userId
-    
+
 
 
     const { data, isLoading, isError, isFetching } = useReports({
@@ -60,6 +60,28 @@ export default function Reports() {
 
     return (
         <section className="relative">
+            <SeoHead
+                title="Explore all scam reports"
+                description="Browse all community-submitted reports on suspicious crypto wallet addresses, scam websites, and fraudulent blockchain projects on ScamScan.io."
+                canonicalUrl="https://scamscan.io/reports"
+                robots="index,follow"
+                ogType="website"
+                ogImage="https://scamscan.io/static/logo.svg"
+                twitterCard="summary_large_image"
+                twitterImage="https://scamscan.io/static/logo.svg"
+                keywords={[
+                    "crypto scam reports",
+                    "browse scam reports",
+                    "crypto address blacklist",
+                    "scam website reports",
+                    "cryptocurrency fraud database",
+                    "user generated scam reports",
+                    "blockchain scam intelligence",
+                    "crypto due diligence tool",
+                    "crypto risk monitoring",
+                    "ScamScan reports explorer",
+                ]}
+            />
             <div
                 className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
             <div className="relative container mx-auto py-10 px-2 md:py-20">

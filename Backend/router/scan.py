@@ -1,13 +1,12 @@
 from math import ceil
 
-from fastapi import APIRouter, Query, HTTPException
-from sqlalchemy import select, func
-from sqlalchemy.orm import joinedload
+from fastapi import APIRouter, Query, HTTPException, Depends, Path
+from sqlalchemy import select, func, case
 from starlette import status
 from database_settings import SessionDep
-from models import Addresses, Reports
-from schemas import SubjectEnum, AddressAPISchema
-from schemas import AddressListReportSchema, AddressReportSchema
+from models import Addresses, Reports, Address_votes
+from schemas import AddressListReportSchema, AddressReportSchema, UserVote, SubjectEnum, AddressAPISchema
+from services import access_token_valid
 
 router = APIRouter(prefix="/api/scan", tags=["scan"])
 
@@ -72,3 +71,56 @@ async def get_reports(session: SessionDep,
         totalPages=total_pages,
         total_reports=total_count
     )
+
+@router.post('/{address_id}/vote', status_code=status.HTTP_200_OK)
+async def add_vote(session: SessionDep,
+                   vote: UserVote,
+                   address_id: int = Path(...,),
+                   user_id: int = Depends(access_token_valid),
+                   ):
+    """Creates a vote from user"""
+
+    user_vote = await (session
+                 .scalar(select(Address_votes)
+                         .where(
+                             Address_votes.address_id == address_id,
+                             Address_votes.user_id == user_id)))
+    
+    if not user_vote:
+        new_vote = Address_votes(
+            user_id = user_id,
+            address_id = address_id,
+            value = vote.value,
+            )
+        session.add(new_vote)
+    
+    elif user_vote.value == vote.value:
+        await session.delete(user_vote)
+
+    elif user_vote.value != vote.value:
+        user_vote.value = vote.value
+
+    await session.commit()
+    return {'status': 'ok'}
+
+
+@router.get('/{address_id}/votes', status_code=status.HTTP_200_OK)
+async def get_votes(session: SessionDep,
+                    address_id: int = Path(...,)):
+    """Retrive all votes [Like, Dislike] by address_id"""
+
+    result = await (session
+                   .execute(
+                       select(
+                           func.count(case((Address_votes.value == 1, 1))).label("likes"),
+                           func.count(case((Address_votes.value == -1, 1))).label("dislikes")
+                           )
+                           .where(Address_votes.address_id == address_id)))
+    
+    row = result.one()
+    
+    return {
+        "status": "ok",
+        "likes": row.likes,
+        "dislikes": row.dislikes
+    }

@@ -1,6 +1,18 @@
+import SeoHead from "../components/Seo"
+
 function TermsOfService() {
     return (
         <section className="relative">
+            <SeoHead
+                title="Terms of Service — ScamScan.io"
+                description="Read the Terms of Service for ScamScan.io. Learn about user responsibilities, content policies, and conditions for using our crypto scam reporting platform."
+                canonicalUrl="https://scamscan.io/terms"
+                robots="index,follow"
+                ogType="website"
+                ogImage="https://scamscan.io/static/logo.svg"
+                twitterCard="summary_large_image"
+                twitterImage="https://scamscan.io/static/logo.svg"
+            />
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
             <div className="container mx-auto px-4 py-20 md:py-28 relative">
                 <div className="mx-auto mb-12 max-w-6xl">
