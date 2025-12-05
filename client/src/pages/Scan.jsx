@@ -32,14 +32,11 @@ export default function Scan() {
         ]}
       />
 
-      {/* мягкий градиентный фон */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
 
       <div className="relative container mx-auto px-2 py-8 md:py-16 max-w-4xl">
-        {/* основной поисковый компонент */}
         <SearchAddress />
 
-        {/* инфо-алерт */}
         <div
           className="mt-5 flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-muted-foreground"
           role="alert"

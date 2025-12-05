@@ -3,7 +3,6 @@ from enum import Enum
 from pydantic import BaseModel, EmailStr, model_validator, ConfigDict, Field
 from typing import Annotated
 
-
 class UserRegistrationSchema(BaseModel):
     email: EmailStr
     password: Annotated[

@@ -10,6 +10,7 @@ import secrets
 from models import Email_tokens
 import logging
 from fastapi.security import OAuth2PasswordBearer
+import re
 
 load_dotenv()
 

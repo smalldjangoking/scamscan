@@ -39,16 +39,22 @@ async def create_report(schema: ReportSchema,
         user_id = access_token_valid(token)
 
     try:
-        response = await session.execute(
-            select(Addresses).where(
-                or_(
-                    Addresses.crypto_address == schema.crypto_address,
-                    Addresses.website_url == schema.website_url,
-                )
-            )
-        )
+        query = select(Addresses)
 
-        address = response.scalar_one_or_none()
+        if schema.subject == "crypto":
+            query = query.where(
+                Addresses.crypto_address == schema.crypto_address,
+                Addresses.crypto_name == schema.crypto_name,
+                )
+
+        elif schema.subject == "website":
+            query = query.where(
+                Addresses.website_url == schema.website_url,
+                )
+        
+        response = await session.execute(query)
+        address = response.scalar()
+        print(address)
 
         address_data = {
             "website_url": schema.website_url,
@@ -57,23 +63,24 @@ async def create_report(schema: ReportSchema,
             "crypto_logo_url": schema.crypto_logo_url,
             "subject": schema.subject,
         }
-
         slug = slugify(schema.report_title)
-        report_data = schema.model_dump(exclude=set(address_data.keys()))
 
         if not address:
             address = Addresses(**address_data)
             session.add(address)
             await session.flush()
 
-        report = Reports(**report_data, address_id=address.id, slug=slug)
+        report = Reports(
+            **schema.model_dump(exclude=set(address_data.keys())),
+            address_id=address.id,
+            slug=slug
+            )
         
         report.report_description = bleach.clean(
             report.report_description,
             tags=ALLOWED_TAGS,
             attributes=ALLOWED_ATTRIBUTES,
             strip=True)
-        #raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(report.report_description))
 
         if user_id:
             report.user_id = int(user_id)

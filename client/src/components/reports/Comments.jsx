@@ -7,7 +7,7 @@ import CommentCard from "../comments/CommentCard"
 import InfiniteScroll from 'react-infinite-scroll-component';
 import CreateComment from "../comments/CreateComment"
 
-export default function Comments({ reportId }) {
+export default function Comments({ reportId, report_owner }) {
 
     const {
         data,
@@ -40,7 +40,7 @@ export default function Comments({ reportId }) {
                 loader={<div className="flex justify-center py-4"><LoadingSpinner /></div>}
             >
                 {comments.map((c) => (
-                    <CommentCard key={c.id} items={c} reportId={reportId} />
+                    <CommentCard key={c.id} items={c} reportId={reportId} report_owner={report_owner} />
                 ))}
             </InfiniteScroll>
         </div>

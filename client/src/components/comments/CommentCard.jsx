@@ -1,12 +1,12 @@
 import { format } from 'timeago.js';
-import { Ellipsis } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { Button } from "../ui/Button"
 import { Context } from "../../main";
 import { observer } from "mobx-react-lite";
 import { useContext, useState } from "react"
 import CreateComment from "../comments/CreateComment"
 
-export default observer(function CommentCard({ items, reportId, isReply = false }) {
+export default observer(function CommentCard({ items, reportId, report_owner, isReply = false }) {
     const { store } = useContext(Context)
     const [reply, setReply] = useState(false)
     const [openReplyComments, setOpenReplyComments] = useState(false)
@@ -35,6 +35,12 @@ export default observer(function CommentCard({ items, reportId, isReply = false 
                                 >
                                     {items.user.nickname}
                                 </p>
+
+                                {items.user_id === report_owner &&
+                                    <span className="ml-2 px-2 py-0.5 text-[10px] rounded-md bg-primary/10 text-primary font-medium">
+                                        Report author
+                                    </span>}
+
                                 <span
                                     className={
                                         "text-gray-500 font-medium leading-none " +
@@ -51,9 +57,9 @@ export default observer(function CommentCard({ items, reportId, isReply = false 
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className={isReply ? "h-7 w-7" : "h-8 w-8"}
+                                    className={isReply ? "h-5 w-5" : "h-6 w-6"}
                                 >
-                                    <Ellipsis className="h-4 w-4" />
+                                    <Trash2 className="h-4 w-4" />
                                 </Button>
                             </div>
                         )}
@@ -61,7 +67,7 @@ export default observer(function CommentCard({ items, reportId, isReply = false 
 
                     <div
                         className={
-                            "mt-2 text-foreground break-words " +
+                            "mt-3 text-foreground break-words " +
                             (isReply ? "text-xs sm:text-sm" : "text-sm sm:text-[15px]")
                         }
                     >

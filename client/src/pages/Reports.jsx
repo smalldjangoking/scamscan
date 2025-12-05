@@ -20,9 +20,11 @@ export default function Reports() {
     const [page, setPage] = useState(1)
     const pageSize = 10
     const [userOnly, setUserOnly] = useState(false)
-    const debounceSearch = debounce((val) => setDebouncedSearch(val), 1000);
-    const userId = store.userId
-
+    const user_id = store.userId
+    const debounceSearch = React.useMemo(
+        () => debounce((val) => setDebouncedSearch(val), 500),
+        []
+    );
 
 
     const { data, isLoading, isError, isFetching } = useReports({
@@ -31,7 +33,7 @@ export default function Reports() {
         pageSize,
         userOnly,
         filterQuery,
-        userId
+        user_id
     })
 
     const reportOptions = [
@@ -51,11 +53,12 @@ export default function Reports() {
         { id: "viewed", label: "Most Viewed" },
     ];
 
-
     useEffect(() => {
         debounceSearch(search);
-        return () => debounceSearch.cancel();
-    }, [search]);
+        return () => {
+            debounceSearch.cancel();
+        };
+    }, [search, debounceSearch]);
 
 
     return (
@@ -84,7 +87,7 @@ export default function Reports() {
             />
             <div
                 className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
-            <div className="relative container mx-auto py-10 px-2 md:py-20">
+            <div className="relative container mx-auto py-10 px-2 md:py-20 md:max-w-4xl">
                 <h2 className="text-4xl font-bold">Reports Explorer</h2>
                 <p className="text-muted-foreground max-w-2xl text-lg">
                     A complete list of all reports collected on the platform.
@@ -150,21 +153,21 @@ export default function Reports() {
                             </div>
                         ) : isError ? (
                             <div>Error</div>
-                        ) : data?.reports.length > 0 ? (
+                        ) : data?.reports?.length > 0 ? (
                             (<ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                                 {data?.reports.map((report) => (
                                     <ReportCard
                                         key={report.id}
-                                        report_title={report.report_title}
-                                        report_description={report.report_description}
-                                        created_at={report.created_at}
-                                        user_id={report.user_id}
+                                        report_title={report?.report_title}
+                                        report_description={report?.report_description}
+                                        created_at={report?.created_at}
+                                        user_id={report?.user_id}
                                         crypto_name={report?.address.crypto_name}
                                         crypto_logo_url={report?.address.crypto_logo_url}
                                         website_url={report?.address.website_url}
                                         crypto_address={report?.address.crypto_address}
-                                        slug={report.slug}
-                                        id={report.id}
+                                        slug={report?.slug}
+                                        id={report?.id}
                                     />
                                 ))}
                             </ul>)

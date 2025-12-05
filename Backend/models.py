@@ -60,7 +60,7 @@ class Addresses(Base):
     subject: Mapped[str] = mapped_column(nullable=False)
     website_url: Mapped[str | None] = mapped_column(String, nullable=True, index=True, unique=True)
     crypto_address: Mapped[str | None] = mapped_column(String, nullable=True, index=True, unique=True)
-    crypto_name: Mapped[str | None] = mapped_column(String, nullable=True, unique=True)
+    crypto_name: Mapped[str | None] = mapped_column(String, nullable=True)
     crypto_logo_url: Mapped[str | None] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

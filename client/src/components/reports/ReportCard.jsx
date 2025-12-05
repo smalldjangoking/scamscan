@@ -1,4 +1,4 @@
-import { Globe, CalendarDays, HatGlasses, Eye, User } from "lucide-react";
+import { Globe, CalendarDays, HatGlasses, Eye, User, Wallet } from "lucide-react";
 import { Button } from "../ui/Button";
 import DOMPurify from "dompurify";
 import { useNavigate } from "react-router-dom";
@@ -59,27 +59,27 @@ const ReportCard = ({
             className={`flex flex-col min-w-[250px] min-h-[250px] rounded border p-5 shadow-md transform transition duration-300 md:hover:scale-101 hover:shadow-lg ${user_id ? "border-green-500" : "border"
                 }`}
         >
-            <div className="flex justify-between">
-                <div className="mb-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                            {user_id ? (
-                                <>
-                                    <User className="h-4 w-4" /> Registered user
-                                </>
-                            ) : (
-                                <>
-                                    <HatGlasses className="h-4 w-4" /> Guest report
-                                </>
-                            )}
-                        </span>
-                    </div>
+            <div className="flex justify-between items-center">
+                {/* LEFT SIDE */}
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    {user_id ? (
+                        <>
+                            <User className="h-7 w-7" />
+                            <span>Registered user</span>
+                        </>
+                    ) : (
+                        <>
+                            <HatGlasses className="h-7 w-7" />
+                            <span>Guest report</span>
+                        </>
+                    )}
                 </div>
 
+                {/* RIGHT SIDE */}
                 {(crypto_name || isWebsite) && (
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         {crypto_name ? (
-                            <div className="flex items-center gap-2">
+                            <>
                                 <div className="flex h-7 w-7 items-center justify-center rounded-full border">
                                     <img
                                         src={crypto_logo_url}
@@ -88,31 +88,47 @@ const ReportCard = ({
                                     />
                                 </div>
                                 <span className="uppercase tracking-wide">{crypto_name}</span>
-                            </div>
+                            </>
                         ) : (
-                            <div className="flex items-center gap-2">
+                            <>
                                 <div className="flex h-7 w-7 items-center justify-center rounded-full border">
                                     <Globe className="h-4 w-4" />
                                 </div>
-                                <span className="uppercase tracking-wide">Website report</span>
-                            </div>
+                                <span className="uppercase tracking-wide">Website</span>
+                            </>
                         )}
                     </div>
                 )}
             </div>
 
+
             {(crypto_address || website_url) && (
-                <div className="mb-3 flex items-center justify-between gap-2">
+                <div className="mt-3 mb-3">
                     <Button
                         onClick={handleScanNavigate}
-                        className="flex max-w-[200px] items-center gap-1 text-xs"
                         size="sm"
                         variant="ghost"
+                        className="flex items-center gap-2 text-xs px-3 py-2
+                       rounded-lg border border-border hover:bg-accent/30 
+                       transition max-w-full"
                     >
-                        {crypto_address ? (crypto_address) : (website_url)}
+                        {/* Иконка — crypto или website */}
+                        <span className="flex h-5 w-5 items-center justify-center rounded-md bg-muted">
+                            {crypto_address ? (
+                                <Wallet className="h-3 w-3 text-muted-foreground" />
+                            ) : (
+                                <Globe className="h-3 w-3 text-muted-foreground" />
+                            )}
+                        </span>
+
+                        {/* Сам адрес — красиво обрезан */}
+                        <span className="truncate max-w-[180px] text-left font-medium">
+                            {crypto_address || website_url}
+                        </span>
                     </Button>
                 </div>
             )}
+
 
             <div
                 onClick={handleOpenDetails}

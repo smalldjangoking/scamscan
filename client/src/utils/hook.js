@@ -9,6 +9,7 @@ import axios from "axios"
 
 
 export function useReports({ user_id, userOnly = false, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = '' }) {
+    console.log(user_id, userOnly)
     return useQuery({
         queryKey: ['reports', { debouncedSearch, page, pageSize, userOnly, filterQuery, user_id }],
         queryFn: async () => {
@@ -98,7 +99,6 @@ export function useSingleReport(id) {
 
             if (!res.ok) {
                 const text = await res.text();
-                console.error("❌ useSingleReport bad response:", res.status, text);
                 throw new Error(`Request failed with status ${res.status}`);
             }
 
@@ -280,7 +280,11 @@ export function deleteReport({ successToast, failedToast }) {
             queryClient.invalidateQueries({
                 queryKey: ["reports"],
             });
-            successToast('Report Was Deleted!')
+
+            if (successToast) {
+                successToast('Report Was Deleted!')
+            }
+
         },
         onError: () => {
             failedToast('An error! Report Was not deleted!')
