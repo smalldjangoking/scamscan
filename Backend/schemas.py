@@ -1,7 +1,8 @@
 from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel, EmailStr, model_validator, ConfigDict, Field
+from pydantic import BaseModel, EmailStr, model_validator, ConfigDict, Field, field_validator
 from typing import Annotated
+from services import normalize_url, normalize_description
 
 class UserRegistrationSchema(BaseModel):
     email: EmailStr
@@ -27,6 +28,7 @@ class UserRegistrationSchema(BaseModel):
 class UserLoginSchema(BaseModel):
     email: EmailStr
     password: str
+    remember_me: bool | None = True
 
 
 class RefreshTokenSchema(BaseModel):
@@ -74,6 +76,18 @@ class ReportSchema(BaseModel):
         if data.subject not in ["crypto", "website"]:
             raise ValueError("subject must be either 'crypto' or 'website'")
         return data
+    
+    @field_validator("website_url", mode="after")
+    def normalize_website_url(cls, v):
+        if v is not None:
+            return normalize_url(v)
+        return v
+    
+    @field_validator("report_description", mode="after")
+    def normalize_report_description(cls, v):
+        if v is not None:
+            return normalize_description(v)
+        return v
 
 class AddressAPISchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)

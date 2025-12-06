@@ -88,7 +88,6 @@ function ReportForm() {
 
     const selectedReportSubject = watch("subject");
     const screenshots = watch("screenshots");
-    console.log(watch())
     const [tooltipContent, setTooltipContent] = useState("ToolTip");
 
 

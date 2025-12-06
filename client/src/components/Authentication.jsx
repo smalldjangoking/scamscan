@@ -23,6 +23,7 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [nickname, setNickname] = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
 
   useEffect(() => {
     store.clearErorrs();
@@ -254,7 +255,7 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
               </div>
               <div className="relative flex gap-2 mt-5 justify-between">
                 <div className="flex gap-1 justify-center items-center">
-                  <input type="checkbox" placeholder="Password" className="" />
+                  <input type="checkbox" defaultChecked={rememberMe} onChange={() => setRememberMe(!rememberMe)} />
                   <span className="text-sm">Remember me</span>
                 </div>
 

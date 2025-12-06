@@ -115,3 +115,19 @@ async def create_token_verify(user_id: int, purpose: str, session):
     
     except Exception as e:
         logging.error(e)
+
+
+def normalize_url(url: str) -> str:
+    """Normalize URL by removing protocols and 'www.' prefix"""
+    url = re.sub(r'^https?://', '', url)
+    url = re.sub(r'^www\.', '', url)
+    url = re.sub(r'/.*$', '', url)
+    return 'https://' + url
+
+
+def normalize_description(description: str) -> str:
+    """Normalize description by stripping <p> tags"""
+    pattern = re.compile(r'(?:<p>\s*</p>){3,}', flags=re.IGNORECASE)
+    replacement = '<p></p><p></p>'
+    description = re.sub(pattern, replacement, description)
+    return description

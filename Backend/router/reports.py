@@ -26,7 +26,7 @@ ALLOWED_TAGS = [
 ]
 
 @router.post("/create", status_code=status.HTTP_200_OK)
-@limiter.limit("55555/5minutes")
+@limiter.limit("2/5minutes")
 async def create_report(schema: ReportSchema,
                         session: SessionDep,
                         request: Request,
@@ -139,7 +139,7 @@ async def get_all_reports(session: SessionDep,
         )
 
     if orderby:
-        if orderby == "newest":  # default
+        if orderby == "newest":
             query = query.order_by(Reports.id.desc())
         if orderby == "oldest":
             query = query.order_by(Reports.id)

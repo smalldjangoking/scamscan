@@ -76,11 +76,11 @@ export default class Store {
     }
   }
 
-  async login(email, password) {
+  async login(email, password, rememberMe) {
     this.setIsLoading(true);
     this.clearErorrs();
     try {
-      const res = await AuthService.login(email, password);
+      const res = await AuthService.login(email, password, rememberMe);
       this.setAccessToken(res.data.access_token)
     } catch (e) {
       if (e?.response?.status === 403) {

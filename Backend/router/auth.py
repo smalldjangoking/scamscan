@@ -81,8 +81,12 @@ async def user_login(userbase: UserLoginSchema, session: SessionDep, response: R
         httponly=True,
         secure=False,
         samesite="lax",
-        max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
-    )
+        max_age = (
+            REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60 # 30 дней
+            if userbase.remember_me
+            else 1 * 24 * 60 * 60 # 1 день
+            ) 
+        )
     
     return {
         "access_token": access_token,

@@ -86,11 +86,7 @@ function Report() {
                                             </div>
                                             <div className="flex items-center gap-3 border-primary/20 p-3">
                                                 <TrendingUp className="h-5 w-5 flex-shrink-0 text-primary" />
-                                                <span className="text-sm font-medium">Earn reputation points</span>
-                                            </div>
-                                            <div className="flex items-center gap-3 border-primary/20 p-3">
-                                                <History className="h-5 w-5 flex-shrink-0 text-primary" />
-                                                <span className="text-sm font-medium">Save & view search history</span>
+                                                <span className="text-sm font-medium">Rate the reputation of addresses</span>
                                             </div>
                                             <div className="flex items-center gap-3 border-primary/20 p-3">
                                                 <Captions className="h-5 w-5 flex-shrink-0 text-primary" />
@@ -135,10 +131,6 @@ function Report() {
                                             <div className="flex items-center gap-3 border-red-400/20 p-3">
                                                 <TrendingUp className="h-5 w-5 flex-shrink-0 text-gray-500 opacity-50" />
                                                 <span className="text-muted-foreground text-sm line-through">No reputation system</span>
-                                            </div>
-                                            <div className="flex items-center gap-3 border-red-400/20 p-3">
-                                                <Eye className="h-5 w-5 flex-shrink-0 text-gray-500 opacity-50" />
-                                                <span className="text-muted-foreground text-sm line-through">No search history saved</span>
                                             </div>
                                             <div className="flex items-center gap-3 border-red-400/20 p-3">
                                                 <Users className="h-5 w-5 flex-shrink-0 text-orange-500" />

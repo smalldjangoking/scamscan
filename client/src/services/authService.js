@@ -2,9 +2,9 @@ import axios from 'axios'
 import $api from '../http/auth'
 
 export default class AuthService {
-
-    static async login(email, password) {
-        return $api.post('/auth/login', { email, password })
+    
+    static async login(email, password, rememberMe) {
+        return $api.post('/auth/login', { email, password, remember_me:rememberMe })
     }
 
     static async registration(email, password, password2, nickname) {
