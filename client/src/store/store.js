@@ -61,18 +61,21 @@ export default class Store {
   errorValid(e) {
     this.clearErorrs();
     const res = e?.response;
-    const detail = res?.data?.detail;
+    const detail = res?.data?.detail?.msg;
+    const selfDetail = res?.data?.detail;
+    const reason = res?.data?.detail?.[0].ctx?.reason;
+    const pydanticErrorMsg = res?.data?.detail?.[0].msg.split(',')[1];
 
-    if (Array.isArray(detail)) {
-      detail.forEach(item => this.addError(item?.loc[1] + ': ' + item?.msg || item?.message || JSON.stringify(item)));
-    } else if (typeof detail === "string") {
+    if (reason) {
+      this.addError(reason);
+    } else if (detail) {
       this.addError(detail);
-    } else if (detail && typeof detail === "object") {
-      this.addError(detail?.msg || detail?.message || JSON.stringify(detail));
-    } else if (res) {
-      this.addError(`HTTP ${res.status} ${res.statusText ?? ""}`.trim());
-    } else {
-      this.addError("Network error");
+    }
+    else if (selfDetail && typeof selfDetail === "string") {
+      this.addError(selfDetail);
+    }
+    else if (pydanticErrorMsg) {
+      this.addError(pydanticErrorMsg);
     }
   }
 

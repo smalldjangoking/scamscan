@@ -6,23 +6,26 @@ from services import normalize_url, normalize_description
 
 class UserRegistrationSchema(BaseModel):
     email: EmailStr
-    password: Annotated[
-        str,
-        Field(
-            min_length=8,
-            max_length=64,
-            pattern=r'^[A-Za-z0-9@#$%^&+=!?._-]+$'
-        )
-    ]
+    password: str
     password2: str
-    nickname: Annotated[
-        str,
-        Field(
-            min_length=3,
-            max_length=24,
-            pattern=r'^[A-Za-z0-9_]+$'
-        )
-    ]
+    nickname: str
+
+    @model_validator(mode="after")
+    def password_check(cls, data):
+        if data.password != data.password2:
+            raise ValueError("Passwords do not match")
+        
+        if len(data.password) < 8:
+            raise ValueError("Password must be at least 8 characters.")
+        
+        if len(data.password) > 64:
+            raise ValueError("Password must be at less 64 characters.")
+        
+        if len(data.nickname) < 3:
+            raise ValueError("Nickname must be at least 3 characters.")
+        
+        return data
+
 
 
 class UserLoginSchema(BaseModel):

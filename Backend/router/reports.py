@@ -143,6 +143,8 @@ async def get_all_reports(session: SessionDep,
             query = query.order_by(Reports.id.desc())
         if orderby == "oldest":
             query = query.order_by(Reports.id)
+        if orderby == "comments":
+            query = query.order_by(func.count(Comments.id).desc()).outerjoin(Comments, Comments.report_id == Reports.id)
 
     count_query = select(func.count()).select_from(query.subquery())
     total_count = (await session.execute(count_query)).scalar()

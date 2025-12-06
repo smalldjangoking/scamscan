@@ -115,8 +115,8 @@ export default observer(function Confirm() {
                 <Button onClick={() => setIsAuthOpen(true)}>Login</Button>
               </div>
             ) : (
-              <div className="bg-card/80 flex flex-col items-center justify-center gap-3 rounded-2xl p-6 shadow-md text-center">
-                <div className="relative bg-card/90 w-full max-w-sm flex flex-col items-center justify-center gap-4 rounded-2xl p-6 shadow-lg border text-center">
+              <div className=" flex flex-col items-center justify-center gap-3 rounded-2xl p-6 shadow-md text-center">
+                <div className="relative bg-card/90 w-full flex flex-col items-center justify-center gap-4 rounded-2xl p-3 shadow-lg border text-center max-w-md">
                   {!isSuccessPassword && (
                     <>
                       <h2 className="text-xl font-semibold text-foreground">Set a New Password</h2>
@@ -161,7 +161,7 @@ export default observer(function Confirm() {
                   {isSuccessPassword && (
                     <>
                       <LockKeyhole className="h-12 w-12 text-green-500" />
-                      <h2 className="text-xl font-semibold text-foreground">
+                      <h2 className="text-xl font-semibold text-foreground flex flex-row">
                         Your Password Has Been Changed! 🎉
                       </h2>
                       <p className="text-muted-foreground">

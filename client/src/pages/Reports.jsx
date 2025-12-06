@@ -49,7 +49,7 @@ export default function Reports() {
 
     const sortBy = [
         { id: "oldest", label: "Oldest first" },
-        { id: "commented", label: "Most commented" },
+        { id: "comments", label: "Most Comments" },
         { id: "viewed", label: "Most Viewed" },
     ];
 
