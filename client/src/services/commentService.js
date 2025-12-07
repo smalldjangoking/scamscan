@@ -13,6 +13,10 @@ export default class commentService {
             }
         })
     }
+
+    static deleteComment(commentId) {
+        return $api.delete(`/report/comments/delete/${commentId}`)
+    }
 }
 
 

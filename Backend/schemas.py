@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from pydantic import BaseModel, EmailStr, model_validator, ConfigDict, Field, field_validator
 from typing import Annotated
-from services import normalize_url, normalize_description
+from services import normalize_url, normalize_description, nickname_symbols_check
 
 class UserRegistrationSchema(BaseModel):
     email: EmailStr
@@ -23,6 +23,12 @@ class UserRegistrationSchema(BaseModel):
         
         if len(data.nickname) < 3:
             raise ValueError("Nickname must be at least 3 characters.")
+        
+        if len(data.nickname) > 15:
+            raise ValueError("Nickname must be at most 15 characters.")
+        
+        if not nickname_symbols_check(data.nickname):
+            raise ValueError("Nickname can contain only English letters and numbers")
         
         return data
 

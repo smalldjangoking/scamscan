@@ -24,6 +24,7 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
   const [password2, setPassword2] = useState("");
   const [nickname, setNickname] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
+  const newMember = store.newMemberAlert;
 
   useEffect(() => {
     store.clearErorrs();
@@ -203,6 +204,16 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
 
           {authVariant === "login" && (
             <>
+              {newMember && (
+                <div className="flex flex-col items-center gap-2 border-green-600 border bg-green-600/20 px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all">
+                  <p>
+                    Hey there! &#128075; Confirm your email to log in
+                  </p>
+                  <div>
+                      <p className="text-sm text-muted-foreground">If you don’t see it, please check your <span className="font-bold">Spam</span> or <span className="font-bold">Promotions</span> folder.</p>
+                  </div>
+                </div>
+              )}
               <div className="flex items-center justify-between mb-10">
                 <h1 className="font-bold text-2xl">Sign in</h1>
 
@@ -217,7 +228,7 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
               </div>
 
               {store.successAlerts && (
-                <div className="flex items-center gap-3 bg-green-600/90 text-white px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all">
+                <div className="flex flex-col items-center gap-2 border-green-600 border bg-green-600/20 px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all">
                   <span>
                     <Mail className="w-6 h-6 text-white" />
                   </span>

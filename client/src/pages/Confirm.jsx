@@ -22,7 +22,11 @@ export default observer(function Confirm() {
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
 
-  const { mutate: tokenCheckFunc, isLoading, isError } = useTokenCheck();
+  const { mutate: tokenCheckFunc, isLoading, isError } = useTokenCheck({
+    onSuccess: () => {
+      store.setNewMemberAlert(false);
+    },
+  });
   const { mutate: passwordChangeFunc, isLoading: isloadingPassword, isSuccess: isSuccessPassword } = useChangePassword();
 
   useEffect(() => {

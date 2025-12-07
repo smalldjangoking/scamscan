@@ -5,6 +5,7 @@ import { Context } from "../../main";
 import { observer } from "mobx-react-lite";
 import { useContext, useState } from "react"
 import CreateComment from "../comments/CreateComment"
+import { deleteComment } from "../../utils/hook"
 
 export default observer(function CommentCard({ items, reportId, report_owner, isReply = false }) {
     const { store } = useContext(Context)
@@ -13,6 +14,11 @@ export default observer(function CommentCard({ items, reportId, report_owner, is
 
     const isOwner = store.userId === items.user_id;
     const hasChildren = items.children?.length > 0;
+
+
+    const {mutate: deleteCommentMutate} = deleteComment();
+
+
 
     return (
         <>
@@ -55,6 +61,7 @@ export default observer(function CommentCard({ items, reportId, report_owner, is
                         {isOwner && (
                             <div>
                                 <Button
+                                    onClick={() => deleteCommentMutate({ reportId, commentId: items.id })}
                                     variant="ghost"
                                     size="icon"
                                     className={isReply ? "h-5 w-5" : "h-6 w-6"}

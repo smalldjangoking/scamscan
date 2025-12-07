@@ -331,3 +331,19 @@ export function useLikeDislike(addressId) {
         },
     });
 }
+
+
+export function deleteComment() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ reportId, commentId }) => {
+            const res = await commentService.deleteComment(commentId)
+            return res
+        },
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries({
+                queryKey: ["report_comments", variables.reportId],
+            });
+        }
+    })
+}

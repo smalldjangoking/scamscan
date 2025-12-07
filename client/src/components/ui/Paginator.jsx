@@ -2,6 +2,7 @@ import { Button } from "./Button.jsx";
 
 export default function Pagination({ page, totalPages, isFetching, onPageChange }) {
     if (totalPages <= 1) return null;
+    if (isFetching) return null;
 
     return (
         <div className="flex justify-center items-center mt-10 gap-2">

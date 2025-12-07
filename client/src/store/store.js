@@ -8,6 +8,7 @@ export default class Store {
   errors = new Set();
   successAlerts = ''
   accessToken = localStorage.getItem("access_token") || null;
+  newMemberAlert = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -54,6 +55,10 @@ export default class Store {
     this.successAlerts = msg
   }
 
+  setNewMemberAlert(bool) {
+    this.newMemberAlert = bool || !this.newMemberAlert
+  }
+
   clearErorrs() {
     this.errors.clear();
   }
@@ -64,7 +69,7 @@ export default class Store {
     const detail = res?.data?.detail?.msg;
     const selfDetail = res?.data?.detail;
     const reason = res?.data?.detail?.[0].ctx?.reason;
-    const pydanticErrorMsg = res?.data?.detail?.[0].msg.split(',')[1];
+    const pydanticErrorMsg = res?.data?.detail?.[0]?.msg?.split(',')[1];
 
     if (reason) {
       this.addError(reason);
@@ -105,7 +110,7 @@ export default class Store {
         password2,
         nickname
       );
-
+      this.setNewMemberAlert();
       return true;
     } catch (e) {
       this.errorValid(e)

@@ -131,3 +131,9 @@ def normalize_description(description: str) -> str:
     replacement = '<p></p><p></p>'
     description = re.sub(pattern, replacement, description)
     return description
+
+
+def nickname_symbols_check(nickname: str):
+    """Check if nickname contains only allowed characters"""
+    pattern = re.compile(r"^(?!.*_.*_)[A-Za-z0-9_]+$")
+    return bool(pattern.fullmatch(nickname))

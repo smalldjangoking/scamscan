@@ -86,6 +86,23 @@ async def create_report_comment(session: SessionDep,
     return {"status": "ok"}
 
 
+@router.delete('/delete/{comment_id}', status_code=status.HTTP_200_OK, include_in_schema=False)
+async def delete_report_comment(session: SessionDep,
+                                comment_id: int = Path(...),
+                                user_id: int = Depends(access_token_valid),
+                                ):
+    """deletes a comment to report"""
+    comment = await session.get(Comments, comment_id)
+
+    if user_id != comment.user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to delete this comment")
+
+    await session.delete(comment)
+    await session.commit()
+
+    return {"status": "ok"}
+
+
 
 
 
