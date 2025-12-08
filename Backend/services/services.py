@@ -122,7 +122,7 @@ def normalize_url(url: str) -> str:
     url = re.sub(r'^https?://', '', url)
     url = re.sub(r'^www\.', '', url)
     url = re.sub(r'/.*$', '', url)
-    return 'https://' + url
+    return url
 
 
 def normalize_description(description: str) -> str:
@@ -137,3 +137,8 @@ def nickname_symbols_check(nickname: str):
     """Check if nickname contains only allowed characters"""
     pattern = re.compile(r"^(?!.*_.*_)[A-Za-z0-9_]+$")
     return bool(pattern.fullmatch(nickname))
+
+
+def convert_iso(value: str) -> datetime:
+    """convert ISO 8601 date string to datetime object"""
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))

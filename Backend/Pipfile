@@ -14,12 +14,12 @@ dotenv = "*"
 bcrypt = "4.0.1"
 bleach = "*"
 pytest = "*"
-httpx = "*"
 aiosmtplib = "*"
 jinja2 = "*"
 python-slugify = "*"
 slowapi = "*"
 asyncpg = "*"
+httpx = "*"
 
 [dev-packages]
 

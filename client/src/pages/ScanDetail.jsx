@@ -19,7 +19,7 @@ import {
   Flag,
   Clock8,
   Copy,
-  ExternalLink,
+  ExternalLink, CalendarClock, AlarmClock, ShieldQuestion, Server, Building2
 } from "lucide-react";
 
 export default function ScanDetail() {
@@ -57,6 +57,33 @@ export default function ScanDetail() {
     page,
     pageSize,
   });
+
+  const whoisMock = [
+    {
+      key: "web_create_date",
+      label: "Domain created",
+      value: "2025-11-21T09:20:30Z",
+      hint: "52 days ago",
+    },
+    {
+      key: "web_expire_date",
+      label: "Expires",
+      value: "2026-11-21T23:59:59Z",
+      hint: "in less than 1 year",
+    },
+    {
+      key: "registrar_name",
+      label: "Registrar",
+      value: "NameCheap, Inc.",
+      hint: null,
+    },
+    {
+      key: "nameservers",
+      label: "Nameservers",
+      value: "ns1.domain.com, ns2.domain.com",
+      hint: "2 records",
+    },
+  ];
 
   useEffect(() => {
     if (addressData && !isAddressFetching) {
@@ -208,11 +235,7 @@ export default function ScanDetail() {
                           asChild
                         >
                           <a
-                            href={
-                              website.startsWith("http")
-                                ? website
-                                : `https://${web_url}`
-                            }
+                            href={`https://${web_url}`}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
@@ -238,65 +261,91 @@ export default function ScanDetail() {
 
                 <hr className="border-border/70" />
 
-                {/* Useful Links + LikeDislike + WHOIS */}
-                <div className="grid gap-4 lg:gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-                  <div className="space-y-4">
-                    {web_url && (
-                      <div className="flex flex-col border rounded-xl bg-background/60 p-4 gap-3">
-                        <p className="text-sm font-medium">
-                          Security tools &amp; OSINT
-                        </p>
-                        <p className="text-xs text-muted-foreground mb-1">
-                          Quickly inspect the website using public scanners.
-                        </p>
-                        <div className="flex flex-wrap justify-start gap-2">
-                          <Button variant="ghost" asChild>
-                            <a
-                              href={`https://www.virustotal.com/gui/home/search/${web_url}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <img
-                                className="h-6"
-                                src="/VirusTotal.svg"
-                                alt="VirusTotal"
-                              />
-                            </a>
-                          </Button>
-                          <Button variant="ghost" asChild>
-                            <a
-                              href={`https://web.archive.org/web/*/${web_url}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <img
-                                className="h-6"
-                                src="/WaybackMachine.svg"
-                                alt="Wayback Machine"
-                              />
-                            </a>
-                          </Button>
-                          <Button variant="ghost" asChild>
-                            <a
-                              href={`https://whois.com/whois/${web_url}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <img
-                                className="h-6"
-                                src="/whois.svg"
-                                alt="Whois"
-                              />
-                            </a>
-                          </Button>
-                        </div>
+                <div className="grid gap-4 lg:gap-6 md:grid-cols-2 grid-rows-1">
+                  {/* Whois Info Section */}
+                  <div className="flex flex-col border rounded-xl bg-card/80 backdrop-blur-sm p-4 sm:p-5 gap-3 shadow-sm">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <ShieldQuestion className="h-5 w-5 text-primary" />
+                        <p className="text-sm font-semibold tracking-tight">WHOIS information</p>
                       </div>
-                    )}
+                      <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">
+                        Auto-fetched OSINT
+                      </span>
+                    </div>
 
-                    <LikeDislike addressId={addressId}/>
+                    <p className="text-xs text-muted-foreground">
+                      Basic WHOIS metadata for this domain. Use this info to quickly estimate how fresh and trustworthy the website might be.
+                    </p>
+
+                    <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* Created */}
+                      <div className="rounded-lg border border-border/60 bg-background/60 px-3 py-2.5 flex flex-col gap-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                            <CalendarClock className="h-3.5 w-3.5 text-primary/80" />
+                            Created
+                          </span>
+                          <span className="rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-medium text-red-500">
+                            52 days ago
+                          </span>
+                        </div>
+                        <p className="text-xs font-medium text-foreground/90">
+                          2025-11-21 09:20 UTC
+                        </p>
+                      </div>
+
+                      {/* Expires */}
+                      <div className="rounded-lg border border-border/60 bg-background/60 px-3 py-2.5 flex flex-col gap-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                            <AlarmClock className="h-3.5 w-3.5 text-amber-400" />
+                            Expires
+                          </span>
+                          <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-400">
+                            &lt; 1 year left
+                          </span>
+                        </div>
+                        <p className="text-xs font-medium text-foreground/90">
+                          2026-11-21 23:59 UTC
+                        </p>
+                      </div>
+
+                      {/* Registrar */}
+                      <div className="rounded-lg border border-border/60 bg-background/60 px-3 py-2.5 flex flex-col gap-1">
+                        <span className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                          <Building2 className="h-3.5 w-3.5 text-primary/80"/>
+                          Registrar
+                        </span>
+                        <p className="text-xs font-semibold text-foreground">
+                          NameCheap, Inc.
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                          Common retail registrar – check if this matches your expectations.
+                        </p>
+                      </div>
+
+                      {/* Nameservers */}
+                      <div className="rounded-lg border border-border/60 bg-background/60 px-3 py-2.5 flex flex-col gap-1">
+                        <span className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                          <Server className="h-3.5 w-3.5 text-primary/80" />
+                          Nameservers
+                        </span>
+                        <p className="text-xs font-medium text-foreground/90">
+                          ns1.domain.com
+                        </p>
+                        <p className="text-xs font-medium text-foreground/90">
+                          ns2.domain.com
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                          2 DNS records detected
+                        </p>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* WHOIS block only for websites (заглушка) */}
+                  {/* Like/Dislike */}
+                  <LikeDislike addressId={addressId} />
                 </div>
 
                 {/* Reports Section */}

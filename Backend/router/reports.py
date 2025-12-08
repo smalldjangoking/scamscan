@@ -5,13 +5,17 @@ from database_settings import SessionDep
 from schemas import ReportSchema, ReportsListAPISchema, ReportAPISchema, \
     SingleReportSchema, AddressAPISchema, SingleReport, PublicUserAPISchema, CommentsSchema, CommentSchema
 from sqlalchemy import select, func, or_, update
-from models import Reports, Addresses, Comments
+from models import Reports, Addresses, Comments, Whois
 from fastapi.security import OAuth2PasswordBearer
 import bleach
 from math import ceil
 from slugify import slugify
-from services import access_token_valid
+from services import access_token_valid, convert_iso
 from limiter import limiter
+import logging
+logger = logging.getLogger(__name__)
+
+
 
 router = APIRouter(prefix="/api/reports", tags=["reports"])
 oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
@@ -54,7 +58,6 @@ async def create_report(schema: ReportSchema,
         
         response = await session.execute(query)
         address = response.scalar()
-        print(address)
 
         address_data = {
             "website_url": schema.website_url,
@@ -69,6 +72,30 @@ async def create_report(schema: ReportSchema,
             address = Addresses(**address_data)
             session.add(address)
             await session.flush()
+            
+            if schema.subject == "website":
+                ip2whois_api = request.app.state.api_ip2whois_client
+                whois_raw = await ip2whois_api.whois(domain=schema.website_url)
+                
+                
+                if whois_raw:
+                    try:
+                        whois_data = {
+                            "address_id": address.id,
+                            "web_create_date": convert_iso(whois_raw["create_date"]),
+                            "web_expire_date": convert_iso(whois_raw["expire_date"]),
+                            "domain_age": whois_raw.get("domain_age"),
+                            "registrar_name": whois_raw.get("registrar", {}).get("name"),
+                            "nameservers": whois_raw.get("nameservers", [])
+                            }
+                        
+                        whois = Whois(**whois_data)
+                        session.add(whois)
+
+                    except (KeyError, ValueError, TypeError) as exc:
+                        logger.error(
+                            f"Failed to build Whois for {schema.website_url}: {exc} | raw={whois_raw}"
+                        )
 
         report = Reports(
             **schema.model_dump(exclude=set(address_data.keys())),

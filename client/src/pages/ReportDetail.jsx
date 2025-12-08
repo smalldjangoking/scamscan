@@ -14,7 +14,6 @@ import {
     Eye,
     Share2,
     FileWarning,
-    Edit,
     Trash2,
     Copy,
     User,

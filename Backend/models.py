@@ -59,13 +59,41 @@ class Addresses(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     subject: Mapped[str] = mapped_column(nullable=False)
     website_url: Mapped[str | None] = mapped_column(String, nullable=True, index=True, unique=True)
+
     crypto_address: Mapped[str | None] = mapped_column(String, nullable=True, index=True, unique=True)
     crypto_name: Mapped[str | None] = mapped_column(String, nullable=True)
     crypto_logo_url: Mapped[str | None] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    reports: Mapped[list["Reports"]] = relationship(back_populates="address", passive_deletes=True)
+    reports: Mapped[list["Reports"]] = relationship(
+        back_populates="address", 
+        passive_deletes=True
+        )
+    whois: Mapped["Whois | None"] = relationship(
+        back_populates="address",
+        uselist=False,
+        passive_deletes=True
+        )
 
+class Whois(Base):
+    __tablename__ = "whois"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    address_id: Mapped[int] = mapped_column(
+        ForeignKey("addresses.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False,
+    )
+    web_create_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    web_expire_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    domain_age: Mapped[int] = mapped_column(nullable=False)
+    registrar_name: Mapped[str] = mapped_column(String, nullable=False)
+    nameservers: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
+
+    address: Mapped["Addresses"] = relationship(back_populates="whois", passive_deletes=True)
 
 class Address_votes(Base):
     __tablename__ = "address_votes"
