@@ -1,6 +1,6 @@
 import { StrictMode, createContext } from "react";
 import { createRoot } from 'react-dom/client'
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import Layout from "./Layout";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
@@ -18,6 +18,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService"
 import CookiePolicy from "./pages/CookiePolicy"
 import { HelmetProvider } from "react-helmet-async";
+import AboutUs from "./pages/about";
+import Contact from "./pages/Contact";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,17 +39,20 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <Home /> },
-      { path: 'profile', index: false, element: <AuthRequired><Profile /></AuthRequired> },
-      { path: 'reports', index: false, element: (<Reports />) },
-      { path: 'scan', index: false, element: (<Scan />) },
-      { path: 'scan/website/:web_url', index: true, element: (<ScanDetail />) },
-      { path: 'scan/crypto/:crypto_address', index: true, element: (<ScanDetail />) },
-      { path: 'report', index: false, element: <Report /> },
-      { path: 'report/show/:id/:slug', index: true, element: (<ReportDetail />) },
-      { path: 'confirm/:option/:token', index: false, element: (<Confirm />) },
-      { path: 'legal/privacy-policy', index: false, element: (<PrivacyPolicy />) },
-      { path: 'legal/terms-of-service', index: false, element: (<TermsOfService />) },
-      { path: 'legal/cookie-policy', index: false, element: (<CookiePolicy />) },
+      { path: 'profile', element: <AuthRequired><Profile /></AuthRequired> },
+      { path: 'reports', element: (<Reports />) },
+      { path: 'scan', element: (<Scan />) },
+      { path: 'scan/website/:web_url', element: (<ScanDetail />) },
+      { path: 'scan/crypto/:crypto_address', element: (<ScanDetail />) },
+      { path: 'report', element: <Report /> },
+      { path: 'report/show/:id/:slug', element: (<ReportDetail />) },
+      { path: 'confirm/:option/:token', element: (<Confirm />) },
+      { path: 'legal/privacy-policy', element: (<PrivacyPolicy />) },
+      { path: 'legal/terms-of-service', element: (<TermsOfService />) },
+      { path: 'legal/cookie-policy', element: (<CookiePolicy />) },
+      { path: 'about-us', element: (<AboutUs />)},
+      { path: 'contact', element: (<Contact />)},
+      { path: '*', element: <Navigate to="/" replace /> }
     ],
   },
 ]);

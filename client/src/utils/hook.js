@@ -346,3 +346,15 @@ export function deleteComment() {
         }
     })
 }
+
+
+export function check_health() {
+    return useMutation({
+        mutationFn: async () => {
+            const res = axios.get("/api/check")
+            return res
+        }
+    })
+}
+
+

@@ -49,3 +49,15 @@ export function normalizeError(error) {
         "Unknown error"
     ];
 }
+
+export function setCookie(name, value, hours) {
+  const maxAge = hours * 60 * 60;
+  document.cookie = `${name}=${encodeURIComponent(value)}; max-age=${maxAge}; path=/; samesite=Strict`;
+}
+
+export function getCookie(name) {
+  const match = document.cookie.match(
+    new RegExp("(^| )" + name + "=([^;]+)")
+  );
+  return match ? decodeURIComponent(match[2]) : null;
+}

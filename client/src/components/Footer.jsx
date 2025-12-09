@@ -1,9 +1,17 @@
 import { Shield } from "lucide-react"
 import { Button } from "./ui/Button.jsx";
 import { useNavigate } from 'react-router-dom';
+import HealthCheck from "./ui/HealthCheck.jsx";
 
 function Footer() {
     const navigate = useNavigate();
+
+    const navscroll = (path) => {
+        navigate(path);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+
     return (
         <>
             <footer className="border-t bg-muted/30">
@@ -41,7 +49,7 @@ function Footer() {
                                 { address: "/report", label: "Report" },
                                 { address: "/reports", label: "All Reports" }
                                 ].map((item) => (
-                                    <li key={item.address} onClick={() => navigate(item.address)} id={item.address} className="cursor-pointer">
+                                    <li key={item.address} onClick={() => navscroll(item.address)} id={item.address} className="cursor-pointer">
                                         <p className="hover:text-foreground transition-colors">{item.label}</p>
                                     </li>
                                 ))}
@@ -54,9 +62,22 @@ function Footer() {
                                 {[{ address: "/legal/privacy-policy", label: "Privacy Policy" },
                                 { address: "/legal/terms-of-service", label: "Terms of service" },
                                 { address: "/legal/cookie-policy", label: "Cookie Policy" },
-                                { address: "/", label: "GDPR Compliance" }
                                 ].map((item) => (
-                                    <li key={item.address} onClick={() => navigate(item.address)} id={item.address} className="cursor-pointer">
+                                    <li key={item.address} onClick={() => navscroll(item.address)} id={item.address} className="cursor-pointer">
+                                        <p className="hover:text-foreground transition-colors">{item.label}</p>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 className="font-medium mb-4">Other</h4>
+                            <ul className="space-y-3 text-sm text-muted-foreground">
+                                {[{ address: "/about-us", label: "About us" },
+                                { address: "/contact", label: "Contact" },
+                                { address: "/api", label: "API" },
+                                ].map((item) => (
+                                    <li key={item.address} onClick={() => navscroll(item.address)} id={item.address} className="cursor-pointer">
                                         <p className="hover:text-foreground transition-colors">{item.label}</p>
                                     </li>
                                 ))}
@@ -69,7 +90,8 @@ function Footer() {
                             © 2025 scamscan.io. All rights reserved.
                         </p>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <p>version: <span className="font-bold text-sm">1.0.0</span></p>
+                            <p className="flex flex-row items-center justify-center">API Status <HealthCheck /></p>
+                            <p>version: <span className="font-bold text-sm">1.0.0-beta</span></p>
                         </div>
                     </div>
                 </div>

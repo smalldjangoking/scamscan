@@ -7,16 +7,11 @@ export default defineConfig({
     server: {
         port: 5173,
         proxy: {
-            '/api/auth': 'http://localhost:8000',
-            '/api/user': 'http://localhost:8000',
-            '/api/reports': 'http://localhost:8000',
-            '/api/scan': 'http://localhost:8000',
-            '/api/report/comments': 'http://localhost:8000'
-        }
+            '/api': {
+                target: 'http://localhost:8000',
+                changeOrigin: true,
+            },
+        },
     },
-
-    plugins: [
-        react(),
-        tailwindcss()
-    ],
+    plugins: [react(), tailwindcss()],
 })

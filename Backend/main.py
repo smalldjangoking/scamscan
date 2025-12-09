@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from router import auth, profile, reports, scan, comments
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
@@ -41,9 +41,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-async def read_root():
-    return {"Backend": "See all endpoints by just writing /docs"}
+@app.get("/api/check", tags=["Health Check"], status_code=status.HTTP_200_OK)
+def health_check():
+    return {"status": "OK", "message": "ScamScan API is up and running."}
 
 
 app.include_router(auth.router)
