@@ -1,4 +1,4 @@
-import { StrictMode, createContext } from "react";
+import { createContext } from "react";
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import Layout from "./Layout";
@@ -10,7 +10,7 @@ import AuthRequired from './pages/AuthRequired';
 import Report from './pages/Report';
 import Scan from './pages/Scan';
 import ScanDetail from './pages/ScanDetail';
-import Confirm from "./pages/confirm.jsx";
+import Confirm from "./pages/Confirm.jsx";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import ReportDetail from "./pages/ReportDetail.jsx";
 import Store from './store/store'
@@ -18,7 +18,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService"
 import CookiePolicy from "./pages/CookiePolicy"
 import { HelmetProvider } from "react-helmet-async";
-import AboutUs from "./pages/about";
+import AboutUs from "./pages/About";
 import Contact from "./pages/Contact";
 
 const queryClient = new QueryClient({
