@@ -57,7 +57,7 @@ export default function CryptoDropDownMenu({ value, onChange, error }) {
             >
                 {!value || !value.name ? (
                     <>
-                        <span className="truncate text-gray-500">Choose...</span>
+                        <span className="truncate text-gray-500">Choose the blockchain...</span>
                         <ArrowDown className={`transition-transform duration-300 ease-in-out ${menuOpen ? 'rotate-180' : 'rotate-0'}`}
                         />
                     </>
@@ -72,7 +72,21 @@ export default function CryptoDropDownMenu({ value, onChange, error }) {
             </Button>
 
             {menuOpen && createPortal(
-                <div className={`crypto-dropdown md:mt-2 fixed md:absolute inset-0 md:inset-auto md:top-full md:left-0 z-[50] max-h-screen md:max-h-96 md:w-md bg-primary-foreground border focus-visible:border-ring dark:border-input`}>
+                <div
+                    className={`
+                        crypto-dropdown
+                        md:mt-2
+                        fixed md:absolute
+                        inset-0 md:inset-auto md:top-[100%] md:left-0
+                        z-[50]
+                        w-full md:w-[400px]
+                        max-h-screen md:max-h-[70vh]
+                        bg-primary-foreground
+                        border
+                        focus-visible:border-ring
+                        dark:border-input
+                        `}
+                >
                     {/* Search Field && Back button */}
                     <div className="flex md:justify-initial justify-between p-3">
                         <div className="full flex w-full">
@@ -87,7 +101,7 @@ export default function CryptoDropDownMenu({ value, onChange, error }) {
                     {/* Crypto List */}
                     <div
                         id="crypto-scroll"
-                        className="overflow-y-auto max-h-[200px] "
+                        className="overflow-y-auto max-h-screen md:max-h-[500px]"
                     >
                         <InfiniteScroll
                             dataLength={coins.length}

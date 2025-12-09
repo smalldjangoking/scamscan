@@ -9,7 +9,6 @@ import axios from "axios"
 
 
 export function useReports({ user_id, userOnly = false, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = '' }) {
-    console.log(user_id, userOnly)
     return useQuery({
         queryKey: ['reports', { debouncedSearch, page, pageSize, userOnly, filterQuery, user_id }],
         queryFn: async () => {

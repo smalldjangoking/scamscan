@@ -1,4 +1,4 @@
-﻿import { MessageSquareWarning, Camera, CircleQuestionMark, WalletMinimal, Globe, Plus } from "lucide-react";
+﻿import { MessageSquareWarning, Camera, CircleQuestionMark, WalletMinimal, Globe } from "lucide-react";
 import { useState } from "react";
 import 'react-tooltip/dist/react-tooltip.css';
 import * as Yup from "yup";
@@ -8,7 +8,6 @@ import { useEffect } from "react";
 import { isValidUrl } from "../../utils/helpers.js";
 import { useReportCreate } from '../../utils/hook.js'
 import { Input } from '../ui/Input.jsx'
-import Dropzone from "./FileDropZone";
 import { Button } from "../ui/Button";
 import Tiptap from './TipTapEditor';
 import { Tooltip } from 'react-tooltip';
@@ -32,17 +31,6 @@ function ReportForm() {
             .min(500, "At least 500 chars")
             .max(2000, "Max 2000 chars")
             .required("Description is required"),
-
-        screenshots: Yup.array()
-            .min(0)
-            .max(8, "You can upload up to 8 screenshots")
-            .of(
-                Yup.mixed()
-                    .test("fileSize", "File is too large", (file) => !file || file.size <= 5 * 1024 * 1024)
-                    .test("fileType", "Unsupported file format", (file) =>
-                        !file || ["image/jpeg", "image/png", "image/heic"].includes(file.type)
-                    )
-            ),
 
         website_url: Yup.string().when("subject", {
             is: "website",
@@ -80,14 +68,12 @@ function ReportForm() {
             website_url: "",
             crypto_address: "",
             crypto_object: {},
-            screenshots: [],
             check_box: { accepted: false }
         }
     });
 
 
     const selectedReportSubject = watch("subject");
-    const screenshots = watch("screenshots");
     const [tooltipContent, setTooltipContent] = useState("ToolTip");
 
 
@@ -96,24 +82,21 @@ function ReportForm() {
     useEffect(() => {
         if (selectedReportSubject === "crypto") {
             setValue("website_url", "");
-            setValue("screenshots", []);
         } else if (selectedReportSubject === "website") {
             setValue("crypto_address", "");
             setValue("crypto_object", {});
-            setValue("screenshots", []);
         }
     }, [selectedReportSubject, setValue]);
 
 
     const onSubmit = (data) => {
         const { subject, report_title, report_description, website_url,
-            crypto_address, crypto_object, screenshots } = data;
+            crypto_address, crypto_object } = data;
 
         let payload = {
             subject,
             report_title,
             report_description,
-            screenshots,
         };
 
         if (data.subject === "crypto") {
@@ -178,12 +161,46 @@ function ReportForm() {
                 ))}
             </div>
 
+
             {/* Description */}
             <div className={`transition-all duration-300 ease-in-out overflow-hidden ${selectedReportSubject ? 'opacity-100 transform translate-y-0'
                 : 'max-h-0 opacity-0 transform -translate-y-2'
                 }`}>
+
                 <div className="block mt-5">
-                    <Input aria-invalid={!!errors.report_title} {...register("report_title")} label="Title" placeholder='Enter a clear and descriptive title for your scam report' />
+                    {/* Report Title */}
+                    <div className="flex flex-col gap-3">
+                        <h3 className="text-lg font-medium tracking-wider text-foreground">Report Title</h3>
+                        <Input aria-invalid={!!errors.report_title} {...register("report_title")} placeholder='Enter a clear and descriptive title for your scam report' />
+
+                    </div>
+                    {/* Report crypto Address */}
+                    {selectedReportSubject === "crypto" && (
+                        <div className="mt-5 flex flex-col gap-3">
+                            <div className="flex items-center">
+                                <h3 className="text-lg font-medium tracking-wider text-foreground">Report Address</h3>
+                                <CircleQuestionMark size={16} onMouseEnter={() => setTooltipContent("Select a blockchain network and write an address")} className=" my-anchor-element text-muted-foreground hover:text-foreground transition-colors cursor-help" />
+                            </div>
+                            <Controller
+                                name="crypto_object"
+                                control={control}
+                                render={({ field }) => (
+                                    <CryptoDropDownMenu
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        error={!!errors.crypto_object}
+                                    />
+                                )}
+                            />
+                            {errors.crypto_object && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.crypto_object.message}</p>}
+                            <Input
+                                {...register("crypto_address")}
+                                placeholder="Enter the cryptocurrency address you want to report"
+                            />
+                            {errors.crypto_address && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.crypto_address.message}</p>}
+                        </div>
+                    )}
+
                     {errors.report_title && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.report_title.message}</p>}
                     <div className="mt-5">
                         <label className="mb-2 block text-lg font-medium tracking-wider text-foreground">
@@ -215,65 +232,6 @@ function ReportForm() {
                     </div>
                 )}
 
-                {/* Report crypto Address */}
-                {selectedReportSubject === "crypto" && (
-                    <div className="mt-5 flex flex-col gap-3">
-                        <div className="flex items-center gap-3">
-                            <h3 className="text-lg font-medium tracking-wider text-foreground">Report an address</h3>
-                            <CircleQuestionMark size={16} onMouseEnter={() => setTooltipContent("Select a blockchain network and write an address")} className=" my-anchor-element text-muted-foreground hover:text-foreground transition-colors cursor-help" />
-                        </div>
-                        <Controller
-                            name="crypto_object"
-                            control={control}
-                            render={({ field }) => (
-                                <CryptoDropDownMenu
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                    error={!!errors.crypto_object}
-                                />
-                            )}
-                        />
-                        {errors.crypto_object && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.crypto_object.message}</p>}
-                        <Input
-                            {...register("crypto_address")}
-                            placeholder="Enter the cryptocurrency address you want to report"
-                        />
-                        {errors.crypto_address && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.crypto_address.message}</p>}
-                    </div>
-                )}
-
-
-                {/* Screenshot field */}
-                <div className="mt-6 flex items-center gap-3 text-lg tracking-wider">
-                    <Camera className="h-4 w-4" />
-                    Evidence
-                    <CircleQuestionMark size={16} onMouseEnter={() => setTooltipContent("Upload up to 8 photos: screenshots of chats, web pages, or documents (max. 5MB each).")} className="my-anchor-element text-muted-foreground hover:text-foreground transition-colors cursor-help" />
-                </div>
-
-                <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-                    {screenshots.map((file, index) => (
-                        <div key={index} className="group relative">
-                            <div className="relative h-32 w-full overflow-hidden rounded-lg border border-border bg-gray-100">
-                                <img
-                                    src={URL.createObjectURL(file)}
-                                    alt="evidence"
-                                    className="h-full w-full object-cover"
-                                />
-                                <Button
-                                    variant="link"
-                                    size="icon"
-                                    onClick={() => setValue('screenshots', screenshots.filter((_, i) => i !== index))}
-                                    className="absolute top-1 right-1 opacity-0 transition-opacity group-hover:opacity-100 bg-destructive"
-                                >
-                                    <Plus className="h-3 w-3 rotate-45 text-[#fff]" />
-                                </Button>
-                            </div>
-                            <p className="text-muted-foreground mt-1 truncate text-xs">{file.name}</p>
-                        </div>
-                    ))}
-                    {screenshots.length < 8 && <Dropzone onFilesSelected={(newFiles) => setValue('screenshots', [...screenshots, ...newFiles], { shouldValidate: true })} />}
-                </div>
-
                 {/* Submit button */}
                 <div className="mt-5 flex items-center gap-3">
                     <Button disabled={!isValid} onClick={handleSubmit(onSubmit)} className="ml-1">
@@ -287,7 +245,6 @@ function ReportForm() {
                     <p>I agree to all terms and conditions.</p>
                 </div>
             </div>
-
 
             <Tooltip anchorSelect=".my-anchor-element" place="top">
                 {tooltipContent}

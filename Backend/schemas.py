@@ -70,7 +70,6 @@ class ReportSchema(BaseModel):
     crypto_address: str | None = None
     crypto_name: str | None = None
     crypto_logo_url: str | None = None
-    screenshots: list[str] | None = None
 
     @model_validator(mode="after")
     def both_subjects_not_allowed(cls, data):
