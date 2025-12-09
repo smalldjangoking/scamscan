@@ -3,7 +3,11 @@ import store from "../store/store"
 
 const $api = axios.create({
     withCredentials: true,
-    baseURL: '/api'
+    baseURL: import.meta.env.VITE_API_URL || "/api",
+})
+
+const $api_no_auth = axios.create({
+    baseURL: import.meta.env.VITE_API_URL || "/api",
 })
 
 $api.interceptors.request.use((config) => {
@@ -51,3 +55,4 @@ $api.interceptors.response.use(
 
 
 export default $api
+export { $api_no_auth };
