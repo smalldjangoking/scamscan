@@ -7,6 +7,7 @@ from database_settings import SessionDep
 from models import Addresses, Reports, Address_votes
 from schemas import AddressListReportSchema, AddressReportSchema, UserVote, SubjectEnum, AddressAPISchema
 from services import access_token_valid
+from sqlalchemy.orm import selectinload
 
 router = APIRouter(prefix="/api/scan", tags=["scan"])
 
@@ -28,10 +29,13 @@ async def get_address(session: SessionDep,
         address_query = select(Addresses).where(
             Addresses.subject == s,
             Addresses.website_url == v
+        ).options(
+            selectinload(Addresses.whois)
         )
 
     address_result = await session.execute(address_query)
     address = address_result.scalar_one_or_none()
+
 
     if not address:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Address not found")

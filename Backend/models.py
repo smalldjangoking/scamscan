@@ -72,7 +72,8 @@ class Addresses(Base):
     whois: Mapped["Whois | None"] = relationship(
         back_populates="address",
         uselist=False,
-        passive_deletes=True
+        passive_deletes=True,
+        lazy="noload",
         )
 
 class Whois(Base):

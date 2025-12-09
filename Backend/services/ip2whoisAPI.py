@@ -13,20 +13,31 @@ class Ip2whoisAPI:
         )
 
     async def whois(self, domain: str):
-        resp = await self.client.get(
+        try:
+            resp = await self.client.get(
             self.BASE_URL,
             params={
                 "key": self.api_key,
                 "domain": domain,
                 },
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        error = data.get("error")
-        if error:
-            logger.error(f"API ip2whois error: {error}")
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            error = data.get("error")
+            if error:
+                logger.error(f"API ip2whois error: {error}")
+                return None
+            return data
+        except httpx.HTTPStatusError as exc:
+            logger.error(
+                f"API ip2whois HTTP error {exc.response.status_code} "
+                f"for domain {domain}: {exc}"
+                )
             return None
-        return data
+        
+        except httpx.HTTPError as exc:
+            logger.error(f"API ip2whois request failed for {domain}: {exc}")
+            return None
 
     async def close(self):
         await self.client.aclose()

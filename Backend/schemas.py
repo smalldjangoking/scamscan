@@ -97,6 +97,16 @@ class ReportSchema(BaseModel):
         if v is not None:
             return normalize_description(v)
         return v
+    
+class WhoisSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    web_create_date: datetime
+    web_expire_date: datetime
+    domain_age: int
+    registrar_name: str
+    nameservers: list[str]
+
 
 class AddressAPISchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -108,6 +118,7 @@ class AddressAPISchema(BaseModel):
     crypto_logo_url: str | None = None
     subject: str | None = None
     created_at: datetime | None = None
+    whois: WhoisSchema | None = None
 
 
 class ReportAPISchema(BaseModel):
