@@ -1,4 +1,4 @@
-import $api, { api_no_auth } from '../http/auth'
+import $api, { $api_no_auth } from '../http/auth'
 
 export default class AuthService {
     
@@ -19,7 +19,7 @@ export default class AuthService {
     }
 
     static async logout() {
-        return api_no_auth.post('api/auth/logout')
+        return $api_no_auth.post('api/auth/logout')
     }
 
     static async changePassword(token, password) {

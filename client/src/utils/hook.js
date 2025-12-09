@@ -5,7 +5,7 @@ import commentService from "../services/commentService"
 import CoinGecko from "../services/CoinGecko"
 import AddressService from "../services/addressService"
 import AuthService from "../services/authService"
-import { api_no_auth } from '../http/auth';
+import { $api_no_auth } from '../http/auth';
 
 
 export function useReports({ user_id, userOnly = false, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = '' }) {
@@ -37,7 +37,7 @@ export function useAddress({ value, subject }) {
     return useQuery({
         queryKey: ['addresses', { value, subject }],
         queryFn: async () => {
-            const { data } = await api_no_auth.get("/api/scan/address", {
+            const { data } = await $api_no_auth.get("/api/scan/address", {
                 params: {
                     value: value.toString(),
                     subject: subject.toString()
@@ -75,7 +75,7 @@ export function useAddrReports({ page = 1, pageSize = 10, address_id = '' }) {
     return useQuery({
         queryKey: ['reports', { page, pageSize, address_id }],
         queryFn: async () => {
-            const { data } = await api_no_auth.get(`/api/scan/${address_id}/reports`, {
+            const { data } = await $api_no_auth.get(`/api/scan/${address_id}/reports`, {
                 params: {
                     page: page.toString(),
                     page_size: pageSize.toString(),
@@ -351,7 +351,7 @@ export function deleteComment() {
 export function check_health() {
     return useMutation({
         mutationFn: async () => {
-            const res = api_no_auth.get("/api/check")
+            const res = $api_no_auth.get("/api/check")
             return res
         }
     })
