@@ -104,7 +104,10 @@ function Report() {
                                 </div>
 
                                 {/* Unregistered User Card */}
-                                <div className="group relative cursor-pointer" onClick={() => setStep(2)}>
+                                <div className="group relative cursor-pointer" onClick={() => {
+                                    setStep(2);
+                                    window.scrollTo({ top: 0, behavior: "smooth" });
+                                    }}>
                                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-red-500/10 to-orange-500/10 opacity-30 blur-xl transition-opacity group-hover:opacity-50"></div>
                                     <div className="relative rounded-2xl border border-border/50 bg-card/60 p-8 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-xl">
                                         <div className="mb-6 text-center">
@@ -163,7 +166,7 @@ function Report() {
                             </div>
 
 
-                            {/* Content */}
+                            {/* Form to submit a fraud report */}
                             <ReportForm />
                         </>
                     )}

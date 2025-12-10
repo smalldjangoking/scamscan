@@ -140,7 +140,7 @@ function ReportForm() {
             </h3>
             {/* Choose the subject of the report */}
 
-            <div className="flex gap-3">
+            <div className="flex flex-col md:flex-row gap-3">
                 {reportOptions.map((option) => (
                     <label key={option.id} className="mt-4 flex cursor-pointer items-center gap-3 rounded-lg border border-border p-4 backdrop-blur-sm transition-colors hover:bg-accent/50">
                         <input

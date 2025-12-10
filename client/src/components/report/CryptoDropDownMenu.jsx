@@ -101,7 +101,7 @@ export default function CryptoDropDownMenu({ value, onChange, error }) {
                     {/* Crypto List */}
                     <div
                         id="crypto-scroll"
-                        className="overflow-y-auto max-h-screen md:max-h-[500px]"
+                        className="overflow-y-auto max-h-screen md:h-[380px]"
                     >
                         <InfiniteScroll
                             dataLength={coins.length}
