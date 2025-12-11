@@ -17,8 +17,8 @@ from fastapi.responses import JSONResponse
 from limiter import limiter
 from services import REFRESH_TOKEN_EXPIRE_DAYS
 
-router = APIRouter(prefix="/api/auth", tags=["auth"])
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+router = APIRouter(prefix="/v1/auth", tags=["auth"])
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/auth/login")
 
 
 @router.post('/create', status_code=status.HTTP_201_CREATED)

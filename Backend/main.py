@@ -35,13 +35,26 @@ logging.basicConfig(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "https://scamscan.io",
+        "https://www.scamscan.io",
+        ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.get("/api/check", tags=["Health Check"], status_code=status.HTTP_200_OK)
+@app.get("/", tags=["Root"], status_code=status.HTTP_200_OK)
+async def root():
+    return {
+        "status": "ok",
+        "name": "ScamScan API",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "message": "Welcome to ScamScan API. Full documentation available at /docs."
+    }
+
+@app.get("/v1/check", tags=["Health Check"], status_code=status.HTTP_200_OK)
 def health_check():
     return {"status": "OK", "message": "ScamScan API is up and running."}
 

@@ -67,12 +67,29 @@ function Footer() {
                         <div>
                             <h4 className="font-medium mb-4">Other</h4>
                             <ul className="space-y-3 text-sm text-muted-foreground">
-                                {[{ address: "/about-us", label: "About us" },
-                                { address: "/contact", label: "Contact" },
-                                { address: "/api", label: "API" },
+                                {[
+                                    { address: "/about-us", label: "About us", external: false },
+                                    { address: "/contact", label: "Contact", external: false },
+                                    {
+                                        address: "https://api.scamscan.io/v1/docs",
+                                        label: "API",
+                                        external: true
+                                    },
                                 ].map((item) => (
-                                    <li key={item.address} onClick={() => navscroll(item.address)} id={item.address} className="cursor-pointer">
-                                        <p className="hover:text-foreground transition-colors">{item.label}</p>
+                                    <li
+                                        key={item.address}
+                                        className="cursor-pointer"
+                                        onClick={() => {
+                                            if (item.external) {
+                                                window.open(item.address, "_blank");
+                                            } else {
+                                                navscroll(item.address);
+                                            }
+                                        }}
+                                    >
+                                        <p className="hover:text-foreground transition-colors">
+                                            {item.label}
+                                        </p>
                                     </li>
                                 ))}
                             </ul>

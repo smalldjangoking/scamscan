@@ -19,7 +19,7 @@ export default class AuthService {
     }
 
     static async logout() {
-        return $api_no_auth.post('api/auth/logout')
+        return $api.post('/auth/logout')
     }
 
     static async changePassword(token, password) {

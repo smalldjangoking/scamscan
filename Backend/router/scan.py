@@ -9,7 +9,7 @@ from schemas import AddressListReportSchema, AddressReportSchema, UserVote, Subj
 from services import access_token_valid
 from sqlalchemy.orm import selectinload
 
-router = APIRouter(prefix="/api/scan", tags=["scan"])
+router = APIRouter(prefix="/v1/scan", tags=["scan"])
 
 
 @router.get('/address', status_code=status.HTTP_200_OK)

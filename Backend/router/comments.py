@@ -11,7 +11,7 @@ from services import access_token_valid
 from sqlalchemy.orm import selectinload
 from limiter import limiter
 
-router = APIRouter(prefix="/api/report/comments", tags=["comments"])
+router = APIRouter(prefix="/v1/report/comments", tags=["comments"])
 
 
 @router.get('/{report_id}/all', status_code=status.HTTP_200_OK, include_in_schema=False)

@@ -17,8 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 
-router = APIRouter(prefix="/api/reports", tags=["reports"])
-oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
+router = APIRouter(prefix="/v1/reports", tags=["reports"])
+oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/v1/auth/login", auto_error=False)
 
 ALLOWED_TAGS = [
     "p", "br",

@@ -37,7 +37,7 @@ export function useAddress({ value, subject }) {
     return useQuery({
         queryKey: ['addresses', { value, subject }],
         queryFn: async () => {
-            const { data } = await $api_no_auth.get("/api/scan/address", {
+            const { data } = await $api_no_auth.get("/scan/address", {
                 params: {
                     value: value.toString(),
                     subject: subject.toString()
@@ -60,11 +60,8 @@ export function useComments({ report_id, page }) {
                 report_id: report_id.toString(),
             })
 
-            const res = await fetch(`/api/scan/address?${params}`)
-
-            if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`)
-
-            return res.json()
+            const res = await $api_no_auth.get(`/scan/address?${params}`)
+            return res.data
         },
         keepPreviousData: true,
     })
@@ -75,7 +72,7 @@ export function useAddrReports({ page = 1, pageSize = 10, address_id = '' }) {
     return useQuery({
         queryKey: ['reports', { page, pageSize, address_id }],
         queryFn: async () => {
-            const { data } = await $api_no_auth.get(`/api/scan/${address_id}/reports`, {
+            const { data } = await $api_no_auth.get(`/scan/${address_id}/reports`, {
                 params: {
                     page: page.toString(),
                     page_size: pageSize.toString(),
@@ -94,14 +91,7 @@ export function useSingleReport(id) {
         enabled: !!id,
         keepPreviousData: true,
         queryFn: async () => {
-            const res = await fetch(`/api/reports/id/${id}`);
-
-            if (!res.ok) {
-                const text = await res.text();
-                throw new Error(`Request failed with status ${res.status}`);
-            }
-
-            const data = await res.json();
+            const { data } = await $api_no_auth.get(`/reports/id/${id}`);
             return data;
         },
     });
@@ -351,7 +341,7 @@ export function deleteComment() {
 export function check_health() {
     return useMutation({
         mutationFn: async () => {
-            const res = $api_no_auth.get("/api/check")
+            const res = $api_no_auth.get("/check")
             return res
         }
     })

@@ -9,7 +9,7 @@ from schemas import UpdateUserInfoSchema
 from sqlalchemy import select
 
 
-router = APIRouter(prefix="/api/user", tags=["user"])
+router = APIRouter(prefix="/v1/user", tags=["user"])
 
 
 @router.post("/me")
