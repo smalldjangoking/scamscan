@@ -1,0 +1,43 @@
+services:
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    image: scamscan-backend:latest
+    container_name: scamscan-backend
+    restart: always
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+    networks:
+      - internal
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      DATABASE_URL: ${DATABASE_URL}
+      API_IP2WHOIS_KEY: ${API_IP2WHOIS_KEY}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+
+  db:
+    image: postgres:16-alpine
+    container_name: scamscan-db
+    restart: always
+    networks:
+      - internal
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+networks:
+  internal:
+    internal: false
+
+volumes:
+  db_data:
