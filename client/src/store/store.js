@@ -103,11 +103,7 @@ export default class Store {
       const res = await AuthService.login(email, password, rememberMe);
       this.setAccessToken(res.data.access_token)
     } catch (e) {
-      if (e?.response?.status === 403) {
-        this.setSuccessAlerts(e?.response?.detail)
-      } else {
-        this.errorValid(e)
-      }
+      this.errorValid(e)
     } finally {
       this.setIsLoading(false);
     }

@@ -227,21 +227,6 @@ export default observer(function Authentication({ isOpen, onClose, authVar }) {
                 </Button>
               </div>
 
-              {store.successAlerts && (
-                <div className="flex flex-col items-center gap-2 border-green-600 border bg-green-600/20 px-5 py-3 rounded-xl shadow-lg mb-6 animate-fade-in transition-all">
-                  <span>
-                    <Mail className="w-6 h-6 text-white" />
-                  </span>
-                  <div>
-                    <div className="font-bold text-lg">Email was sent!</div>
-                    <div className="text-sm font-medium opacity-90">
-                      Please check your Spam or Promotions folder if you don’t
-                      see it within a few minutes.
-                    </div>
-                  </div>
-                </div>
-              )}
-
               <div className="relative mb-5">
                 <div className="absolute left-3 top-1/2 p-transform -translate-y-1/2 flex items-center gap-2">
                   <Mail className="h-4 w-4 text-black/55" />
