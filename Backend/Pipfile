@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-uvicorn = "*"
 sqlalchemy = "*"
 pydantic = {extras = ["email"], version = "*"}
 passlib = "1.7.4"
@@ -19,7 +18,7 @@ python-slugify = "*"
 slowapi = "*"
 asyncpg = "*"
 httpx = "*"
-fastapi = {extras = ["standard"], version = "*"}
+uvicorn = "*"
 
 [dev-packages]
 
