@@ -19,6 +19,7 @@ slowapi = "*"
 asyncpg = "*"
 httpx = "*"
 uvicorn = "*"
+fastapi = "*"
 
 [dev-packages]
 
