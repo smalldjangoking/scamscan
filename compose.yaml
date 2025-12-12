@@ -7,7 +7,7 @@ services:
     container_name: scamscan-backend
     restart: always
     ports:
-      - "8000:80"
+      - "443:443"
     depends_on:
       - db
     networks:
@@ -20,6 +20,8 @@ services:
       SMTP_PORT: ${SMTP_PORT}
       SMTP_USER: ${SMTP_USER}
       SMTP_PASS: ${SMTP_PASS}
+    volumes:
+      - ./certs:/certs:ro
 
   db:
     image: postgres:16-alpine

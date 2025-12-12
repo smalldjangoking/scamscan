@@ -13,4 +13,4 @@ RUN pipenv sync --system
 
 
 
-CMD ["fastapi", "run", "main.py", "--port", "80"]
+CMD ["fastapi", "run", "main.py", "--port", "443", "--ssl-certfile", "/certs/cert.pem", "--ssl-keyfile", "/certs/key.pem"]
