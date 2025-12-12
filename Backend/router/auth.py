@@ -70,7 +70,7 @@ async def user_login(userbase: UserLoginSchema, session: SessionDep, response: R
 
         token = await create_token_verify(user.id, purpose='email', session=session)
         await asyncio.create_task(send_confirm_email(user.email, user.nickname, token))
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Verification email has been sent to your address')
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Your email is not verified yet. We've sent you a verification link")
 
     refresh_token = create_refresh_token({"sub": str(user.id)})
     access_token = create_access_token({"sub": str(user.id)})
