@@ -40,7 +40,7 @@ async def user_create(request: Request, user: UserRegistrationSchema, session: S
         await asyncio.create_task(send_confirm_email(user.email, user.nickname, token))
 
     except Exception as error:
-        raise HTTPException(status_code=500, detail=str(error))
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @router.post('/login')
@@ -79,7 +79,7 @@ async def user_login(userbase: UserLoginSchema, session: SessionDep, response: R
         key="refresh_token", 
         value=refresh_token, 
         httponly=True,
-        secure=False,
+        secure=True,
         samesite="lax",
         max_age = (
             REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60 # 30 дней

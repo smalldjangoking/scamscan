@@ -9,6 +9,8 @@ load_dotenv()
 
 BASE_DIR = os.path.dirname(__file__)
 WEBSITE_URL = os.getenv('WEBSITE_URL')
+
+
 env = Environment(
     loader=FileSystemLoader(BASE_DIR),
     autoescape=select_autoescape(["html", "xml"])
@@ -29,7 +31,7 @@ async def send_confirm_email(to_email: str, nickname: str, token: str) -> None:
     html = render_template("email_confirm.html", nickname=nickname, confirm_url=confirm_url)
 
     msg = EmailMessage()
-    msg["From"] = 'Ruslan from ScamScan <no-reply@scamscan.io>'
+    msg["From"] = "ScamScan.io <no-reply@scamscan.io>"
     msg["To"] = to_email
     msg["Subject"] = subject
     msg.set_content(plain)
@@ -47,7 +49,7 @@ async def send_reset_password(to_email: str, nickname: str, token: str) -> None:
     html = render_template("reset_password.html", nickname=nickname, reset_url=reset_url)
 
     msg = EmailMessage()
-    msg["From"] = 'Ruslan from ScamScan <no-reply@scamscan.io>'
+    msg["From"] = "ScamScan.io <no-reply@scamscan.io>"
     msg["To"] = to_email
     msg["Subject"] = subject
     msg.set_content(plain)
