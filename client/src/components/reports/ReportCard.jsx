@@ -112,7 +112,6 @@ const ReportCard = ({
                        rounded-lg border border-border hover:bg-accent/30 
                        transition max-w-full"
                     >
-                        {/* Иконка — crypto или website */}
                         <span className="flex h-5 w-5 items-center justify-center rounded-md bg-muted">
                             {crypto_address ? (
                                 <Wallet className="h-3 w-3 text-muted-foreground" />
@@ -121,7 +120,6 @@ const ReportCard = ({
                             )}
                         </span>
 
-                        {/* Сам адрес — красиво обрезан */}
                         <span className="truncate max-w-[180px] text-left font-medium">
                             {crypto_address || website_url}
                         </span>

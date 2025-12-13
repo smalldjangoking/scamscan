@@ -168,6 +168,7 @@ export default function Reports() {
                                         crypto_address={report?.address.crypto_address}
                                         slug={report?.slug}
                                         id={report?.id}
+                                        views={report?.views}
                                     />
                                 ))}
                             </ul>)

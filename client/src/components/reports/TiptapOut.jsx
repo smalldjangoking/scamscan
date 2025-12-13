@@ -35,7 +35,7 @@ export function TiptapViewer({ html }) {
                 [&_pre]:break-words
                 [&_pre]:max-w-full
                 [&_code]:break-words
-                ${openFull ? "" : " line-clamp-15"}
+                ${openFull ? "" : " line-clamp-5"}
                 `
         }
       >

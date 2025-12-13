@@ -152,7 +152,7 @@ export function useReportCreate() {
     return useMutation({
         mutationFn: async (payload) => {
             const { data } = await reportService.createReport(payload);
-            return data;
+            return data
         }
     });
 }

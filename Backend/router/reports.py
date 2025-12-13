@@ -119,7 +119,7 @@ async def create_report(schema: ReportSchema,
 
     except Exception as e:
         await session.rollback()
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        raise HTTPException(status_code=500, detail=(str(e)))
 
 
 @router.get("/all", status_code=status.HTTP_200_OK)

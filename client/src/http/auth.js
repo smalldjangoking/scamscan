@@ -3,11 +3,11 @@ import store from "../store/store"
 
 const $api = axios.create({
     withCredentials: true,
-    baseURL: import.meta.env.VITE_API_URL || "/api",
+    baseURL: import.meta.env.VITE_API_URL || "/v1",
 })
 
 const $api_no_auth = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || "/api",
+    baseURL: import.meta.env.VITE_API_URL || "/v1",
 })
 
 $api.interceptors.request.use((config) => {
