@@ -7,13 +7,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useCommentCreate } from "../../utils/hook"
 import { Input } from "../ui/Input"
 import { Button } from "../ui/Button"
-import LoadingSpinner  from "../ui/Loading"
+import LoadingSpinner from "../ui/Loading"
 
-export default observer(function CreateComment({ reportId, mainForm=false, labelForm=false, mainCommentId=null }) {
+export default observer(function CreateComment({ reportId, mainForm = false, labelForm = false, mainCommentId = null }) {
     const { store } = useContext(Context)
 
     const schema = Yup.object().shape({
         comment: Yup.string()
+            .trim()
             .max(1000, 'Max 1000 chars')
             .min(10, 'Min 10 chars')
             .required("This field is required"),
