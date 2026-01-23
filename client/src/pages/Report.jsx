@@ -6,17 +6,24 @@ import Authentication from "../components/Authentication.jsx";
 import { Context } from "../main";
 import { observer } from "mobx-react-lite";
 import SeoHead from "../components/Seo.jsx"
+import { setCookie, getCookie } from "../utils/helpers.js"
 
 function Report() {
     const { store } = useContext(Context);
     const [step, setStep] = useState(1);
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const toggleAuth = () => setIsAuthOpen(prev => !prev);
+    const userChoiceOfRegister = getCookie('choiceOfRegistration')
 
     useEffect(() => {
         if (store.accessToken) {
             setStep(2);
         }
+
+        if (userChoiceOfRegister) {
+            setStep(2)
+        }
+
     }, [store.accessToken]);
 
     return (
@@ -45,9 +52,8 @@ function Report() {
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
                 <div className="relative container mx-auto px-4 py-20 md:py-28 min-h-screen md:max-w-4xl">
                     {/* Register proposal */}
-                    {step === 1 && (
+                    {step === 1 && !userChoiceOfRegister && (
                         <>
-                            {/* Header */}
                             <div className="mx-auto mb-12 max-w-6xl text-center">
                                 <h1 className="mb-4 text-4xl tracking-tight md:text-5xl">
                                     Choose Your <span className="text-primary">Protection Level</span>
@@ -105,6 +111,7 @@ function Report() {
 
                                 {/* Unregistered User Card */}
                                 <div className="group relative cursor-pointer" onClick={() => {
+                                    setCookie('choiceOfRegistration', false, 1);
                                     setStep(2);
                                     window.scrollTo({ top: 0, behavior: "smooth" });
                                     }}>
@@ -155,7 +162,6 @@ function Report() {
 
                     {step === 2 && (
                         <>
-                            {/* Header */}
                             <div className="mb-12 max-w-6xl">
                                 <h1 className="text-4xl font-bold">
                                     Fraud <span className="text-primary">Report</span> Submission

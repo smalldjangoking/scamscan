@@ -71,7 +71,7 @@ function Footer() {
                                     { address: "/about-us", label: "About us", external: false },
                                     { address: "/contact", label: "Contact", external: false },
                                     {
-                                        address: "https://api.scamscan.io/v1/docs",
+                                        address: "https://api.scamscan.io/docs",
                                         label: "API",
                                         external: true
                                     },
@@ -102,7 +102,7 @@ function Footer() {
                         </p>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                             <p className="flex flex-row items-center justify-center">API Status <HealthCheck /></p>
-                            <p>version: <span className="font-bold text-sm">1.0.0-beta</span></p>
+                            <p>version: <span className="font-bold text-sm">1.1.0-beta</span></p>
                         </div>
                     </div>
                 </div>

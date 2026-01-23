@@ -13,6 +13,7 @@ import Pagination from "../components/ui/Paginator.jsx";
 import SeoHead from "../components/Seo.jsx"
 import { useLocation } from "react-router-dom";
 import Whois from "../components/scan/whois";
+import { useNavigate } from "react-router-dom";
 
 import {
   FileWarning,
@@ -24,6 +25,7 @@ import {
 } from "lucide-react";
 
 export default function ScanDetail() {
+  const navigator = useNavigate()
   const { web_url, crypto_address } = useParams();
   const location = useLocation()
 
@@ -58,33 +60,6 @@ export default function ScanDetail() {
     page,
     pageSize,
   });
-
-  const whoisMock = [
-    {
-      key: "web_create_date",
-      label: "Domain created",
-      value: "2025-11-21T09:20:30Z",
-      hint: "52 days ago",
-    },
-    {
-      key: "web_expire_date",
-      label: "Expires",
-      value: "2026-11-21T23:59:59Z",
-      hint: "in less than 1 year",
-    },
-    {
-      key: "registrar_name",
-      label: "Registrar",
-      value: "NameCheap, Inc.",
-      hint: null,
-    },
-    {
-      key: "nameservers",
-      label: "Nameservers",
-      value: "ns1.domain.com, ns2.domain.com",
-      hint: "2 records",
-    },
-  ];
 
   useEffect(() => {
     if (addressData && !isAddressFetching) {
@@ -180,8 +155,12 @@ export default function ScanDetail() {
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <FileWarning className="h-10 w-10 text-muted-foreground mb-3" />
               <p className="text-muted-foreground">
-                Address not found.
+                There are no reports yet
               </p>
+
+              <Button onClick={() => navigator('/report')} className="mt-5">
+                Create a Report
+              </Button>
             </div>
           ) : (
             addressData && (

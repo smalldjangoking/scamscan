@@ -21,7 +21,12 @@ router = APIRouter(prefix="/v1/auth", tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/auth/login")
 
 
-@router.post('/create', status_code=status.HTTP_201_CREATED)
+@router.post('/create', 
+             status_code=status.HTTP_201_CREATED,
+             summary="Create Account",
+             description="Registers a new user in the system. Sends a confirmation link via email.",
+             response_description="Returns 201. Step 2 is required. Go to your email to confirm temp link"
+             )
 @limiter.limit("10/hour")
 async def user_create(request: Request, user: UserRegistrationSchema, session: SessionDep):
     """Registration"""
@@ -39,15 +44,30 @@ async def user_create(request: Request, user: UserRegistrationSchema, session: S
         token = await create_token_verify(user.id, purpose='email', session=session)
         await asyncio.create_task(send_confirm_email(user.email, user.nickname, token))
 
+        return {"status": "ok", 'detail': 'User created successfully. Please check your email.'}
+
     except Exception as error:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        raise HTTPException(status_code=500, detail="Something went wrong. Please, repeat in few minutes")
 
 
-@router.post('/login')
+@router.post('/login', 
+             status_code=status.HTTP_200_OK,
+             summary="User Authentication",
+             description="""
+             Authenticates a user and establishes a session.
+             
+             **Security features:**
+             - Sets a `refresh_token` in a **Secure HttpOnly Cookie**.
+             - Returns an `access_token` for immediate API authorization.
+             - Implements brute-force protection (rate limiting).
+             
+             *Note: If email is not verified, a 403 error is returned and a new link is sent.*
+             """,
+             response_description="Access token and token type. Refresh token is set via cookie.")
 async def user_login(userbase: UserLoginSchema, session: SessionDep, response: Response):
     """
     Login
-    format: email, password
+    format: email, password, remeber_me (bool)
     """
 
     user = await get_user_by_email(userbase.email, session)
@@ -94,7 +114,7 @@ async def user_login(userbase: UserLoginSchema, session: SessionDep, response: R
     }
 
 
-@router.post('/logout', status_code=status.HTTP_200_OK)
+@router.post('/logout', status_code=status.HTTP_200_OK, include_in_schema=False)
 async def logout(response: Response):
     """
         logout endpoint, clears the refresh token cookie
@@ -127,7 +147,7 @@ async def web_refresh_token_validator(request: Request, response: Response):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token")
     
 
-@router.patch('/email/verify/{token}', status_code=status.HTTP_200_OK)
+@router.patch('/email/verify/{token}', status_code=status.HTTP_200_OK, include_in_schema=False)
 async def verify_email(token: str, session: SessionDep):    
     token_db = await session.execute(
         select(Email_tokens)
@@ -164,7 +184,7 @@ async def verify_email(token: str, session: SessionDep):
     return {'status': 'ok', 'detail': 'email address was confirmed'}
     
 
-@router.patch('/password/verify/{token}', status_code=status.HTTP_200_OK)
+@router.patch('/password/verify/{token}', status_code=status.HTTP_200_OK, include_in_schema=False)
 async def password_change(
     session: SessionDep,
     token: str = Path(..., description="Token from email to confirm your rights to the account")
@@ -191,7 +211,7 @@ async def password_change(
     return {'status': 'ok'}
 
 
-@router.patch('/password/change/{token}')
+@router.patch('/password/change/{token}', status_code=status.HTTP_200_OK, include_in_schema=False)
 async def password_change_confirm(
     payload: PasswordRestore,
     session: SessionDep,
@@ -231,7 +251,7 @@ async def password_change_confirm(
 
 
 
-@router.post('/password/token/create', status_code=status.HTTP_201_CREATED)
+@router.post('/password/token/create', status_code=status.HTTP_201_CREATED, include_in_schema=False)
 async def restore_password_token_create(payload: EmailRequest, session: SessionDep) -> dict:
     """creates token and saves token to db for restoring password"""
     user = await session.scalar(select(Users).where(Users.email == payload.email))

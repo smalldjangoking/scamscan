@@ -119,7 +119,8 @@ async def create_report(schema: ReportSchema,
 
     except Exception as e:
         await session.rollback()
-        raise HTTPException(status_code=500, detail=(str(e)))
+        logging.error(e, 'Error accured while creating a report')
+        raise HTTPException(status_code=500, detail=('Something went wrong. Try again in few minutes'))
 
 
 @router.get("/all", status_code=status.HTTP_200_OK)
@@ -284,7 +285,7 @@ async def get_report(session: SessionDep,
         ),
     )
 
-@router.get('/{report_id}/comments', status_code=status.HTTP_200_OK)
+@router.get('/{report_id}/comments', status_code=status.HTTP_200_OK, include_in_schema=False)
 async def get_report_comments(session: SessionDep,
                               report_id: int,
                               page: int = Query(ge=0, description="Page number for pagination"),
@@ -314,7 +315,7 @@ async def get_report_comments(session: SessionDep,
     )
 
 
-@router.delete('/delete/{report_id}')
+@router.delete('/delete/{report_id}', include_in_schema=False)
 async def delete_report(session: SessionDep,
                         report_id: int = Path(..., description="Provide Report_Id for deleting specific Report"),
                         user_id: int = Depends(access_token_valid)

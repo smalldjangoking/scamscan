@@ -5,7 +5,7 @@ import commentService from "../services/commentService"
 import CoinGecko from "../services/CoinGecko"
 import AddressService from "../services/addressService"
 import AuthService from "../services/authService"
-import { $api_no_auth } from '../http/auth';
+import $api, { $api_no_auth } from '../http/auth';
 
 
 export function useReports({ user_id, userOnly = false, page = 1, pageSize = 10, filterQuery = {}, debouncedSearch = '' }) {
@@ -347,4 +347,15 @@ export function check_health() {
     })
 }
 
+export function fetchUserData({setUser}) {
+    return useMutation({
+        mutationFn: async () => {
+            const { data } = UserService.me()
+            return data
+        },
+        onSuccess: (data) => {
+            setUser(data)
+        }
+    })
+}
 

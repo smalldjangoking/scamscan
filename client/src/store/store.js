@@ -153,16 +153,4 @@ export default class Store {
       this.errorValid(e)
     }
   }
-
-  async me() {
-    this.setIsLoading(true)
-    try {
-      return await UserService.me();
-    }
-    catch (e) {
-      this.errorValid(e)
-    } finally {
-      this.setIsLoading(false)
-    }
-  }
 }

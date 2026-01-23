@@ -1,7 +1,7 @@
 import { Button } from "./Button.jsx";
 
 export default function Pagination({ page, totalPages, isFetching, onPageChange }) {
-    if (totalPages <= 1) return null;
+    if (!totalPages || totalPages <= 1) return null;
     if (isFetching) return null;
 
     return (

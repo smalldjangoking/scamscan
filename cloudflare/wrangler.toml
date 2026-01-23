@@ -1,0 +1,11 @@
+name = "scamscan-seo-worker"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[[routes]]
+pattern = "scamscan.io/*"
+custom_domain = true
+
+[[routes]]
+pattern = "www.scamscan.io/*"
+custom_domain = true

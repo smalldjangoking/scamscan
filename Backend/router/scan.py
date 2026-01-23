@@ -16,7 +16,7 @@ router = APIRouter(prefix="/v1/scan", tags=["scan"])
 async def get_address(session: SessionDep,
                       v: str = Query(alias="value", description="Address value to search in Addresses", max_length=150,
                                      min_length=5),
-                      s: SubjectEnum = Query(alias="subject", description="[crypto, website] are allowed.")
+                      s: SubjectEnum = Query(alias="subject", description="[crypto, website] are only allowed.")
                       ):
     """Finds Address by Input, Filers by subject"""
 
@@ -76,7 +76,7 @@ async def get_reports(session: SessionDep,
         total_reports=total_count
     )
 
-@router.post('/{address_id}/vote', status_code=status.HTTP_200_OK)
+@router.post('/{address_id}/vote', status_code=status.HTTP_200_OK, include_in_schema=False)
 async def add_vote(session: SessionDep,
                    vote: UserVote,
                    address_id: int = Path(...,),
@@ -108,7 +108,7 @@ async def add_vote(session: SessionDep,
     return {'status': 'ok'}
 
 
-@router.get('/{address_id}/votes', status_code=status.HTTP_200_OK)
+@router.get('/{address_id}/votes', status_code=status.HTTP_200_OK, include_in_schema=False)
 async def get_votes(session: SessionDep,
                     address_id: int = Path(...,)):
     """Retrive all votes [Like, Dislike] by address_id"""

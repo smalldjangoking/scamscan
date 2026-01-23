@@ -152,7 +152,9 @@ export default function Reports() {
                                 <LoadingSpinner />
                             </div>
                         ) : isError ? (
-                            <div>Error</div>
+                            <div className="text-center text-sm text-gray-500 mt-10">
+                                ⚠️ Failed to load data
+                            </div>
                         ) : data?.reports?.length > 0 ? (
                             (<ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                                 {data?.reports.map((report) => (
