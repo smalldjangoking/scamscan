@@ -21,7 +21,7 @@ router = APIRouter(prefix="/v1/ceo", tags=["bot ceo"], include_in_schema=False)
 async def seo_bot_prerender_meta(
     session: SessionDep,
     path: str = Query(description="scamscan url path for prerender data of the page"),
-    query: str = Query(None, description="Path Query params. Only supported: [Page]"),
+    query: str = Query(description="Path Query params. Only supported: [Page]"),
 ):
     """
     Detailed logic for Bot Prerendering
@@ -31,7 +31,8 @@ async def seo_bot_prerender_meta(
     """
 
     path_segments = path.strip("/").split("/")
-    query = parse_qs(query.lstrip("?")).get("page", ["1"])[0]
+    if query:
+        query = parse_qs(query.lstrip("?")).get("page", ["1"])[0]
 
     metadata = MetaData()
 
