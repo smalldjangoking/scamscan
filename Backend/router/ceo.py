@@ -4,7 +4,7 @@ from database_settings import SessionDep
 from urllib.parse import parse_qs
 
 
-router = APIRouter(prefix="/v1/ceo", tags=["bot ceo"], include_in_schema=False)
+router = APIRouter(prefix="/v1/ceo", tags=["bot ceo"])
 
 
 @router.get(
@@ -30,8 +30,6 @@ async def seo_bot_prerender_meta(
     - Fetches dynamic data if needed
     """
 
-    print(path)
-    print(query)
     path_segments = path.strip("/").split("/")
     query = parse_qs(query.lstrip("?")).get("page", ["1"])[0]
 
