@@ -1,5 +1,5 @@
 from fastapi import FastAPI, status
-from router import auth, profile, reports, scan, comments
+from router import auth, profile, reports, scan, comments, ceo
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -35,10 +35,7 @@ logging.basicConfig(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://scamscan.io",
-        "https://www.scamscan.io",
-        ],
+    allow_origins=['*'],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -54,7 +51,7 @@ async def root():
         "message": "Welcome to ScamScan API. Full documentation available at /docs."
     }
 
-@app.get("/v1/check", tags=["Health Check"], status_code=status.HTTP_200_OK)
+@app.get("/v1/check", tags=["Health Check"], status_code=status.HTTP_200_OK, include_in_schema=False)
 def health_check():
     return {"status": "OK", "message": "ScamScan API is up and running."}
 
@@ -64,3 +61,4 @@ app.include_router(profile.router)
 app.include_router(reports.router)
 app.include_router(scan.router)
 app.include_router(comments.router)
+app.include_router(ceo.router)

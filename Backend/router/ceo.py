@@ -4,7 +4,7 @@ from database_settings import SessionDep
 from urllib.parse import parse_qs
 
 
-router = APIRouter(prefix="/v1/ceo", tags=["bot ceo"])
+router = APIRouter(prefix="/v1/ceo", tags=["bot ceo"], include_in_schema=False)
 
 
 @router.get(
