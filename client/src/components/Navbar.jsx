@@ -48,7 +48,10 @@ function Navbar() {
                         ].map((item) => (
                             <a
                                 key={item.address}
-                                onClick={() => navigate(item.address)}
+                                onClick={() => {
+                                    navigate(item.address);
+                                    window.scrollTo({ top: 0, behavior: "smooth" });
+                                }}
                                 className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium cursor-pointer">{item.label}
                             </a>
                         ))}

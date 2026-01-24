@@ -16,6 +16,7 @@ from models import Users
 from fastapi.responses import JSONResponse
 from limiter import limiter
 from services import REFRESH_TOKEN_EXPIRE_DAYS
+import logging
 
 router = APIRouter(prefix="/v1/auth", tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/auth/login")
@@ -47,6 +48,7 @@ async def user_create(request: Request, user: UserRegistrationSchema, session: S
         return {"status": "ok", 'detail': 'User created successfully. Please check your email.'}
 
     except Exception as error:
+        logging.error(error)
         raise HTTPException(status_code=500, detail="Something went wrong. Please, repeat in few minutes")
 
 
