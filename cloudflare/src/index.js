@@ -22,7 +22,8 @@ export default {
         if (!isBot) return response;
 
         try {
-            const seoResponse = await fetch(`https://api.scamscan.io/v1/ceo/meta?path=${encodeURIComponent(url.pathname)}&query=${encodeURIComponent(url.search)}`);
+            const queryString = url.search ? url.search.replace('?', '&') : '';
+            const seoResponse = await fetch(`https://api.scamscan.io/v1/ceo/meta?path=${encodeURIComponent(url.pathname)}${queryString}`);
 
             if (!seoResponse.ok) return response;
             const meta = await seoResponse.json();
