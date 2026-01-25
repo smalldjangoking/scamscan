@@ -341,7 +341,7 @@ export function deleteComment() {
 export function check_health() {
     return useMutation({
         mutationFn: async () => {
-            const res = $api_no_auth.get("/check")
+            const res = await $api_no_auth.get("/check")
             return res
         }
     })
@@ -350,7 +350,7 @@ export function check_health() {
 export function fetchUserData({setUser}) {
     return useMutation({
         mutationFn: async () => {
-            const { data } = UserService.me()
+            const { data } = await UserService.me()
             return data
         },
         onSuccess: (data) => {

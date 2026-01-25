@@ -69,7 +69,7 @@ function Profile() {
     );
 
 
-    const { mutate: getUserData, isError, isLoading: isLoadingUser, isSuccess } = fetchUserData({ setUser })
+    const { mutate: getUserData, isError, isLoading: isLoadingUser, isSuccess: isSuccessUser } = fetchUserData({ setUser })
 
 
     useEffect(() => {
@@ -91,6 +91,10 @@ function Profile() {
             store.logout();
         }
     }, [isSuccessDeleted])
+
+    useEffect(() => {
+        console.log(user)
+    }, [user])
 
     const reportDeleteHandler = (reportId, reportName) => {
         const ok = window.confirm(`Are you sure to delete Report: ${reportName}?`);
@@ -161,7 +165,7 @@ function Profile() {
         );
     }
 
-    if (user && isSuccess) {
+    if (user && isSuccessUser) {
         return (
             <section className="relative">
                 <SeoHead

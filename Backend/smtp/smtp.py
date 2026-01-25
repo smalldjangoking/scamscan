@@ -1,4 +1,3 @@
-import asyncio
 from email.message import EmailMessage
 import aiosmtplib
 import os
@@ -22,7 +21,7 @@ def render_template(template_name: str, **context) -> str:
 
 
 async def send_confirm_email(to_email: str, nickname: str, token: str) -> None:
-    confirm_url = WEBSITE_URL + 'confirm/email/' + token
+    confirm_url = WEBSITE_URL + '/confirm/email/' + token
     subject = "Confirm your email — ScamScan.io"
     plain = (
         f"Hi {nickname},\n\n"
@@ -31,7 +30,7 @@ async def send_confirm_email(to_email: str, nickname: str, token: str) -> None:
     html = render_template("email_confirm.html", nickname=nickname, confirm_url=confirm_url)
 
     msg = EmailMessage()
-    msg["From"] = "ScamScan.io <no-reply@scamscan.io>"
+    msg["From"] = os.getenv("EMAIL_FROM", "no-reply@scamscan.io")
     msg["To"] = to_email
     msg["Subject"] = subject
     msg.set_content(plain)
@@ -40,7 +39,7 @@ async def send_confirm_email(to_email: str, nickname: str, token: str) -> None:
     await send_email(msg)
 
 async def send_reset_password(to_email: str, nickname: str, token: str) -> None:
-    reset_url = WEBSITE_URL + 'confirm/password/' + token
+    reset_url = WEBSITE_URL + '/confirm/password/' + token
     subject = "Reset your password — ScamScan.io"
     plain = (
         f"Hi {nickname},\n\n"
@@ -49,7 +48,7 @@ async def send_reset_password(to_email: str, nickname: str, token: str) -> None:
     html = render_template("reset_password.html", nickname=nickname, reset_url=reset_url)
 
     msg = EmailMessage()
-    msg["From"] = "ScamScan.io <no-reply@scamscan.io>"
+    msg["From"] = os.getenv("EMAIL_FROM", "no-reply@scamscan.io")
     msg["To"] = to_email
     msg["Subject"] = subject
     msg.set_content(plain)
@@ -62,7 +61,7 @@ async def send_email(msg: EmailMessage) -> None:
     await aiosmtplib.send(
         msg,
         hostname=os.getenv("SMTP_HOST"),
-        port=os.getenv("SMTP_PORT"),
+        port=int(os.getenv("SMTP_PORT")),
         username=os.getenv("SMTP_USER"),
         password=os.getenv("SMTP_PASS"),
         start_tls=True,

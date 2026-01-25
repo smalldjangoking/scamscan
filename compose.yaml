@@ -1,7 +1,7 @@
 services:
   backend:
     build:
-      context: ./Backend
+      context: ./backend
       dockerfile: Dockerfile
     image: scamscan-backend:latest
     container_name: scamscan-backend

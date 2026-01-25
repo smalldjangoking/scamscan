@@ -11,6 +11,8 @@ from models import Email_tokens
 import logging
 from fastapi.security import OAuth2PasswordBearer
 import re
+from sqlalchemy.ext.asyncio import AsyncSession
+
 
 load_dotenv()
 
@@ -33,7 +35,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-async def get_user_by_email(email: str, session: dict):
+async def get_user_by_email(email: str, session: AsyncSession):
     """check if user with given email exists, gives none if not"""
     stmt = select(Users).where(Users.email == email)
     result = await session.execute(stmt)
@@ -41,14 +43,14 @@ async def get_user_by_email(email: str, session: dict):
     return user
 
 
-async def nickname_check(nickname: str, session: dict):
+async def nickname_check(nickname: str, session: AsyncSession):
     stmt = select(
         exists().where(Users.nickname == nickname)
     )
     return await session.scalar(stmt)
 
 
-async def add_user(userbase: dict, session: dict):
+async def add_user(userbase: dict, session: AsyncSession):
     """Adds a new user to the database"""
     try:
         user_data = userbase.model_dump()

@@ -18,40 +18,48 @@ async def read_user_me(session: SessionDep, user_id: int = Depends(access_token_
 
     if data:
         return {
-        'email': data.email,
-        'name': data.name,
-        'surname': data.surname,
-        'nickname': data.nickname,
-        'phone': data.phone,
-        'created_at': data.created_at
+            "email": data.email,
+            "name": data.name,
+            "surname": data.surname,
+            "nickname": data.nickname,
+            "phone": data.phone,
+            "created_at": data.created_at,
         }
-    
+
     raise HTTPException(status_code=401, detail="Bad credentials")
 
 
-@router.post('/update/password')
-async def change_password(passwordSchema: ChangePasswordSchema, 
-                          session: SessionDep, 
-                          user_id: int = Depends(access_token_valid)):
+@router.post("/update/password")
+async def change_password(
+    passwordSchema: ChangePasswordSchema,
+    session: SessionDep,
+    user_id: int = Depends(access_token_valid),
+):
     user = await session.get(Users, user_id)
 
+    if not user:
+        return {"status": "bad", "detail": "User is not found."}
+
     user.hashed_password = hash_password(passwordSchema.new_password)
-    
+
     await session.commit()
 
-    return {'message': 'Password changed successfully'}
+    return {"message": "Password changed successfully"}
 
-    
 
-@router.patch('/update/info')
-async def update_user_info(userInfoSchema: UpdateUserInfoSchema, 
-                           session: SessionDep, 
-                           user_id: int = Depends(access_token_valid)):
-    
+@router.patch("/update/info")
+async def update_user_info(
+    userInfoSchema: UpdateUserInfoSchema,
+    session: SessionDep,
+    user_id: int = Depends(access_token_valid),
+):
+
     data = await session.get(Users, user_id)
 
     if userInfoSchema.nickname:
-        result = await session.execute(select(Users).where(Users.nickname == userInfoSchema.nickname))
+        result = await session.execute(
+            select(Users).where(Users.nickname == userInfoSchema.nickname)
+        )
         nickname_user = result.scalar_one_or_none()
 
         if nickname_user:
@@ -62,16 +70,14 @@ async def update_user_info(userInfoSchema: UpdateUserInfoSchema,
             setattr(data, key, value)
 
         await session.commit()
-        return {'status': 'ok', 'message': 'User information was updated successfully'}
+        return {"status": "ok", "message": "User information was updated successfully"}
 
     except Exception as e:
         raise HTTPException(status_code=400, detail="Bad request")
-    
 
 
-@router.delete('/delete/me')
-async def delete_user(session: SessionDep,
-                      user_id: int = Depends(access_token_valid)):
+@router.delete("/delete/me")
+async def delete_user(session: SessionDep, user_id: int = Depends(access_token_valid)):
     """Deletes user and all his data"""
 
     user = await session.get(Users, user_id)
@@ -79,4 +85,4 @@ async def delete_user(session: SessionDep,
     await session.delete(user)
     await session.commit()
 
-    return {'status': 'ok', 'detail': 'User and all his data were deleted'}
+    return {"status": "ok", "detail": "User and all his data were deleted"}
