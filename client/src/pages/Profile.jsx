@@ -194,7 +194,10 @@ function Profile() {
                             <Button onClick={userDeleteHandler} size="sm" variant="destructive">
                                 <UserRoundX /> Delete Account
                             </Button>
-                            <Button onClick={() => store.logout()} size="sm" variant="ghost">
+                            <Button onClick={() => {
+                                store.logout();
+                                
+                                }} size="sm" variant="ghost">
                                 <DoorOpen /> Logout
                             </Button>
                         </div>

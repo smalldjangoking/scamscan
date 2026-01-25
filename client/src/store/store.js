@@ -1,6 +1,5 @@
-import { makeAutoObservable, set } from "mobx";
+import { makeAutoObservable, reaction } from "mobx";
 import AuthService from "../services/authService";
-import UserService from "../services/userService";
 import { jwtDecode } from "jwt-decode";
 
 export default class Store {
@@ -13,9 +12,20 @@ export default class Store {
   constructor() {
     makeAutoObservable(this);
 
+    reaction(
+      () => this.accessToken,
+      (token) => {
+        if (token) {
+          localStorage.setItem("access_token", token);
+        } else {
+          localStorage.removeItem("access_token");
+        }
+      }
+    );
+
     window.addEventListener("storage", (event) => {
-      if (event.key === "access_token") {
-        this.setAccessToken(event.newValue);
+      if (event.key === "access_token" && event.newValue !== this.accessToken) {
+        this.accessToken = event.newValue;
       }
     });
 
