@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy import DateTime, func, String, Boolean, JSON, Integer, CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
-from database_settings import engine
+from database.database_settings import engine
 
 
 class Base(DeclarativeBase):

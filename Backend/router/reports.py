@@ -1,11 +1,11 @@
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Request, Response, Path
 from sqlalchemy.orm import selectinload, joinedload
 
-from database_settings import SessionDep
+from database.database_settings import SessionDep
 from schemas import ReportSchema, ReportsListAPISchema, ReportAPISchema, \
     SingleReportSchema, AddressAPISchema, SingleReport, PublicUserAPISchema, CommentsSchema, CommentSchema
 from sqlalchemy import select, func, or_, update
-from models import Reports, Addresses, Comments, Whois
+from database.models import Reports, Addresses, Comments, Whois
 from fastapi.security import OAuth2PasswordBearer
 import bleach
 from math import ceil

@@ -2,7 +2,7 @@ import os
 import jwt
 import asyncio
 from fastapi import APIRouter, status, HTTPException, Security, Request, Response, Path
-from database_settings import SessionDep
+from database.database_settings import SessionDep
 from schemas import (
     UserRegistrationSchema,
     UserLoginSchema,
@@ -23,11 +23,11 @@ from services import (
 )
 from fastapi.security import OAuth2PasswordBearer
 from smtp.smtp import send_confirm_email, send_reset_password
-from models import Email_tokens
+from database.models import Email_tokens
 from datetime import datetime, timezone
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
-from models import Users
+from database.models import Users
 from fastapi.responses import JSONResponse
 from limiter import limiter
 from services import REFRESH_TOKEN_EXPIRE_DAYS

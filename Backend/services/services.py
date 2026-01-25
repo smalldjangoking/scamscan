@@ -3,11 +3,11 @@ from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import jwt
 from sqlalchemy import select, exists
-from models import Users
+from database.models import Users
 from passlib.context import CryptContext
 from fastapi import HTTPException, status, Depends
 import secrets
-from models import Email_tokens
+from database.models import Email_tokens
 import logging
 from fastapi.security import OAuth2PasswordBearer
 import re

@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy import select, func
-from models import Reports
+from database.models import Reports
 import logging
 import re
 from math import ceil

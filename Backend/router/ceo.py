@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query, status
 from services.metadata import MetaData
-from database_settings import SessionDep
+from database.database_settings import SessionDep
 from urllib.parse import parse_qs
 
 

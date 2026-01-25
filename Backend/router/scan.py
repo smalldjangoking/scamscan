@@ -3,8 +3,8 @@ from math import ceil
 from fastapi import APIRouter, Query, HTTPException, Depends, Path
 from sqlalchemy import select, func, case
 from starlette import status
-from database_settings import SessionDep
-from models import Addresses, Reports, Address_votes
+from database.database_settings import SessionDep
+from database.models import Addresses, Reports, Address_votes
 from schemas import AddressListReportSchema, AddressReportSchema, UserVote, SubjectEnum, AddressAPISchema
 from services import access_token_valid
 from sqlalchemy.orm import selectinload

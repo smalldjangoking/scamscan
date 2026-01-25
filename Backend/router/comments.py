@@ -1,12 +1,12 @@
 from fastapi import APIRouter, HTTPException, Query, status, Path, Depends, Request
 
-from database_settings import SessionDep
+from database.database_settings import SessionDep
 from schemas import CommentsSchema, CommentSchema
 from sqlalchemy import select, func
-from models import Comments
+from database.models import Comments
 from schemas import CommentValid
 from math import ceil
-from models import Comments
+from database.models import Comments
 from services import access_token_valid
 from sqlalchemy.orm import selectinload
 from limiter import limiter

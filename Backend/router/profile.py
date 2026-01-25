@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi import Depends, HTTPException
-from database_settings import SessionDep
-from models import Users
+from database.database_settings import SessionDep
+from database.models import Users
 from router.auth import access_token_valid
 from services import verify_password, hash_password
 from schemas import ChangePasswordSchema

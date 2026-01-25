@@ -10,10 +10,13 @@ import os
 from services import Ip2whoisAPI
 from contextlib import asynccontextmanager
 import logging
+from database.admin import setup_admin
+from database.database_settings import engine
 
 load_dotenv()
 
 API_IP2WHOIS_KEY = os.getenv("API_IP2WHOIS_KEY")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -21,7 +24,11 @@ async def lifespan(app: FastAPI):
     yield
     await app.state.api_ip2whois_client.close()
 
+
 app = FastAPI(lifespan=lifespan)
+
+#Admin panel
+setup_admin(app, engine)
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -37,25 +44,33 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://scamscan.io",
-        "https://www.scamscan.io",],
+        "https://www.scamscan.io",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/", tags=["Root"], status_code=status.HTTP_200_OK)
 async def root():
     return {
         "status": "ok",
         "name": "ScamScan API",
-        "version": "1.0.0",
+        "version": "1.1.1",
         "docs": "/docs",
-        "message": "Welcome to ScamScan API. Full documentation available at /docs."
+        "message": "Welcome to ScamScan API. Full documentation available at /docs.",
     }
 
-@app.get("/v1/check", tags=["Health Check"], status_code=status.HTTP_200_OK, include_in_schema=False)
+
+@app.get(
+    "/v1/check",
+    tags=["Health Check"],
+    status_code=status.HTTP_200_OK,
+    include_in_schema=False,
+)
 def health_check():
-    return {"status": "OK", "message": "ScamScan API is up and running."}
+    return {"status": "ok", "message": "ScamScan API is up and running."}
 
 
 app.include_router(auth.router)
