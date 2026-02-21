@@ -12,11 +12,14 @@ if not DATABASE_URL:
 
 engine = create_async_engine(DATABASE_URL)
 
-new_session = async_sessionmaker(engine, expire_on_commit=False, future=True)
+new_session = async_sessionmaker[AsyncSession](engine, expire_on_commit=False, future=True)
 
 async def get_session():
     async with new_session() as session:
         yield session
+
+
+
 
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]

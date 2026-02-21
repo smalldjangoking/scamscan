@@ -5,13 +5,15 @@ import jwt
 from sqlalchemy import select, exists
 from database.models import Users
 from passlib.context import CryptContext
-from fastapi import HTTPException, status, Depends
+from fastapi import HTTPException, Depends, status
 import secrets
 from database.models import Email_tokens
 import logging
 from fastapi.security import OAuth2PasswordBearer
 import re
 from sqlalchemy.ext.asyncio import AsyncSession
+
+logger = logging.getLogger(__name__)
 
 
 load_dotenv()
@@ -65,7 +67,6 @@ async def add_user(userbase: dict, session: AsyncSession):
     except Exception as e:
         await session.rollback()
         raise e
-    
 
 
 def create_refresh_token(data: dict, expires_in: int = REFRESH_TOKEN_EXPIRE_DAYS):
@@ -144,3 +145,21 @@ def nickname_symbols_check(nickname: str):
 def convert_iso(value: str) -> datetime:
     """convert ISO 8601 date string to datetime object"""
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+async def admin_token_valid(user_id: int, session: AsyncSession) -> bool:
+    """Check if user exists, is active, and has superuser rights."""
+    try:
+        result = await session.execute(
+            select(Users).where(
+                Users.id == user_id,
+                Users.is_superuser == True,
+                Users.is_active == True,
+            )
+        )
+        return result.scalar_one_or_none() is not None
+
+    except Exception as e:
+        logger.error(f"admin_token_valid error: {e}")
+        return False
+
+
