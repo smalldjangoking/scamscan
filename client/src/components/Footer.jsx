@@ -102,7 +102,7 @@ function Footer() {
                         </p>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                             <p className="flex flex-row items-center justify-center">API Status <HealthCheck /></p>
-                            <p>version: <span className="font-bold text-sm">1.1.1-beta</span></p>
+                            <p>version: <span className="font-bold text-sm">1.3.0-beta</span></p>
                         </div>
                     </div>
                 </div>
