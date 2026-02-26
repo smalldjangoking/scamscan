@@ -120,6 +120,7 @@ class CommentAdmin(ModelView, model=Comments):
 
     column_list = [
         Comments.id,
+        
         Comments.report_id,
         Comments.user_id,
         Comments.comment,

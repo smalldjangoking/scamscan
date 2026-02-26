@@ -145,10 +145,3 @@ class Email_tokens(Base):
               nullable=False)
     
     user: Mapped["Users"] = relationship("Users")
-    
-
-
-
-async def setup_database():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)

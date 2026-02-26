@@ -21,6 +21,9 @@ httpx = "*"
 uvicorn = "*"
 fastapi = "*"
 sqladmin = "*"
+alembic = "*"
+pydantic-settings = "*"
+itsdangerous = "*"
 
 [dev-packages]
 

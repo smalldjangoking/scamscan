@@ -9,18 +9,25 @@ services:
     ports:
       - "443:443"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - internal
     environment:
       SECRET_KEY: ${SECRET_KEY}
-      DATABASE_URL: ${DATABASE_URL}
       API_IP2WHOIS_KEY: ${API_IP2WHOIS_KEY}
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
       SMTP_USER: ${SMTP_USER}
       SMTP_PASS: ${SMTP_PASS}
       WEBSITE_URL: ${WEBSITE_URL}
+      ADMIN_SECRET_KEY: ${ADMIN_SECRET_KEY}
+      DATABASE_URL: ${DATABASE_URL}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
     volumes:
       - ./certs:/certs:ro
 
@@ -37,6 +44,11 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 networks:
   internal:
