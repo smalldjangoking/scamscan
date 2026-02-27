@@ -7,7 +7,6 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 load_dotenv()
 
 BASE_DIR = os.path.dirname(__file__)
-WEBSITE_URL = os.getenv('WEBSITE_URL')
 
 
 env = Environment(
@@ -21,7 +20,7 @@ def render_template(template_name: str, **context) -> str:
 
 
 async def send_confirm_email(to_email: str, nickname: str, token: str) -> None:
-    confirm_url = WEBSITE_URL + '/confirm/email/' + token
+    confirm_url = os.getenv('WEBSITE_URL') + '/confirm/email/' + token
     subject = "Confirm your email — ScamScan.io"
     plain = (
         f"Hi {nickname},\n\n"
@@ -39,7 +38,7 @@ async def send_confirm_email(to_email: str, nickname: str, token: str) -> None:
     await send_email(msg)
 
 async def send_reset_password(to_email: str, nickname: str, token: str) -> None:
-    reset_url = WEBSITE_URL + '/confirm/password/' + token
+    reset_url = os.getenv('WEBSITE_URL') + '/confirm/password/' + token
     subject = "Reset your password — ScamScan.io"
     plain = (
         f"Hi {nickname},\n\n"
@@ -64,5 +63,5 @@ async def send_email(msg: EmailMessage) -> None:
         port=int(os.getenv("SMTP_PORT")),
         username=os.getenv("SMTP_USER"),
         password=os.getenv("SMTP_PASS"),
-        start_tls=True,
+        use_tls=True,
     )
