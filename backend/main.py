@@ -83,14 +83,11 @@ app.include_router(scan.router)
 app.include_router(comments.router)
 app.include_router(ceo.router)
 
-
-SITE_URL = "https://scamscan.io"
-
 STATIC_PAGES = [
-    (f"{SITE_URL}/",        "weekly",  "1.0"),
-    (f"{SITE_URL}/scan",    "weekly",  "0.9"),
-    (f"{SITE_URL}/reports", "daily",   "0.9"),
-    (f"{SITE_URL}/report",  "monthly", "0.7"),
+    (f"{os.getenv('WEBSITE_URL')}/",        "weekly",  "1.0"),
+    (f"{os.getenv('WEBSITE_URL')}/scan",    "weekly",  "0.9"),
+    (f"{os.getenv('WEBSITE_URL')}/reports", "daily",   "1.0"),
+    (f"{os.getenv('WEBSITE_URL')}/report",  "monthly", "0.7"),
 ]
 
 
