@@ -37,7 +37,7 @@ class Reports(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True)
-    report_title: Mapped[str] = mapped_column(String(50), nullable=False)
+    report_title: Mapped[str] = mapped_column(String(100), nullable=False)
     report_description: Mapped[str] = mapped_column(String(2000), nullable=False)
 
     address_id: Mapped[int] = mapped_column(ForeignKey("addresses.id", ondelete="CASCADE"), nullable=False)

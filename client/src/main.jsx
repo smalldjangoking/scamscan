@@ -20,6 +20,16 @@ import CookiePolicy from "./pages/CookiePolicy"
 import { HelmetProvider } from "react-helmet-async";
 import AboutUs from "./pages/About";
 import Contact from "./pages/Contact";
+import { useEffect } from "react";
+
+const ADMIN_URL = import.meta.env.VITE_ADMIN_URL || "https://api.scamscan.io/admin";
+
+function AdminRedirect() {
+  useEffect(() => {
+    window.location.replace(ADMIN_URL);
+  }, []);
+  return null;
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,6 +44,8 @@ const store = new Store()
 export const Context = createContext({ store })
 
 const router = createBrowserRouter([
+  { path: "/admin", element: <AdminRedirect /> },
+  { path: "/admin/*", element: <AdminRedirect /> },
   {
     path: '/',
     element: <Layout />,

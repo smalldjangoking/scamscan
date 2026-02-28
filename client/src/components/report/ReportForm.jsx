@@ -24,7 +24,7 @@ function ReportForm() {
 
         report_title: Yup.string()
             .min(10, "At least 10 chars")
-            .max(35, "Max 35 chars")
+            .max(100, "Max 100 chars")
             .required("Title is required"),
 
         report_description: Yup.string()
