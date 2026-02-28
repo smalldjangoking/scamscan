@@ -5,8 +5,8 @@ from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 from fastapi import HTTPException
 from database.models import Users, Reports, Addresses, Comments, Whois
-from database.database_settings import new_session
-from services import access_token_valid, admin_token_valid
+from services import get_user_by_email, verify_password, admin_token_valid
+from database.database_settings import async_session_maker 
 import logging
 
 logger = logging.getLogger(__name__)
@@ -14,34 +14,40 @@ logger = logging.getLogger(__name__)
 
 class AdminAuth(AuthenticationBackend):
     async def login(self, request: Request) -> bool:
-        token = request.cookies.get("access_token")
+        form = await request.form()
+        username, password = form.get("username"), form.get("password")
 
-        if not token:
-            return False
+        async with async_session_maker() as db_session:
+            user = await get_user_by_email(username, db_session)
 
-        try:
-            user_id = access_token_valid(token)
-        except HTTPException:
-            logger.warning("Admin login rejected: invalid or expired token")
-            return False
+            if not user:
+                return False
 
-        async with new_session() as session:
-            is_admin = await admin_token_valid(user_id, session)
+            if not verify_password(password, user.hashed_password):
+                return False
+            
+            if not user.is_superuser:
+                return False
 
-        if not is_admin:
-            logger.warning(f"Admin login rejected: user_id={user_id} is not superuser")
-            return False
+            request.session.update({"user_id": user.id})
 
-        request.session.update({"admin_authenticated": True})
-        return True
+            return True
 
     async def logout(self, request: Request) -> bool:
         request.session.clear()
         return True
 
     async def authenticate(self, request: Request) -> bool:
-        return request.session.get("admin_authenticated") is True
+        user_id = request.session.get("user_id")
 
+        if not user_id:
+            return False
+
+        async with async_session_maker() as db_session:
+            if not await admin_token_valid(user_id, db_session):
+                return False
+
+        return True
 
 class UserAdmin(ModelView, model=Users):
     name = "User"

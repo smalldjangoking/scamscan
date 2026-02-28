@@ -53,7 +53,6 @@ function Input({
                 </label>
             )}
 
-            {/* 👇 Контейнер для иконки и инпута */}
             <div className="relative w-full p-[1px] overflow-visible">
                 {Icon && (
                     <Icon

@@ -1,10 +1,9 @@
-﻿import { MessageSquareWarning, Camera, CircleQuestionMark, WalletMinimal, Globe } from "lucide-react";
-import { useState } from "react";
+import { MessageSquareWarning, CircleQuestionMark, WalletMinimal, Globe } from "lucide-react";
+import { useState, useEffect } from "react";
 import 'react-tooltip/dist/react-tooltip.css';
 import * as Yup from "yup";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useEffect } from "react";
 import { isValidUrl } from "../../utils/helpers.js";
 import { useReportCreate } from '../../utils/hook.js'
 import { Input } from '../ui/Input.jsx'
@@ -172,7 +171,7 @@ function ReportForm() {
                     <div className="flex flex-col gap-3">
                         <h3 className="text-lg font-medium tracking-wider text-foreground">Report Title</h3>
                         <Input aria-invalid={!!errors.report_title} {...register("report_title")} placeholder='Enter a clear and descriptive title for your scam report' />
-
+                        {errors.report_title && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.report_title.message}</p>}
                     </div>
                     {/* Report crypto Address */}
                     {selectedReportSubject === "crypto" && (
@@ -201,7 +200,6 @@ function ReportForm() {
                         </div>
                     )}
 
-                    {errors.report_title && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.report_title.message}</p>}
                     <div className="mt-5">
                         <label className="mb-2 block text-lg font-medium tracking-wider text-foreground">
                             What happened
@@ -222,8 +220,6 @@ function ReportForm() {
                     </div>
                 </div>
 
-                {errors.crypto_object && <p className="mt-2 flex items-center gap-2 text-sm text-destructive"><MessageSquareWarning size="20" />{errors.crypto_object.message}</p>}
-
                 {/* Report website URL */}
                 {selectedReportSubject === "website" && (
                     <div className="mt-5">
@@ -233,16 +229,26 @@ function ReportForm() {
                 )}
 
                 {/* Submit button */}
-                <div className="mt-5 flex items-center gap-3">
-                    <Button disabled={!isValid} onClick={handleSubmit(onSubmit)} className="ml-1">
-                        Submit Report
-                    </Button>
-                    <input
-                        type="checkbox"
-                        className="checkbox-custom"
-                        {...register("check_box.accepted")}
-                    />
-                    <p>I agree to all terms and conditions.</p>
+                <div className="mt-5 flex flex-col gap-3">
+                    <div className="flex items-center gap-3">
+                        <Button disabled={!isValid} onClick={handleSubmit(onSubmit)} className="ml-1">
+                            Submit Report
+                        </Button>
+                        <label className="flex cursor-pointer items-center gap-2">
+                            <input
+                                type="checkbox"
+                                className="checkbox-custom"
+                                {...register("check_box.accepted")}
+                            />
+                            <span>I agree to all terms and conditions.</span>
+                        </label>
+                    </div>
+                    {errors.check_box && (
+                        <p className="flex items-center gap-2 text-sm text-destructive">
+                            <MessageSquareWarning size={20} />
+                            {errors.check_box?.accepted?.message ?? errors.check_box?.message}
+                        </p>
+                    )}
                 </div>
             </div>
 

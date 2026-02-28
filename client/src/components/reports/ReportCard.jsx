@@ -51,7 +51,6 @@ const ReportCard = ({
         );
     };
 
-    const isCrypto = Boolean(crypto_address);
     const isWebsite = Boolean(website_url);
 
     return (
