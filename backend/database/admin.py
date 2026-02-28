@@ -21,14 +21,17 @@ class AdminAuth(AuthenticationBackend):
             user = await get_user_by_email(username, db_session)
 
             if not user:
+                print("User not found")
                 return False
 
             if not verify_password(password, user.hashed_password):
+                print("Password is incorrect")
                 return False
             
             if not user.is_superuser:
+                print("User is not superuser")
                 return False
-
+            print("Access granted")
             request.session.update({"user_id": user.id})
 
             return True
