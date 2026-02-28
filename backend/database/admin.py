@@ -3,10 +3,9 @@ import os
 from sqladmin import Admin, ModelView
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
-from fastapi import HTTPException
 from database.models import Users, Reports, Addresses, Comments, Whois
 from services import get_user_by_email, verify_password, admin_token_valid
-from database.database_settings import async_session_maker 
+from database.database_settings import new_session 
 import logging
 
 logger = logging.getLogger(__name__)
@@ -17,7 +16,7 @@ class AdminAuth(AuthenticationBackend):
         form = await request.form()
         username, password = form.get("username"), form.get("password")
 
-        async with async_session_maker() as db_session:
+        async with new_session() as db_session:
             user = await get_user_by_email(username, db_session)
 
             if not user:
@@ -46,7 +45,7 @@ class AdminAuth(AuthenticationBackend):
         if not user_id:
             return False
 
-        async with async_session_maker() as db_session:
+        async with new_session() as db_session:
             if not await admin_token_valid(user_id, db_session):
                 return False
 
