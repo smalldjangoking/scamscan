@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     SMTP_PASS: str
     WEBSITE_URL: str
     ADMIN_SECRET_KEY: str
+    ENVIRONMENT: str # - Set to LOCAL for development or PRODUCTION
 
     @property
     def DATABASE_URL(self):
