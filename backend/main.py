@@ -1,3 +1,4 @@
+from ast import If
 from fastapi import FastAPI, status
 from fastapi.responses import Response
 from router import auth, profile, reports, scan, comments, ceo
@@ -15,6 +16,7 @@ from database.admin import setup_admin
 from database.database_settings import engine, SessionDep
 from database.models import Reports
 from sqlalchemy import select
+from settings import settings
 
 load_dotenv()
 
@@ -42,13 +44,18 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
 )
 
+allow_origins=[
+        "https://scamscan.io",
+        "https://www.scamscan.io",
+    ]
+
+if settings.ENVIRONMENT == "LOCAL":
+    allow_origins.append("*")
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://scamscan.io",
-        "https://www.scamscan.io",
-    ],
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -118,7 +125,7 @@ async def sitemap(session: SessionDep):
 
     for row in report_rows:
         lastmod = (row.updated_at or row.created_at).strftime("%Y-%m-%d")
-        loc = f"{SITE_URL}/report/show/{row.id}/{row.slug}"
+        loc = f"{os.getenv('WEBSITE_URL')}/report/show/{row.id}/{row.slug}"
         url_entries.append(
             f"  <url>\n"
             f"    <loc>{loc}</loc>\n"
